@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import os
@@ -9,7 +8,19 @@ from feature_engineering import show_feature_engineering_playground
 
 st.set_page_config(page_title="Titanic AutoML Tracker", layout="wide")
 
-tab1, tab2 = st.tabs(["📊 Leaderboard", "🧠 Notebook Insights"])
+tab1, tab2, tab3 = st.tabs(["📊 Leaderboard", "🧠 Notebook Insights", "🧪 Feature Playground"])
+
+with tab1:
+    st.title("🚢 Titanic AutoML Tracker")
+    st.markdown("Upload your submission files, compare model scores, and launch AutoML runs.")
+    # (Leaderboard code goes here...)
+
+with tab2:
+    show_notebook_insights()
+
+with tab3:
+    show_feature_engineering_playground()
+
 
 with tab1:
     st.title("🚢 Titanic AutoML Tracker")
@@ -38,11 +49,4 @@ with tab1:
         history = pd.read_csv("submissions.csv")
         st.dataframe(history.sort_values("Score", ascending=False).reset_index(drop=True))
 
-tab1, tab2, tab3 = st.tabs(["📊 Leaderboard", "🧠 Notebook Insights", "🧪 Feature Playground"])
 
-with tab1:
-    # leaderboard code...
-with tab2:
-    show_notebook_insights()
-with tab3:
-    show_feature_engineering_playground()
