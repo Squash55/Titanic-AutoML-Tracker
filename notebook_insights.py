@@ -8,7 +8,8 @@ def show_notebook_insights():
 
     with st.expander("1. Titanic Top 1% EDA + Feature Engineering + XGBoost (Score: 0.80383)"):
         st.markdown("**Key Features Used:**")
-        st.markdown("- " + "\n- ".join(note['features']))
+       for feature in note['features']:
+        st.markdown(f"- {feature}")
         st.markdown("**Model(s):** " + ", ".join(note['models']))
         st.markdown("[🔗 View Full Notebook](https://www.kaggle.com/code/startupsci/titanic-data-science-solutions)")
     
