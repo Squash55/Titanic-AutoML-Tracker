@@ -2,7 +2,6 @@
 import streamlit as st
 import pandas as pd
 import os
-
 from utils import evaluate_submission
 from notebook_insights import show_notebook_insights
 
