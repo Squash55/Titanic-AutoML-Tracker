@@ -5,6 +5,7 @@ import os
 from utils import evaluate_submission
 from notebook_insights import show_notebook_insights
 from feature_engineering import show_feature_engineering_playground
+from autofe import show_feature_engineering_playground
 
 st.set_page_config(page_title="Titanic AutoML Tracker", layout="wide")
 
