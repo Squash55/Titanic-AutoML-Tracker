@@ -5,6 +5,7 @@ import os
 
 from utils import evaluate_submission
 from notebook_insights import show_notebook_insights
+from feature_engineering import show_feature_engineering_playground
 
 st.set_page_config(page_title="Titanic AutoML Tracker", layout="wide")
 
@@ -37,5 +38,11 @@ with tab1:
         history = pd.read_csv("submissions.csv")
         st.dataframe(history.sort_values("Score", ascending=False).reset_index(drop=True))
 
+tab1, tab2, tab3 = st.tabs(["📊 Leaderboard", "🧠 Notebook Insights", "🧪 Feature Playground"])
+
+with tab1:
+    # leaderboard code...
 with tab2:
     show_notebook_insights()
+with tab3:
+    show_feature_engineering_playground()
