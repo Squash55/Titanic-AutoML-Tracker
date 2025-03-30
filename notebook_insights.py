@@ -1,11 +1,4 @@
-import streamlit as st
-import pandas as pd
-import os
 
-from utils import evaluate_submission
-from notebook_insights import show_notebook_insights  # 👈 make sure this is aligned with others
-
-st.set_page_config(page_title="Titanic AutoML Tracker", layout="wide")
 
 import streamlit as st
 
