@@ -1,4 +1,4 @@
-
+from notebook_insights import show_notebook_insights
 import streamlit as st
 import pandas as pd
 import os
@@ -33,3 +33,5 @@ if os.path.exists("submissions.csv"):
     st.subheader("📈 Submission History")
     history = pd.read_csv("submissions.csv")
     st.dataframe(history.sort_values("Score", ascending=False).reset_index(drop=True))
+if st.sidebar.button("🧠 Notebook Insights"):
+    show_notebook_insights()
