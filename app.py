@@ -6,7 +6,6 @@ import os
 from utils import evaluate_submission
 from notebook_insights import show_notebook_insights
 from dse_tracker_panel import show_dse_maturity_panel
-from feature_importance_panel import show_feature_importance_panel
 from feature_importance_compare import show_feature_importance_panel
 
 st.set_page_config(page_title="Titanic AutoML Tracker", layout="wide")
