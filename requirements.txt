@@ -4,3 +4,4 @@ numpy
 autofeat
 featuretools
 scikit-learn
+setuptools
