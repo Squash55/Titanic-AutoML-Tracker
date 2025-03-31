@@ -1,34 +1,6 @@
 
 import streamlit as st
 
-def show_dse_maturity_panel():
-    st.title("📋 DSE Maturity Tracker")
-    st.markdown("Track your progress on the 20 most powerful Data Science Experiments (DSEs).")
-
-    # ✅ Move initialization here
-    if "dse_status" not in st.session_state:
-        st.session_state.dse_status = {
-            section: {dse: "Red" for dse in items} for section, items in dse_experiments.items()
-        }
-
-    if "dse_notes" not in st.session_state:
-        st.session_state.dse_notes = {
-            section: {dse: "" for dse in items} for section, items in dse_experiments.items()
-        }
-
-    # ✅ Now it's safe to reference session_state below
-    ...
-
-if "dse_status" not in st.session_state:
-    st.session_state.dse_status = {
-        section: {dse: "Red" for dse in items} for section, items in dse_experiments.items()
-    }
-
-if "dse_notes" not in st.session_state:
-    st.session_state.dse_notes = {
-        section: {dse: "" for dse in items} for section, items in dse_experiments.items()
-    }
-
 # Define DSE experiment categories and items
 dse_experiments = {
     "A. Data Preparation & Wrangling": [
@@ -61,7 +33,7 @@ dse_experiments = {
     ]
 }
 
-# Initialize session state for progress and notes
+# Initialize session state
 if "dse_status" not in st.session_state:
     st.session_state.dse_status = {
         section: {dse: "Red" for dse in items} for section, items in dse_experiments.items()
@@ -72,6 +44,7 @@ if "dse_notes" not in st.session_state:
         section: {dse: "" for dse in items} for section, items in dse_experiments.items()
     }
 
+# Main display function
 def show_dse_maturity_panel():
     st.title("📋 DSE Maturity Tracker")
     st.markdown("Track your progress on the 20 most powerful Data Science Experiments (DSEs).")
@@ -95,7 +68,7 @@ def show_dse_maturity_panel():
             st.markdown(f"**Status:** {status}")
             note_key = f"note-{section}-{dse}"
             st.session_state.dse_notes[section][dse] = st.text_input(
-                f"Notes for {dse}", 
+                f"Notes for {dse}",
                 value=st.session_state.dse_notes[section][dse],
                 key=note_key
             )
