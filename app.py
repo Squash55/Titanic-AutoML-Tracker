@@ -6,13 +6,15 @@ import os
 from utils import evaluate_submission
 from notebook_insights import show_notebook_insights
 from dse_tracker_panel import show_dse_maturity_panel
+from feature_importance_panel import show_feature_importance_panel
 
 st.set_page_config(page_title="Titanic AutoML Tracker", layout="wide")
 
-tab1, tab2, tab3 = st.tabs([
+tab1, tab2, tab3, tab6 = st.tabs([
     "📊 Leaderboard",
     "🧠 Notebook Insights",
     "📋 DSE Tracker"
+    "📊 Feature Importance + Suggestions"
 ])
 
 # Tab 1: Leaderboard
@@ -50,6 +52,10 @@ with tab2:
 # Tab 3: DSE Tracker
 with tab3:
     show_dse_maturity_panel()
+
+with tab6:
+    show_feature_importance_panel()
+
 
 # Commented out tabs (to be re-enabled later)
 # from autofe import show_autofe_playground
