@@ -4,11 +4,11 @@ import os
 
 from utils import evaluate_submission
 from notebook_insights import show_notebook_insights
-from autofe import show_autofe_playground
+# from autofe import show_autofe_playground
 from feature_engineering import show_feature_engineering_playground
-from automl_launcher import show_automl_launcher
+# from automl_launcher import show_automl_launcher
 from dse_tracker_panel import show_dse_maturity_panel
-from algo_selector_dual_panel import show_algo_selector
+# from algo_selector_dual_panel import show_algo_selector
 
 st.set_page_config(page_title="Titanic AutoML Tracker", layout="wide")
 
@@ -30,14 +30,14 @@ with tab1:
 with tab2:
     show_notebook_insights()
 
-with tab3:
+# with tab3:
     show_autofe_playground()
 
-with tab4:
+# with tab4:
     show_automl_launcher()
 
 with tab5:
     show_dse_maturity_panel()
 
-with tab6:
+# with tab6:
     show_algo_selector()
