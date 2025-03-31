@@ -2,75 +2,57 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import KBinsDiscretizer
 from autofeat import AutoFeatRegressor
 import featuretools as ft
 
-# --- Manual Feature Engineering Functions ---
-def manual_engineering(df):
-    df = df.copy()
-    df['Title'] = df['Name'].str.extract(' ([A-Za-z]+)\.', expand=False)
-    df['FamilySize'] = df['SibSp'] + df['Parch'] + 1
-    df['IsAlone'] = (df['FamilySize'] == 1).astype(int)
-    df['FareBin'] = pd.qcut(df['Fare'], 4, labels=False)
-    df['AgeGroup'] = pd.cut(df['Age'], bins=[0, 12, 18, 35, 60, 120], labels=['Child', 'Teen', 'YoungAdult', 'Adult', 'Senior'])
-    df['CabinKnown'] = df['Cabin'].notnull().astype(int)
-    return df
+def show_autofe_playground():
+    st.title("🧪 Feature Engineering Playground")
+    st.markdown("Try different feature engineering techniques and preview results.")
 
-# --- Autofeat Feature Engineering ---
-def autofeat_engineering(df):
-    df = df.copy()
-    df = df.drop(columns=["Name", "Ticket", "Cabin", "Embarked"], errors="ignore")
-    df = df.select_dtypes(include=[np.number]).dropna()
-    if df.shape[0] < 5:
-        return df  # Not enough rows to run autofeat
-    afr = AutoFeatRegressor(verbose=0, feateng_steps=2)
-    try:
-        X_feat = afr.fit_transform(df.drop(columns=["Survived"], errors="ignore"), df["Survived"] if "Survived" in df else np.zeros(len(df)))
-        return pd.DataFrame(X_feat)
-    except:
-        return df  # fallback
-
-# --- Featuretools Engineering ---
-def featuretools_engineering(df):
-    df = df.copy()
-    df = df.reset_index(drop=True)
-    es = ft.EntitySet(id="titanic_data")
-    es = es.add_dataframe(dataframe_name="titanic", dataframe=df, index="index")
-    feature_matrix, _ = ft.dfs(entityset=es, target_dataframe_name="titanic", max_depth=2)
-    return feature_matrix
-
-# --- Main Playground Function ---
-def show_feature_engineering_playground():
-    st.header("🧪 Auto Feature Engineering Playground")
-
-    uploaded = st.file_uploader("Upload Titanic dataset (CSV)", type=["csv"], key="autofe")
+    uploaded = st.file_uploader("Upload your Titanic training dataset (CSV)", type=["csv"], key="feupload")
 
     if uploaded:
         df = pd.read_csv(uploaded)
-        st.markdown("### 🔍 Feature Engineering Strategy")
-        option = st.selectbox(
-            "Choose a feature engineering method:",
-            ["Raw", "Manual (Notebook Inspired)", "Autofeat (Polynomial & Interactions)", "Featuretools (Deep Features)"]
-        )
+        st.subheader("📊 Raw Data Preview")
+        st.dataframe(df.head())
 
-        if option == "Raw":
-            st.info("Using the dataset as-is, with no modifications.")
-            transformed = df.copy()
+        method = st.selectbox("Choose a Feature Engineering Strategy", [
+            "Raw",
+            "Manual (Title, IsAlone, CabinKnown)",
+            "Autofeat (Polynomial/Interaction Features)",
+            "Featuretools (Deep Feature Synthesis)"
+        ])
 
-        elif option == "Manual (Notebook Inspired)":
-            st.info("Applying classic Kaggle-engineered features like Title, IsAlone, FareBin, etc.")
-            transformed = manual_engineering(df)
+        if method == "Raw":
+            st.info("Showing original dataset.")
+            fe_df = df.copy()
 
-        elif option == "Autofeat (Polynomial & Interactions)":
-            st.info("Running autofeat to generate nonlinear polynomial features from numeric columns.")
-            transformed = autofeat_engineering(df)
+        elif method == "Manual (Title, IsAlone, CabinKnown)":
+            fe_df = df.copy()
+            fe_df['Title'] = fe_df['Name'].str.extract(' ([A-Za-z]+)\.', expand=False)
+            fe_df['IsAlone'] = ((fe_df['SibSp'] + fe_df['Parch']) == 0).astype(int)
+            fe_df['CabinKnown'] = fe_df['Cabin'].notnull().astype(int)
+            st.success("Manual features added.")
 
-        elif option == "Featuretools (Deep Features)":
-            st.info("Using Featuretools to automatically generate deep, stacked features.")
-            transformed = featuretools_engineering(df)
+        elif method == "Autofeat (Polynomial/Interaction Features)":
+            df_num = df.select_dtypes(include=np.number).drop(columns=["PassengerId", "Survived"], errors='ignore')
+            model = AutoFeatRegressor(verbose=0)
+            X_transformed = model.fit_transform(df_num.values, df_num.columns)
+            fe_df = pd.DataFrame(X_transformed, columns=model.new_feature_names_)
+            st.success("Autofeat features generated.")
 
-        st.markdown("### 🧬 Transformed Dataset Preview")
-        st.dataframe(transformed.head())
+        elif method == "Featuretools (Deep Feature Synthesis)":
+            try:
+                df['PassengerId'] = df['PassengerId'].astype(int)
+                es = ft.EntitySet(id="titanic")
+                es = es.add_dataframe(dataframe_name="passengers", dataframe=df, index="PassengerId")
+                fe_df, _ = ft.dfs(entityset=es, target_dataframe_name="passengers", max_depth=1)
+                st.success("Featuretools deep features generated.")
+            except Exception as e:
+                st.error(f"Featuretools failed: {e}")
+                return
 
-        csv = transformed.to_csv(index=False).encode("utf-8")
-        st.download_button("📥 Download Transformed CSV", data=csv, file_name="autofe_transformed.csv", mime="text/csv")
+        st.subheader("🔍 Transformed Features")
+        st.dataframe(fe_df.head())
+        st.download_button("Download Features CSV", data=fe_df.to_csv(index=False), file_name="engineered_features.csv")
