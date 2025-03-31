@@ -5,6 +5,7 @@ import os
 from utils import evaluate_submission
 from notebook_insights import show_notebook_insights
 from autofe import show_autofe_playground
+from feature_engineering import show_feature_engineering_playground
 from automl_launcher import show_automl_launcher
 from dse_tracker_panel import show_dse_maturity_panel
 
