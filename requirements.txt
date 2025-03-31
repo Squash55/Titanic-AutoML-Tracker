@@ -1,8 +1,8 @@
+streamlit
+pandas
+numpy
+scikit-learn
 featuretools
 woodwork
 autofeat
-scikit-learn
-pandas
-numpy
-streamlit
 setuptools
