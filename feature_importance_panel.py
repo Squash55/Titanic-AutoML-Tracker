@@ -3,46 +3,61 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestClassifier
 
 def show_feature_importance_panel():
-    st.title("📊 Feature Importance + Suggestions")
+    st.title("📊 Compare Feature Importance (Baseline vs New)")
 
-    uploaded = st.file_uploader("Upload a training dataset (with target)", type=["csv"])
-    target_col = st.text_input("Enter the target column name")
+    col1, col2 = st.columns(2)
+    with col1:
+        base_file = st.file_uploader("📁 Upload Baseline CSV", type=["csv"], key="base")
+    with col2:
+        new_file = st.file_uploader("📁 Upload New Feature CSV", type=["csv"], key="new")
 
-    if uploaded and target_col:
-        df = pd.read_csv(uploaded)
-        if target_col not in df.columns:
-            st.error(f"❌ '{target_col}' not found in dataset.")
+    target_col = st.text_input("🎯 Enter the target column name (must exist in both files)")
+
+    if base_file and new_file and target_col:
+        df_base = pd.read_csv(base_file)
+        df_new = pd.read_csv(new_file)
+
+        if target_col not in df_base.columns or target_col not in df_new.columns:
+            st.error("❌ Target column not found in both datasets.")
             return
 
-        X = df.drop(columns=[target_col])
-        y = df[target_col]
+        def get_importance(df):
+            X = df.drop(columns=[target_col])
+            y = df[target_col]
+            model = RandomForestClassifier(n_estimators=100, random_state=42)
+            model.fit(X, y)
+            return pd.DataFrame({
+                "Feature": X.columns,
+                "Importance": model.feature_importances_
+            }).sort_values("Importance", ascending=False).reset_index(drop=True)
 
-        # Use a basic model for importance estimation
-        from sklearn.ensemble import RandomForestClassifier
-        model = RandomForestClassifier(n_estimators=100, random_state=42)
-        model.fit(X, y)
+        base_imp = get_importance(df_base)
+        new_imp = get_importance(df_new)
 
-        importances = model.feature_importances_
-        importance_df = pd.DataFrame({
-            "Feature": X.columns,
-            "Importance": importances
-        }).sort_values(by="Importance", ascending=False).reset_index(drop=True)
+        st.subheader("📈 Feature Importance Comparison")
 
-        st.subheader("🔍 Top Feature Importances")
-        st.dataframe(importance_df)
+        merged = pd.merge(base_imp, new_imp, on="Feature", how="outer", suffixes=("_Base", "_New")).fillna(0)
+        merged["Change"] = merged["Importance_New"] - merged["Importance_Base"]
+        merged = merged.sort_values("Importance_New", ascending=False)
 
-        st.subheader("📈 Pareto Chart of Importances")
-        fig, ax = plt.subplots()
-        ax.barh(importance_df["Feature"][::-1], importance_df["Importance"][::-1])
-        ax.set_xlabel("Importance Score")
-        ax.set_ylabel("Feature")
-        ax.set_title("Feature Importance (Random Forest)")
+        st.dataframe(merged.style.background_gradient(axis=0, cmap="RdYlGn", subset=["Change"]))
+
+        st.subheader("📊 Side-by-Side Pareto Charts")
+        fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+        axes[0].barh(base_imp["Feature"][::-1], base_imp["Importance"][::-1])
+        axes[0].set_title("Baseline Importances")
+        axes[1].barh(new_imp["Feature"][::-1], new_imp["Importance"][::-1], color="orange")
+        axes[1].set_title("New Importances")
         st.pyplot(fig)
 
-        st.subheader("💡 Suggestions")
-        top_features = importance_df.head(5)["Feature"].tolist()
-        low_features = importance_df.tail(3)["Feature"].tolist()
-        st.markdown(f"✅ Consider prioritizing these high-impact features: **{', '.join(top_features)}**")
-        st.markdown(f"❌ Consider removing or transforming these lower-impact features: **{', '.join(low_features)}**")
+        st.subheader("💡 Smart Suggestions")
+        gainers = merged[merged["Change"] > 0].head(3)["Feature"].tolist()
+        droppers = merged[merged["Change"] < 0].tail(3)["Feature"].tolist()
+
+        if gainers:
+            st.markdown(f"✅ These features gained importance: **{', '.join(gainers)}**")
+        if droppers:
+            st.markdown(f"⚠️ These features dropped in importance: **{', '.join(droppers)}**")
