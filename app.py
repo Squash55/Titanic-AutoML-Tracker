@@ -31,13 +31,13 @@ with tab2:
     show_notebook_insights()
 
 # with tab3:
-    show_autofe_playground()
+ #   show_autofe_playground()
 
 # with tab4:
-    show_automl_launcher()
+  #  show_automl_launcher()
 
 with tab5:
     show_dse_maturity_panel()
 
 # with tab6:
-    show_algo_selector()
+ #   show_algo_selector()
