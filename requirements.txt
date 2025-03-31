@@ -6,3 +6,5 @@ featuretools
 woodwork
 autofeat
 setuptools
+xgboost
+lightgbm
