@@ -14,3 +14,5 @@ if run_button:
     with st.spinner("Running AutoML..."):
         st.success(f"{automl_tool} run completed! (This is a placeholder result.)")
         st.code("Sample output logs will appear here.", language="bash")
+if selected_tab == "Algorithm Selector":
+    run_algorithm_selector_tab()
