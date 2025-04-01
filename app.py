@@ -1,17 +1,92 @@
 
 import streamlit as st
 
-st.set_page_config(page_title="Titanic AutoML Launcher", layout="wide")
+# -- AutoML Launcher Logic --
+def run_automl_launcher():
+    st.subheader("🚢 Titanic AutoML Launcher")
+    automl_tool = st.selectbox("Choose AutoML Tool", ["TPOT", "H2O.ai"])
+    parallel_mode = st.checkbox("🔁 Run in Parallel (Dask mode)", value=False)
+    if st.button("🚀 Launch AutoML"):
+        with st.spinner("Running AutoML..."):
+            st.success(f"{automl_tool} run completed!")
+            st.code("This is placeholder output. Real model training will be added next.")
 
-st.title("🚢 Titanic AutoML Launcher")
-st.markdown("Select your preferred AutoML tool and run your model below.")
+# -- Algorithm Selector Logic --
+def run_algorithm_selector():
+    st.subheader("🧠 Algorithm Selector (Dual Mode)")
+    mode = st.radio("Select Mode:", ["Classification", "Regression"], horizontal=True)
 
-automl_tool = st.selectbox("Choose AutoML Tool", ["TPOT", "H2O.ai", "AutoGluon (coming soon)", "PyCaret (coming soon)"])
-parallel_mode = st.checkbox("🔁 Run in Parallel (Dask mode)", value=False)
-run_button = st.button("🚀 Launch AutoML")
+    if mode == "Classification":
+        algorithms = {
+            "Logistic Regression": {
+                "Pros": "Interpretable, fast.",
+                "Cons": "Assumes linearity, sensitive to outliers.",
+                "When to Use": "Simple binary problems, baseline models."
+            },
+            "Random Forest": {
+                "Pros": "High accuracy, robust.",
+                "Cons": "Less interpretable.",
+                "When to Use": "General-purpose tabular classification."
+            },
+            "XGBoost": {
+                "Pros": "Top performer in competitions.",
+                "Cons": "Requires tuning, less interpretable.",
+                "When to Use": "Accuracy-critical tabular problems."
+            },
+            "CatBoost": {
+                "Pros": "Handles categorical data natively.",
+                "Cons": "Newer, fewer tutorials.",
+                "When to Use": "Mixed-type data with categorical features."
+            },
+            "TabNet": {
+                "Pros": "Deep learning for tabular data.",
+                "Cons": "Heavier training, less intuitive.",
+                "When to Use": "When capturing complex patterns is critical."
+            }
+        }
+    else:
+        algorithms = {
+            "Linear Regression": {
+                "Pros": "Simple, interpretable.",
+                "Cons": "Assumes linear relationships.",
+                "When to Use": "Fast baseline or simple trends."
+            },
+            "Random Forest Regressor": {
+                "Pros": "Accurate, handles non-linearity.",
+                "Cons": "Can overfit, less interpretable.",
+                "When to Use": "Flexible, general-purpose regression."
+            },
+            "XGBoost Regressor": {
+                "Pros": "Great accuracy, powerful.",
+                "Cons": "Requires tuning.",
+                "When to Use": "When performance is key."
+            },
+            "ExtraTrees Regressor": {
+                "Pros": "Very fast, robust.",
+                "Cons": "Can be noisy.",
+                "When to Use": "Fast ensemble alternative to Random Forest."
+            },
+            "MLP Regressor": {
+                "Pros": "Can model complex patterns.",
+                "Cons": "Needs tuning and data prep.",
+                "When to Use": "Deep relationships in features."
+            }
+        }
 
-if run_button:
-    with st.spinner("Running AutoML..."):
-        st.success(f"{automl_tool} run completed! (This is a placeholder result.)")
-        st.code("Sample output logs will appear here.", language="bash")
+    selected_algo = st.selectbox("Choose an Algorithm:", list(algorithms.keys()))
+    info = algorithms[selected_algo]
+    st.markdown(f"### ℹ️ {selected_algo} Info")
+    st.markdown(f"**Pros:** {info['Pros']}")
+    st.markdown(f"**Cons:** {info['Cons']}")
+    st.markdown(f"**When to Use:** {info['When to Use']}")
 
+# -- Sidebar Navigation --
+st.set_page_config(page_title="Titanic AutoML App", layout="wide")
+st.sidebar.title("📊 Navigation")
+tab = st.sidebar.radio("Choose a Tab:", ["AutoML Launcher", "Algorithm Selector"])
+
+# -- Tab Routing --
+if tab == "AutoML Launcher":
+    run_automl_launcher()
+elif tab == "Algorithm Selector":
+    run_algorithm_selector()
