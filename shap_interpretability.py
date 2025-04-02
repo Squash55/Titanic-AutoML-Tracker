@@ -20,7 +20,7 @@ def run_shap_panel():
     explainer = shap.Explainer(model)
     shap_values = explainer(X)
 
-   st.set_option("deprecation.showPyplotGlobalUse", False)
+    st.set_option("deprecation.showPyplotGlobalUse", False)
     shap.plots.bar(shap_values, show=False)
     st.pyplot()
 
