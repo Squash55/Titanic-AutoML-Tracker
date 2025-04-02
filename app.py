@@ -1,7 +1,7 @@
 import streamlit as st
 st.set_page_config(page_title="Titanic AutoML App", layout="wide")
 
-# Now safely try to import the SHAP panel
+# -- Safely import SHAP Panel --
 try:
     from shap_interpretability import run_shap_panel
 except ImportError:
