@@ -1,12 +1,13 @@
 
 import streamlit as st
+from shap_interpretability import run_shap_panel
 
 # -------------------------------
 # App Setup
 # -------------------------------
 st.set_page_config(page_title="Titanic AutoML App", layout="wide")
 st.sidebar.title("📊 Navigation")
-tab = st.sidebar.radio("Choose a Tab:", ["AutoML Launcher", "Algorithm Selector", "Golden Q&A"])
+tab = st.sidebar.radio("Choose a Tab:", ["AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel"])
 
 # -------------------------------
 # Tab 1: AutoML Launcher
@@ -131,3 +132,5 @@ elif tab == "Algorithm Selector":
     run_algorithm_selector()
 elif tab == "Golden Q&A":
     run_golden_qa()
+elif tab == "SHAP Panel":
+    run_shap_panel()
