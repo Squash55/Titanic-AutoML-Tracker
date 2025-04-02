@@ -43,7 +43,7 @@ def smart_explanation():
     """)
 
 # -- Main app --
-st.set_page_config(page_title="SHAP + Interpretability", layout="wide")
+# st.set_page_config(page_title="SHAP + Interpretability", layout="wide")
 st.title("🔍 SHAP + Interpretability Panel")
 
 df = load_data()
