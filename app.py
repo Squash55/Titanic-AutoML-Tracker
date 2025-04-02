@@ -1,6 +1,8 @@
 
 import streamlit as st
 from shap_interpretability import run_shap_panel
+except ImportError:
+    run_shap_panel = None
 
 # -------------------------------
 # App Setup
@@ -132,5 +134,7 @@ elif tab == "Algorithm Selector":
     run_algorithm_selector()
 elif tab == "Golden Q&A":
     run_golden_qa()
-elif tab == "SHAP Panel":
+elif tab == "SHAP Panel" and run_shap_panel:
     run_shap_panel()
+elif tab == "SHAP Panel":
+    st.error("SHAP Panel is not yet available.")
