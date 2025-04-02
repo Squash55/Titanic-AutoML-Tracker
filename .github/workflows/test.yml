@@ -1,4 +1,4 @@
-name: Internal QA for Titanic App
+name: Full Test Suite
 
 on:
   push:
@@ -7,20 +7,30 @@ on:
     branches: [main]
 
 jobs:
-  test_app_import:
+  full_test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: 3.9
+
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-      - name: Check app.py import
+          pip install pytest flake8
+
+      - name: Lint code with flake8
         run: |
-          python -c "import app"
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Run import tests for all .py files
+        run: |
+          for file in *.py; do
+            echo "Checking $file..."
+            python -c "import $(basename "$file" .py)"
+          done
+
+      - name: Run pytest for golden_qa.py
+        run: |
+          pytest test_golden_qa.py
 
   check_shap_import:
     runs-on: ubuntu-latest
