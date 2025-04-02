@@ -2,6 +2,10 @@ import streamlit as st
 from pathlib import Path
 
 # Load tabs
+def run_golden_qa():
+    st.subheader("🔮 Golden Questions + Smart Answers")
+    ...
+
 def run_automl_launcher():
     st.subheader("🚢 Titanic AutoML Launcher")
     automl_tool = st.selectbox("Choose AutoML Tool", ["TPOT", "H2O.ai"])
@@ -38,5 +42,6 @@ if tab == "AutoML Launcher":
     run_automl_launcher()
 elif tab == "Algorithm Selector":
     run_algorithm_selector()
-if selected_tab == "Golden Q&A":
+elif tab == "Golden Q&A":
     run_golden_qa()
+
