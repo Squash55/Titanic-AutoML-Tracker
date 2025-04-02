@@ -1,53 +1,32 @@
 
-import streamlit as st
 import shap
-import xgboost
 import pandas as pd
-import matplotlib.pyplot as plt
+import streamlit as st
+import xgboost as xgb
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
 
-# -- Load and prepare Titanic data --
-@st.cache_data
-def load_data():
-    df = pd.read_csv("https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv")
-    df = df[['Survived', 'Pclass', 'Sex', 'Age', 'Fare']].dropna()
-    df['Sex'] = LabelEncoder().fit_transform(df['Sex'])
-    return df
+def run_shap_panel():
+    st.header("🔍 SHAP + Interpretability Panel")
+    st.subheader("📊 SHAP Summary Plot")
 
-# -- Load and train sample XGBoost model --
-@st.cache_resource
-def train_model(df):
-    X = df.drop(columns='Survived')
-    y = df['Survived']
-    model = xgboost.XGBClassifier(use_label_encoder=False, eval_metric='logloss')
+    df = pd.read_csv("sample_titanic_data.csv")
+    df = df.dropna()
+    X = df.drop("Survived", axis=1)
+    y = df["Survived"]
+
+    model = xgb.XGBClassifier()
     model.fit(X, y)
-    return model, X, y
 
-# -- SHAP interpretation --
-def plot_shap_summary(model, X):
     explainer = shap.Explainer(model)
     shap_values = explainer(X)
-    st.subheader("📊 SHAP Summary Plot")
-    fig, ax = plt.subplots()
+
+    st.set_option("deprecation.showPyplotGlobalUse", False)
     shap.plots.bar(shap_values, show=False)
-    st.pyplot(fig)
+    st.pyplot()
 
-# -- Smart Interpretation --
-def smart_explanation():
-    st.subheader("🧠 Smart Explanation")
+    st.markdown("### 🧠 Smart Explanation")
     st.markdown("""
-    - **Sex**: The most powerful predictor. Females had much higher survival rates.
-    - **Fare**: Higher fare often meant better class and higher survival odds.
-    - **Pclass**: First-class passengers had better access to lifeboats and survived more.
-    """)
-
-# -- Main app --
-# st.set_page_config(page_title="SHAP + Interpretability", layout="wide")
-st.title("🔍 SHAP + Interpretability Panel")
-
-df = load_data()
-model, X, y = train_model(df)
-
-plot_shap_summary(model, X)
-smart_explanation()
+- **Sex**: The most powerful predictor. Females had much higher survival rates.
+- **Fare**: Higher fare often meant better class and higher survival odds.
+- **Pclass**: First-class passengers had better access to lifeboats and survived more.
+""")
