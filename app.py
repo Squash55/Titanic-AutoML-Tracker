@@ -6,7 +6,7 @@ from shap_interpretability import run_shap_panel
 
 # Now safely try to import the SHAP panel
 try:
-from shap_interpretability import run_shap_panel
+    from shap_interpretability import run_shap_panel
 except ImportError:
     def run_shap_panel():
         st.error("❌ SHAP Panel failed to load. Check shap_interpretability.py is present and correctly named.")
