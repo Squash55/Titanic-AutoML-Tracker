@@ -1,20 +1,14 @@
+
 import streamlit as st
-from shap_interpretability import run_shap_panel  # or try/except version
+from shap_interpretability import run_shap_panel
 
 st.set_page_config(page_title="Titanic AutoML App", layout="wide")
 
-
-
-# -------------------------------
-# App Setup
-# -------------------------------
-st.set_page_config(page_title="Titanic AutoML App", layout="wide")
+# -- Sidebar navigation --
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", ["AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel"])
 
-# -------------------------------
-# Tab 1: AutoML Launcher
-# -------------------------------
+# -- Tab 1: AutoML Launcher --
 def run_automl_launcher():
     st.subheader("🚢 Titanic AutoML Launcher")
     automl_tool = st.selectbox("Choose AutoML Tool", ["TPOT", "H2O.ai"])
@@ -24,13 +18,10 @@ def run_automl_launcher():
             st.success(f"{automl_tool} run completed!")
             st.code("This is placeholder output. Real model training will be added next.")
 
-# -------------------------------
-# Tab 2: Algorithm Selector
-# -------------------------------
+# -- Tab 2: Algorithm Selector --
 def run_algorithm_selector():
     st.subheader("🧠 Algorithm Selector (Dual Mode)")
     mode = st.radio("Select Mode:", ["Classification", "Regression"], horizontal=True)
-
     if mode == "Classification":
         algorithms = {
             "Logistic Regression": {
@@ -95,13 +86,10 @@ def run_algorithm_selector():
     st.markdown(f"**Cons:** {info['Cons']}")
     st.markdown(f"**When to Use:** {info['When to Use']}")
 
-# -------------------------------
-# Tab 3: Golden Q&A
-# -------------------------------
+# -- Tab 3: Golden Q&A --
 def run_golden_qa():
     st.subheader("🔮 Golden Questions + Smart Answers")
     st.markdown("Choose a diagnostic question from the list below. Toggle 'Show Smart Answer' to see an expert-level insight.")
-
     questions = [
         "Which features most influence survival predictions?",
         "Is there a gender gap in model accuracy?",
@@ -109,10 +97,8 @@ def run_golden_qa():
         "Are there any signs of overfitting?",
         "What improvements could boost predictive performance?"
     ]
-
     selected_question = st.selectbox("Select a Golden Question:", questions)
     show_answer = st.checkbox("💡 Show Smart Answer")
-
     if show_answer:
         answers = {
             questions[0]: "Smart Answer: Based on SHAP and model importance, 'Sex', 'Pclass', and 'Fare' are the top survival predictors.",
@@ -126,16 +112,12 @@ def run_golden_qa():
     else:
         st.info("Enable 'Show Smart Answer' to view an AI-generated insight.")
 
-# -------------------------------
-# Tab Router
-# -------------------------------
+# -- Tab Routing --
 if tab == "AutoML Launcher":
     run_automl_launcher()
 elif tab == "Algorithm Selector":
     run_algorithm_selector()
 elif tab == "Golden Q&A":
     run_golden_qa()
-elif tab == "SHAP Panel" and run_shap_panel:
-    run_shap_panel()
 elif tab == "SHAP Panel":
-    st.error("SHAP Panel is not yet available.")
+    run_shap_panel()
