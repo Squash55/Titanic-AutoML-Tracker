@@ -1,8 +1,10 @@
 
 import streamlit as st
-from shap_interpretability import run_shap_panel
+try:
+    from shap_interpretability import run_shap_panel
 except ImportError:
     run_shap_panel = None
+
 
 # -------------------------------
 # App Setup
