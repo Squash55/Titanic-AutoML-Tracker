@@ -1,6 +1,5 @@
 import streamlit as st
 st.set_page_config(page_title="Titanic AutoML App", layout="wide")
-
 from shap_interpretability import run_shap_panel
 
 
