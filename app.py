@@ -9,6 +9,18 @@ except ImportError:
     def run_shap_panel():
         st.error("❌ SHAP Panel failed to load. Check shap_interpretability.py is present and correctly named.")
 
+# -- Sidebar navigation --
+st.sidebar.title("📊 Navigation")
+tab = st.sidebar.radio("Choose a Tab:", ["AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel"])
+
+
+# -- Safely import SHAP Panel --
+try:
+    from shap_interpretability import run_shap_panel
+except ImportError:
+    def run_shap_panel():
+        st.error("❌ SHAP Panel failed to load. Check shap_interpretability.py is present and correctly named.")
+
 
 # -- Safely import SHAP Panel --
 try:
