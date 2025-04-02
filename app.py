@@ -38,3 +38,5 @@ if tab == "AutoML Launcher":
     run_automl_launcher()
 elif tab == "Algorithm Selector":
     run_algorithm_selector()
+if selected_tab == "Golden Q&A":
+    run_golden_qa()
