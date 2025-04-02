@@ -1,7 +1,8 @@
-
+# golden_qa.py
 import streamlit as st
 
-st.set_page_config(page_title="Golden Questions + Smart Answers", layout="wide")
+# DO NOT use st.set_page_config here — only in app.py
+
 st.title("🔮 Golden Questions + Smart Answers")
 
 st.markdown("Choose a diagnostic question from the list below. Toggle 'Show Smart Answer' to see an expert-level insight.")
