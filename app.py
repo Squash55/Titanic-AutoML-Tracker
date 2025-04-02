@@ -1,9 +1,8 @@
-
 import streamlit as st
-try:
-    from shap_interpretability import run_shap_panel
-except ImportError:
-    run_shap_panel = None
+from shap_interpretability import run_shap_panel  # or try/except version
+
+st.set_page_config(page_title="Titanic AutoML App", layout="wide")
+
 
 
 # -------------------------------
