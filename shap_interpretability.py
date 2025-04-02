@@ -11,7 +11,7 @@ def run_shap_panel():
 
     df = pd.read_csv("sample_titanic_data.csv")
     df = df.dropna()
-    X = df.drop("Survived", axis=1)
+    X = pd.get_dummies(df.drop("Survived", axis=1))
     y = df["Survived"]
 
     model = xgb.XGBClassifier()
