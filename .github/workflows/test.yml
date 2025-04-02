@@ -23,9 +23,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Check all Python files for import errors
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Format check with black
+        run: |
+          pip install black
+          black --check .
+
+      - name: Compile all Python files (syntax check)
         run: |
           for file in *.py; do
             echo "Checking $file"
-            python -c "import ${file%%.py}" || exit 1
+            python -m py_compile "$file"
           done
+
+      - name: Check for required files
+        run: |
+          test -f app.py
+          test -f shap_interpretability.py
+          test -f requirements.txt
