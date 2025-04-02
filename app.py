@@ -126,4 +126,3 @@ elif tab == "Golden Q&A":
     run_golden_qa()
 elif tab == "SHAP Panel":
     run_shap_panel()
-```
