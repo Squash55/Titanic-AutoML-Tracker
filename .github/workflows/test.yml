@@ -82,12 +82,19 @@ jobs:
 
 
   check_linting:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install Flake8
-        run: |
-          pip install flake8
-      - name: Run flake8
-        run: |
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Flake8
+      run: |
+        pip install flake8
+
+    - name: Run flake8
+      run: |
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: 🧪 Run pytest for golden_qa.py
+      run: |
+        pip install pytest
+        pytest test_golden_qa.py
