@@ -45,7 +45,7 @@ def run_auto_eda():
         st.warning("⚠️ No training data found. Please run AutoML Comparison first.")
         return
 
-    tabs = st.tabs(["📈 Summary Plots", "🧭 Parallel Coordinates", "🎯 Scatter + R²", "🌧 Raincloud Plot"])
+    tabs = st.tabs(["📈 Summary Plots", "🧭 Parallel Coordinates", "🎯 Scatter + R²", "🌧 Raincloud Plot", "🔴🔵 Jittered Categorical", "🧮 Nomogram"])
 
     with tabs[0]:
         numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns.tolist()
@@ -68,6 +68,12 @@ def run_auto_eda():
 
     with tabs[3]:
         render_raincloud_plot(df)
+
+    with tabs[4]:
+        render_jittered_categorical(df)
+
+    with tabs[5]:
+        render_nomogram_simulation(df)
         render_parallel_coordinates(df)
 def render_parallel_coordinates(df, stratify_col="Survived", normalize=True):
     st.markdown("### 🧭 Parallel Coordinates Plot")
@@ -156,3 +162,74 @@ def render_raincloud_plot(df):
         st.pyplot(fig)
     except Exception as e:
         st.error(f"❌ Raincloud plot failed: {e}")
+
+# Auto EDA extension: Red/Blue Jittered Categorical Plot
+
+import numpy as np
+
+def render_jittered_categorical(df):
+    st.markdown("### 🔴🔵 Jittered Categorical Plot")
+
+    df = df.copy()
+    cat_x = st.selectbox("X Axis (categorical):", df.select_dtypes(include=["object", "category"]).columns.tolist())
+    cat_y = st.selectbox("Y Axis (categorical):", [col for col in df.columns if df[col].dtype == "object" or df[col].dtype.name == "category" or df[col].nunique() < 10 and col != cat_x])
+    outcome = st.selectbox("Outcome (0/1):", df.select_dtypes(include=["int64", "float64"]).columns.tolist())
+
+    if cat_x not in df.columns or cat_y not in df.columns or outcome not in df.columns:
+        st.warning("Select valid columns to plot.")
+        return
+
+    fig, ax = plt.subplots()
+
+    jitter_strength = st.slider("Jitter amount", 0.1, 0.5, 0.2, 0.05)
+    for _, row in df[[cat_x, cat_y, outcome]].dropna().iterrows():
+        color = "blue" if row[outcome] == 0 else "red"
+        x_jitter = np.random.uniform(-jitter_strength, jitter_strength)
+        y_jitter = np.random.uniform(-jitter_strength, jitter_strength)
+        ax.plot(
+            [row[cat_x] + x_jitter], [row[cat_y] + y_jitter],
+            marker='o', markersize=6, color=color, alpha=0.5
+        )
+
+    ax.set_xlabel(cat_x)
+    ax.set_ylabel(cat_y)
+    ax.set_title("Red = 1, Blue = 0")
+    st.pyplot(fig)
+
+# Auto EDA extension: Nomogram Simulation
+
+import shap
+
+def render_nomogram_simulation(df):
+    st.markdown("### 🧮 Nomogram Simulation with Sliders")
+
+    model = _tpot_cache.get("latest_tpot_model") or _tpot_cache.get("latest_rf_model")
+    if model is None:
+        st.warning("⚠️ No model found. Train TPOT or RandomForest first.")
+        return
+
+    numeric_cols = df.select_dtypes(include=["float64", "int64"]).columns.tolist()
+    input_vals = {}
+    st.markdown("Adjust sliders to simulate prediction:")
+
+    for col in numeric_cols[:8]:  # limit for layout
+        min_val = float(df[col].min())
+        max_val = float(df[col].max())
+        step = (max_val - min_val) / 100
+        default = float(df[col].mean())
+        input_vals[col] = st.slider(f"{col}", min_val, max_val, default, step=step)
+
+    input_df = pd.DataFrame([input_vals])
+    try:
+        prob = model.predict_proba(input_df)[0][1]
+        st.success(f"Predicted probability of class 1: **{prob:.3f}**")
+    except Exception as e:
+        st.error(f"Prediction failed: {e}")
+
+    try:
+        explainer = shap.Explainer(model, df[numeric_cols])
+        shap_vals = explainer(input_df)
+        fig = shap.plots.waterfall(shap_vals[0], show=False)
+        st.pyplot(fig)
+    except Exception as e:
+        st.warning("SHAP explanation unavailable for this model or input.")
