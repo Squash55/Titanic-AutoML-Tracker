@@ -1,4 +1,4 @@
-autogluon
+autogluon==0.8.2
 pip install autogluon
 tpot
 fpdf
