@@ -27,9 +27,10 @@ except ImportError:
         st.error("❌ Saved Models panel failed to load.")
 try:
     from automl_comparison import run_automl_comparison
-except ImportError:
+except Exception as e:
     def run_automl_comparison():
-        st.error("❌ AutoML Comparison panel failed to load.")
+        import streamlit as st
+        st.error(f"❌ AutoML Comparison panel failed. {type(e).__name__}: {e}")
 
 # Notebook Scout
 try:
