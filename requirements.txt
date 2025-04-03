@@ -1,3 +1,4 @@
+tpot
 fpdf
 streamlit
 xgboost
