@@ -25,6 +25,11 @@ try:
 except ImportError:
     def run_tpot_saver():
         st.error("❌ Saved Models panel failed to load.")
+try:
+    from automl_comparison import run_automl_comparison
+except ImportError:
+    def run_automl_comparison():
+        st.error("❌ AutoML Comparison panel failed to load.")
 
 # Notebook Scout
 try:
@@ -50,7 +55,7 @@ except ImportError:
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models"
+    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison"
 ])
 
 
@@ -150,6 +155,8 @@ elif tab == "PDF Report":
     run_pdf_report()
 elif tab == "Saved Models":
     run_tpot_saver()
+elif tab == "AutoML Comparison":
+    run_automl_comparison()
 
 
 
