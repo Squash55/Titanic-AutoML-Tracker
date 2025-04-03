@@ -25,7 +25,7 @@ except Exception as e:
     def run_auto_eda():
         st.error("❌ Auto EDA panel failed to load.")
         st.text(f"{type(e).__name__}: {e}")
-        st.text(traceback.format_exc())
+        st.code(traceback.format_exc())
 
         
 try:
