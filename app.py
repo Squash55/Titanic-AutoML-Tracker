@@ -140,3 +140,6 @@ elif tab == "SHAP Waterfall":
 elif tab == "PDF Report":
     run_pdf_report()
 
+except Exception as e:
+    def run_pdf_report():
+        st.error(f"❌ PDF Report module failed. {type(e).__name__}: {e}")
