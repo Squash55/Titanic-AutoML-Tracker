@@ -84,11 +84,17 @@ except ImportError:
     def run_automl_launcher():
         st.error("❌ AutoML Launcher failed to load. Check automl_launcher.py is present.")
 
+try:
+    from saved_models import run_saved_models_panel
+except:
+    def run_saved_models_panel():
+        st.error("❌ Saved Models Panel failed to load.")
+
 # -- Sidebar navigation --
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer"
+    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models"
 ])
 
 
@@ -194,6 +200,9 @@ elif tab == "Ensemble Builder":
     run_ensemble_builder()
 elif tab == "SHAP Comparison":
     run_shap_comparison()
+elif tab == "Saved Models":
+    run_saved_models_panel()
+
 
 
 
