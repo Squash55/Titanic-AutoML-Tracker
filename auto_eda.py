@@ -1,9 +1,5 @@
 import streamlit as st
-from tpot_connector import __dict__ as _tpot_cache  # ✅ this is correct
-
-st.write("X_train in cache:", _tpot_cache.get("latest_X_train"))
-st.write("y_train in cache:", _tpot_cache.get("latest_y_train"))
-st.write("Model in cache:", _tpot_cache.get("latest_tpot_model"))
+from tpot_connector import __dict__ as _tpot_cache
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -15,21 +11,35 @@ from sklearn.preprocessing import MinMaxScaler
 import plotly.express as px
 import plotly.graph_objects as go
 
-
 def run_auto_eda():
     st.title("📊 Auto EDA Dashboard")
-
+    
+    # Check cached data
     df = _tpot_cache.get("latest_X_train")
     y = _tpot_cache.get("latest_y_train")
-    model = _tpot_cache.get("latest_rf_model") or _tpot_cache.get("latest_tpot_model")
-
+    tpot_model = _tpot_cache.get("latest_tpot_model")
+    rf_model = _tpot_cache.get("latest_rf_model")
+    
+    st.write("✅ Cached X_train:", df.head() if df is not None else "❌ Missing")
+    st.write("✅ Cached y_train:", y.head() if y is not None else "❌ Missing")
+    st.write("✅ Cached TPOT Model:", tpot_model if tpot_model is not None else "❌ Missing")
+    st.write("✅ Cached RF Model:", rf_model if rf_model is not None else "❌ Missing")
+    
+    # Check for required data
     if df is None or y is None:
-        st.warning("Train a model first to populate Auto EDA.")
+        st.error("❌ X_train or y_train not found in cache. Run AutoML first.")
         return
 
     df = df.copy()
     df['target'] = y
 
+    # Try both models in order
+    model = tpot_model or rf_model
+    if model is None:
+        st.warning("⚠️ No model found in cache. Please run TPOT or RandomForest AutoML first.")
+        return
+
+    # Select plot type
     tab = st.selectbox("Select EDA View", [
         "Main Effects",
         "Pairwise Scatter + R²",
@@ -39,6 +49,8 @@ def run_auto_eda():
         "Jittered Categorical Plot",
         "3D Rotating Surface"
     ])
+
+    st.success(f"EDA view selected: {tab}. Placeholder content will be added here.")
 
     if tab == "Main Effects":
         st.subheader("📈 Main Effects Plot")
