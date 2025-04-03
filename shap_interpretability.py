@@ -1,39 +1,43 @@
+
+# shap_interpretability.py
+
 import streamlit as st
 import shap
 import matplotlib.pyplot as plt
-import pandas as pd
-import xgboost as xgb
-from sklearn.model_selection import train_test_split
+
+try:
+    from tpot_connector import latest_tpot_model, latest_X_train
+except ImportError:
+    latest_tpot_model = None
+    latest_X_train = None
+
 
 def run_shap_panel():
-    st.title("🔍 SHAP + Interpretability Panel")
-    st.subheader("📊 SHAP Summary Plot")
+    st.subheader("🔍 SHAP Interpretability Panel")
 
-    # Load sample Titanic dataset (or adapt to your actual dataset)
-    df = pd.read_csv("sample_titanic_data.csv")
+    if latest_tpot_model is None or latest_X_train is None:
+        st.warning("⚠️ No trained model found. Please run TPOT in the AutoML Launcher tab first.")
+        return
 
-    # Simple preprocessing
-    df = df.dropna()
-    df = pd.get_dummies(df, columns=["Sex"], drop_first=False)
-    features = ["Sex_male", "Sex_female", "Fare", "Age", "Pclass", "PassengerId"]
-    X = df[features]
-    y = df["Survived"]
+    try:
+        st.info("Generating SHAP summary plot for the latest TPOT model...")
 
-    # Train a simple model
-    model = xgb.XGBClassifier(use_label_encoder=False, eval_metric="logloss")
-    model.fit(X, y)
+        explainer = shap.Explainer(latest_tpot_model.predict, latest_X_train)
+        shap_values = explainer(latest_X_train)
 
-    # Compute SHAP values
-    explainer = shap.Explainer(model)
-    shap_values = explainer(X)
+        st.markdown("### 📈 SHAP Summary Plot")
+        fig, ax = plt.subplots()
+        shap.plots.beeswarm(shap_values, max_display=10, show=False)
+        st.pyplot(fig)
 
-    # Generate SHAP summary plot using future-proof method
-    fig, ax = plt.subplots()
-    shap.summary_plot(shap_values, X, show=False)
-    st.pyplot(fig)
+        st.markdown("### 💡 Top Feature Insights")
+        top_features = shap_values.abs.mean(0).values
+        sorted_indices = top_features.argsort()[::-1]
+        feature_names = latest_X_train.columns[sorted_indices[:3]]
 
-    # Optional: smart explanation
-    st.subheader("🧠 Smart Explanation")
-    st.markdown("**Sex**: The most powerful predictor. Females had much higher survival rates.")
-    st.markdown("**Fare**: Higher fare often meant better class and higher survival odds.")
-    st.markdown("**Pclass**: First-class passengers had better access to lifeboats and survived more.")
+        st.markdown(f"**Top driver:** `{feature_names[0]}`")
+        st.markdown(f"**Secondary factors:** `{feature_names[1]}`, `{feature_names[2]}`")
+
+        st.success("✅ SHAP analysis completed successfully.")
+    except Exception as e:
+        st.error(f"❌ SHAP analysis failed. {type(e).__name__}: {e}")
