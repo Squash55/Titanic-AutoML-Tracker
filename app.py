@@ -24,6 +24,12 @@ try:
 except ImportError:
     def run_golden_qa():
         st.error("❌ Golden Q&A Panel failed to load. Check golden_qa.py is present and correctly named.")
+# automl launcher
+try:
+    from automl_launcher import run_automl_launcher
+except ImportError:
+    def run_automl_launcher():
+        st.error("❌ AutoML Launcher failed to load. Check automl_launcher.py is present.")
 
 # -- Sidebar navigation --
 st.sidebar.title("📊 Navigation")
