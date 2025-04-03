@@ -1,54 +1,40 @@
-# automl_launcher.py
-
 import streamlit as st
+import pandas as pd
 from tpot import TPOTClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-import pandas as pd
-import numpy as np
-
-
-@st.cache_data
-def load_titanic_data():
-    # Simulated Titanic dataset
-    df = pd.read_csv("https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv")
-    df = df.drop(columns=["PassengerId", "Name", "Ticket", "Cabin"])
-    df["Sex"] = df["Sex"].map({"male": 0, "female": 1})
-    df["Embarked"] = df["Embarked"].map({"S": 0, "C": 1, "Q": 2})
-    df = df.fillna(df.median(numeric_only=True))
-    df = df.dropna()
-    X = df.drop("Survived", axis=1)
-    y = df["Survived"]
-    return train_test_split(X, y, test_size=0.2, random_state=42)
+from tpot_connector import _tpot_cache
 
 
 def run_automl_launcher():
-    st.subheader("🚢 Titanic AutoML Launcher (TPOT Demo)")
+    st.title("🚀 TPOT AutoML Launcher")
 
-    st.info("Running a real TPOT model on the Titanic dataset...")
-    X_train, X_test, y_train, y_test = load_titanic_data()
+    uploaded_file = st.file_uploader("Upload CSV Data", type=["csv"])
+    if uploaded_file is not None:
+        df = pd.read_csv(uploaded_file)
+        st.write("📄 Data Preview:", df.head())
 
-    tpot = TPOTClassifier(generations=5, population_size=20, verbosity=2, max_time_mins=2, random_state=42)
-    with st.spinner("⏳ TPOT is optimizing models..."):
-        tpot.fit(X_train, y_train)
+        target_column = st.selectbox("Select Target Column", df.columns)
+        if target_column:
+            X = df.drop(columns=[target_column])
+            y = df[target_column]
 
-    # 🔁 Store model and data for SHAP/Q&A modules
-    from tpot_connector import (
-        __dict__ as _tpot_cache
-    )
-    _tpot_cache["latest_tpot_model"] = tpot.fitted_pipeline_
-    _tpot_cache["latest_X_train"] = X_train
-    _tpot_cache["latest_y_train"] = y_train
-    _tpot_cache["latest_X_test"] = X_test
-    _tpot_cache["latest_y_test"] = y_test
+            if st.button("▶️ Run TPOT AutoML"):
+                with st.spinner("Training TPOT Classifier... this may take a minute..."):
+                    X_train, X_test, y_train, y_test = train_test_split(
+                        X, y, test_size=0.2, random_state=42
+                    )
 
-    y_pred = tpot.predict(X_test)
-    acc = accuracy_score(y_test, y_pred)
+                    tpot = TPOTClassifier(generations=5, population_size=20, verbosity=2)
+                    tpot.fit(X_train, y_train)
 
-    st.success(f"✅ TPOT Finished. Accuracy on Test Set: **{acc:.3f}**")
-    st.markdown("### 📜 Best Pipeline Code")
-    st.code(tpot.export(), language="python")
+                    best_model = tpot.fitted_pipeline_
 
-    st.markdown("### 🧪 Predictions Sample")
-    sample = pd.DataFrame({"Actual": y_test.values[:10], "Predicted": y_pred[:10]})
-    st.dataframe(sample)
+                    # ✅ Store in shared memory so other modules (Auto EDA) can access it
+                    _tpot_cache["latest_X_train"] = X_train
+                    _tpot_cache["latest_y_train"] = y_train
+                    _tpot_cache["latest_tpot_model"] = best_model
+
+                    st.success("✅ TPOT training complete!")
+                    st.code(best_model)
+    else:
+        st.info("👆 Upload a CSV file to get started.")
