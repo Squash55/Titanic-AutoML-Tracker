@@ -22,7 +22,7 @@ def run_shap_panel():
     try:
         st.info("Generating SHAP summary plot for the latest TPOT model...")
 
-        explainer = shap.Explainer(latest_tpot_model.predict, latest_X_train)
+        explainer = shap.Explainer(latest_tpot_model, latest_X_train)
         shap_values = explainer(latest_X_train)
 
         st.markdown("### 📈 SHAP Summary Plot")
