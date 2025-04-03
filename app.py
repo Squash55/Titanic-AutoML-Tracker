@@ -66,7 +66,7 @@ except ImportError:
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder
+    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder"
 ])
 
 
