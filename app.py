@@ -31,6 +31,11 @@ try:
 except Exception as e:
     import streamlit as st
     st.error(f"❌ AutoML Comparison panel failed to load: {type(e).__name__}: {e}")
+try:
+    from shap_comparison import run_shap_comparison
+except:
+    def run_shap_comparison():
+        st.error("❌ SHAP Comparison Panel failed to load.")
 
 
 try:
@@ -68,7 +73,7 @@ except ImportError:
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder"
+    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison"
 ])
 
 
@@ -172,6 +177,8 @@ elif tab == "AutoML Comparison":
     run_automl_comparison()
 elif tab == "Ensemble Builder":
     run_ensemble_builder()
+elif tab == "SHAP Comparison":
+    run_shap_comparison()
 
 
 
