@@ -25,12 +25,14 @@ try:
 except ImportError:
     def run_tpot_saver():
         st.error("❌ Saved Models panel failed to load.")
+
 try:
     from automl_comparison import run_automl_comparison
-except Exception as e:
+except Exception:
     def run_automl_comparison():
         import streamlit as st
-        st.error(f"❌ AutoML Comparison panel failed. {type(e).__name__}: {e}")
+        st.error("❌ AutoML Comparison panel failed to load.")
+
 try:
     from shap_comparison import run_shap_comparison
 except:
