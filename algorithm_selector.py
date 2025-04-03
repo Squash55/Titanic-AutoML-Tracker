@@ -1,72 +1,45 @@
 
+# automl_launcher.py
+
 import streamlit as st
+from tpot import TPOTClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+import pandas as pd
+import numpy as np
 
-st.set_page_config(page_title="Algorithm Selector", layout="wide")
-st.title("🧠 Algorithm Selector (Dual Mode)")
-st.markdown("Toggle between Classification and Regression modes to explore algorithm options.")
 
-mode = st.radio("Select Mode:", ["Classification", "Regression"], horizontal=True)
+@st.cache_data
+def load_titanic_data():
+    # Simulated Titanic dataset
+    df = pd.read_csv("https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv")
+    df = df.drop(columns=["PassengerId", "Name", "Ticket", "Cabin"])
+    df["Sex"] = df["Sex"].map({"male": 0, "female": 1})
+    df["Embarked"] = df["Embarked"].map({"S": 0, "C": 1, "Q": 2})
+    df = df.fillna(df.median(numeric_only=True))
+    df = df.dropna()
+    X = df.drop("Survived", axis=1)
+    y = df["Survived"]
+    return train_test_split(X, y, test_size=0.2, random_state=42)
 
-if mode == "Classification":
-    algorithms = {
-        "Logistic Regression": {
-            "Pros": "Interpretable, fast.",
-            "Cons": "Assumes linearity, sensitive to outliers.",
-            "When to Use": "Simple binary problems, baseline models."
-        },
-        "Random Forest": {
-            "Pros": "High accuracy, robust.",
-            "Cons": "Less interpretable.",
-            "When to Use": "General-purpose tabular classification."
-        },
-        "XGBoost": {
-            "Pros": "Top performer in competitions.",
-            "Cons": "Requires tuning, less interpretable.",
-            "When to Use": "Accuracy-critical tabular problems."
-        },
-        "CatBoost": {
-            "Pros": "Handles categorical data natively.",
-            "Cons": "Newer, fewer tutorials.",
-            "When to Use": "Mixed-type data with categorical features."
-        },
-        "TabNet": {
-            "Pros": "Deep learning for tabular data.",
-            "Cons": "Heavier training, less intuitive.",
-            "When to Use": "When capturing complex patterns is critical."
-        }
-    }
-else:
-    algorithms = {
-        "Linear Regression": {
-            "Pros": "Simple, interpretable.",
-            "Cons": "Assumes linear relationships.",
-            "When to Use": "Fast baseline or simple trends."
-        },
-        "Random Forest Regressor": {
-            "Pros": "Accurate, handles non-linearity.",
-            "Cons": "Can overfit, less interpretable.",
-            "When to Use": "Flexible, general-purpose regression."
-        },
-        "XGBoost Regressor": {
-            "Pros": "Great accuracy, powerful.",
-            "Cons": "Requires tuning.",
-            "When to Use": "When performance is key."
-        },
-        "ExtraTrees Regressor": {
-            "Pros": "Very fast, robust.",
-            "Cons": "Can be noisy.",
-            "When to Use": "Fast ensemble alternative to Random Forest."
-        },
-        "MLP Regressor": {
-            "Pros": "Can model complex patterns.",
-            "Cons": "Needs tuning and data prep.",
-            "When to Use": "Deep relationships in features."
-        }
-    }
 
-selected_algo = st.selectbox("Choose an Algorithm:", list(algorithms.keys()))
-info = algorithms[selected_algo]
-st.markdown(f"### ℹ️ {selected_algo} Info")
-st.markdown(f"**Pros:** {info['Pros']}")
-st.markdown(f"**Cons:** {info['Cons']}")
-st.markdown(f"**When to Use:** {info['When to Use']}")
+def run_automl_launcher():
+    st.subheader("🚢 Titanic AutoML Launcher (TPOT Demo)")
+
+    st.info("Running a real TPOT model on the Titanic dataset...")
+    X_train, X_test, y_train, y_test = load_titanic_data()
+
+    tpot = TPOTClassifier(generations=5, population_size=20, verbosity=2, max_time_mins=2, random_state=42)
+    with st.spinner("⏳ TPOT is optimizing models..."):
+        tpot.fit(X_train, y_train)
+
+    y_pred = tpot.predict(X_test)
+    acc = accuracy_score(y_test, y_pred)
+
+    st.success(f"✅ TPOT Finished. Accuracy on Test Set: **{acc:.3f}**")
+    st.markdown("### 📜 Best Pipeline Code")
+    st.code(tpot.export(), language="python")
+
+    st.markdown("### 🧪 Predictions Sample")
+    sample = pd.DataFrame({"Actual": y_test.values[:10], "Predicted": y_pred[:10]})
+    st.dataframe(sample)
