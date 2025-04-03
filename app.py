@@ -14,9 +14,9 @@ except ImportError:
 # Notebook Scout
 try:
     from notebook_scout import run_notebook_scout
-except ImportError:
+except Exception as e:
     def run_notebook_scout():
-        st.error("❌ Notebook Scout failed to load. Check notebook_scout.py is present and correctly named.")
+        st.error(f"❌ Notebook Scout failed to load. Error: {type(e).__name__}: {e}")
 
 # -- Import Golden Q&A --
 try:
