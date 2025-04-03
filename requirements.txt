@@ -1,3 +1,4 @@
+autogluon
 pip install autogluon
 tpot
 fpdf
