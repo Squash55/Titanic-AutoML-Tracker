@@ -1,4 +1,4 @@
-
+st.write("✅ Ensemble Builder module is loading")
 # ensemble_builder.py
 
 import streamlit as st
