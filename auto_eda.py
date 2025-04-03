@@ -21,7 +21,7 @@ def run_auto_eda():
 
     df = _tpot_cache.get("latest_X_train")
     y = _tpot_cache.get("latest_y_train")
-    model = _tpot_cache.get("latest_tpot_model") or _tpot_cache.get("latest_rf_model")
+    model = _tpot_cache.get("latest_rf_model") or _tpot_cache.get("latest_tpot_model")
 
     if df is None or y is None:
         st.warning("Train a model first to populate Auto EDA.")
