@@ -1,43 +1,54 @@
+# automl_launcher.py
 
 import streamlit as st
+from tpot import TPOTClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 import pandas as pd
+import numpy as np
 
-def run_tpot(df):
-    st.info("🔧 TPOT run would be triggered here.")
-    return df
 
-def run_pycaret(df):
-    st.info("🤖 PyCaret run would be triggered here.")
-    return df
+@st.cache_data
+def load_titanic_data():
+    # Simulated Titanic dataset
+    df = pd.read_csv("https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv")
+    df = df.drop(columns=["PassengerId", "Name", "Ticket", "Cabin"])
+    df["Sex"] = df["Sex"].map({"male": 0, "female": 1})
+    df["Embarked"] = df["Embarked"].map({"S": 0, "C": 1, "Q": 2})
+    df = df.fillna(df.median(numeric_only=True))
+    df = df.dropna()
+    X = df.drop("Survived", axis=1)
+    y = df["Survived"]
+    return train_test_split(X, y, test_size=0.2, random_state=42)
 
-def run_h2o(df):
-    st.info("💧 H2O AutoML run would be triggered here.")
-    return df
 
-def run_autogluon(df):
-    st.info("🧠 AutoGluon run would be triggered here.")
-    return df
+def run_automl_launcher():
+    st.subheader("🚢 Titanic AutoML Launcher (TPOT Demo)")
 
-def show_automl_launcher():
-    st.header("🚀 AutoML Launcher")
-    uploaded = st.file_uploader("Upload processed CSV for AutoML", type=["csv"], key="automl")
+    st.info("Running a real TPOT model on the Titanic dataset...")
+    X_train, X_test, y_train, y_test = load_titanic_data()
 
-    if uploaded:
-        df = pd.read_csv(uploaded)
-        st.markdown("### ✅ Data Preview")
-        st.dataframe(df.head())
+    tpot = TPOTClassifier(generations=5, population_size=20, verbosity=2, max_time_mins=2, random_state=42)
+    with st.spinner("⏳ TPOT is optimizing models..."):
+        tpot.fit(X_train, y_train)
 
-        automl_option = st.selectbox(
-            "Select AutoML Engine to Run",
-            ["TPOT", "PyCaret", "H2O AutoML", "AutoGluon"]
-        )
+    # 🔁 Store model and data for SHAP/Q&A modules
+    from tpot_connector import (
+        __dict__ as _tpot_cache
+    )
+    _tpot_cache["latest_tpot_model"] = tpot.fitted_pipeline_
+    _tpot_cache["latest_X_train"] = X_train
+    _tpot_cache["latest_y_train"] = y_train
+    _tpot_cache["latest_X_test"] = X_test
+    _tpot_cache["latest_y_test"] = y_test
 
-        if st.button("🚀 Run Selected AutoML Engine"):
-            if automl_option == "TPOT":
-                run_tpot(df)
-            elif automl_option == "PyCaret":
-                run_pycaret(df)
-            elif automl_option == "H2O AutoML":
-                run_h2o(df)
-            elif automl_option == "AutoGluon":
-                run_autogluon(df)
+    y_pred = tpot.predict(X_test)
+    acc = accuracy_score(y_test, y_pred)
+
+    st.success(f"✅ TPOT Finished. Accuracy on Test Set: **{acc:.3f}**")
+    st.markdown("### 📜 Best Pipeline Code")
+    st.code(tpot.export(), language="python")
+
+    st.markdown("### 🧪 Predictions Sample")
+    sample = pd.DataFrame({"Actual": y_test.values[:10], "Predicted": y_pred[:10]})
+    st.dataframe(sample)
