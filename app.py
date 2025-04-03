@@ -147,3 +147,4 @@ except Exception as e:
         import streamlit as st
         st.error(f"❌ PDF Report module failed. {type(e).__name__}: {e}")
 
+
