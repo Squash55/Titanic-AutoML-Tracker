@@ -20,10 +20,14 @@ def run_shap_panel():
         return
 
     try:
-        st.info("Generating SHAP summary plot for the latest TPOT model...")
+        st.info("Generating SHAP summary plot for the latest TPOT model (sampled 100 rows)...")
 
-        explainer = shap.Explainer(latest_tpot_model, latest_X_train)
-        shap_values = explainer(latest_X_train)
+        # Sample the training data for faster SHAP computation
+        X_sample = latest_X_train.sample(n=min(100, len(latest_X_train)), random_state=42)
+
+        # Use model directly — SHAP will auto-select best explainer
+        explainer = shap.Explainer(latest_tpot_model, X_sample)
+        shap_values = explainer(X_sample)
 
         st.markdown("### 📈 SHAP Summary Plot")
         fig, ax = plt.subplots()
