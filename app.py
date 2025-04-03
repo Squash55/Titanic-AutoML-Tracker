@@ -11,6 +11,13 @@ except ImportError:
     def run_shap_panel():
         st.error("❌ SHAP Panel failed to load. Check shap_interpretability.py is present and correctly named.")
 
+# Notebook Scout
+try:
+    from notebook_scout import run_notebook_scout
+except ImportError:
+    def run_notebook_scout():
+        st.error("❌ Notebook Scout failed to load. Check notebook_scout.py is present and correctly named.")
+
 # -- Import Golden Q&A --
 try:
     from golden_qa import run_golden_qa
@@ -20,7 +27,7 @@ except ImportError:
 
 # -- Sidebar navigation --
 st.sidebar.title("📊 Navigation")
-tab = st.sidebar.radio("Choose a Tab:", ["AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel"])
+tab = st.sidebar.radio("Choose a Tab:", ["AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel", "Notebook Scout"])
 
 # -- Tab 1: AutoML Launcher --
 def run_automl_launcher():
@@ -110,3 +117,5 @@ elif tab == "Golden Q&A":
     run_golden_qa()
 elif tab == "SHAP Panel":
     run_shap_panel()
+elif tab == "Notebook Scout":
+    run_notebook_scout()
