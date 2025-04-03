@@ -27,6 +27,7 @@ except Exception as e:
         st.text(f"{type(e).__name__}: {e}")
         st.code(traceback.format_exc())
 
+
         
 try:
     from pdf_report import run_pdf_report
