@@ -10,3 +10,5 @@ shap==0.41.0
 matplotlib==3.7.1
 joblib==1.2.0
 fpdf==1.7.2
+seaborn
+ptitprince
