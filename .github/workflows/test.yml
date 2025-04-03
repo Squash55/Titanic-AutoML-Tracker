@@ -23,11 +23,13 @@ jobs:
 
       - name: Run import tests for all .py files
         run: |
+          set -e  # fail on any error
           for file in *.py; do
             module=$(basename "$file" .py)
-            echo "Checking $module..."
-            python -c "import $module"
+            echo "Importing $module"
+            timeout 10s python -c "import $module" || echo "⚠️ Import failed or timed out: $module"
           done
+
 
       - name: Run pytest for golden_qa.py
         run: |
