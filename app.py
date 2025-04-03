@@ -140,6 +140,10 @@ elif tab == "SHAP Waterfall":
 elif tab == "PDF Report":
     run_pdf_report()
 
+try:
+    from pdf_report import run_pdf_report
 except Exception as e:
     def run_pdf_report():
+        import streamlit as st
         st.error(f"❌ PDF Report module failed. {type(e).__name__}: {e}")
+
