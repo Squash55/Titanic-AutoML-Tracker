@@ -17,6 +17,13 @@ except ImportError:
     def run_shap_waterfall():
         st.error("❌ SHAP Waterfall Panel failed to load.")
         
+# Near the top
+try:
+    from auto_eda import run_auto_eda
+except Exception as e:
+    def run_auto_eda():
+        st.error(f"❌ Auto EDA panel failed to load. {type(e).__name__}: {e}")
+        
 try:
     from pdf_report import run_pdf_report
 except ImportError:
@@ -51,12 +58,6 @@ try:
 except:
     def run_shap_comparison():
         st.error("❌ SHAP Comparison Panel failed to load.")
-
-try:
-    from auto_eda import run_auto_eda
-except:
-    def run_auto_eda():
-        st.error("❌ Auto EDA panel failed to load.")
 
 try:
     from shap_comparison import run_shap_comparison
