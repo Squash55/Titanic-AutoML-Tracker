@@ -53,3 +53,16 @@ def get_smart_answers() -> dict:
         "Which features have the most consistent influence?": f"Based on SHAP mean values, features like {top_features[0]} have consistent impact.",
         "Are there any features with unexpected impact?": "SHAP summary can help uncover surprising drivers that weren’t initially expected."
     }
+import streamlit as st  # Add at the top if not already
+
+def run_golden_qa():
+    st.subheader("✨ Golden Q&A Panel")
+
+    questions = get_golden_questions()
+    answers = get_smart_answers()
+
+    for q in questions:
+        st.markdown(f"**Q:** {q}")
+        st.markdown(f":bulb: **A:** {answers.get(q, 'No answer available.')}")
+
+    st.success("✅ Golden Q&A loaded successfully.")
