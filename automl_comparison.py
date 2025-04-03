@@ -42,6 +42,7 @@ def run_automl_comparison():
 
     # Random Forest Baseline
     if st.button("🌲 Run RandomForest Baseline"):
+        _tpot_cache["latest_rf_model"] = model
         start = time.time()
         model = RandomForestClassifier(random_state=42)
         model.fit(X_train, y_train)
