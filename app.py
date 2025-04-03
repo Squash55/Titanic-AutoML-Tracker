@@ -1,8 +1,9 @@
 # app.py
-# Triggering test workflow
-
 import streamlit as st
+import traceback  # <-- move this right after streamlit
+
 st.set_page_config(page_title="Titanic AutoML App", layout="wide")
+
 
 # -- Safely import SHAP Panel --
 try:
