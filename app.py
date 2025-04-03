@@ -36,6 +36,11 @@ try:
 except:
     def run_shap_comparison():
         st.error("❌ SHAP Comparison panel failed to load.")
+try:
+    from ensemble_builder import run_ensemble_builder
+except:
+    def run_ensemble_builder():
+        st.error("❌ Ensemble Builder failed to load.")
 
 # Notebook Scout
 try:
@@ -61,7 +66,7 @@ except ImportError:
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison"
+    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder
 ])
 
 
@@ -163,6 +168,8 @@ elif tab == "Saved Models":
     run_tpot_saver()
 elif tab == "AutoML Comparison":
     run_automl_comparison()
+elif tab == "Ensemble Builder":
+    run_ensemble_builder()
 
 
 
