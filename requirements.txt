@@ -1,3 +1,4 @@
+pip install autogluon
 tpot
 fpdf
 streamlit
