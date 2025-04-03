@@ -22,11 +22,13 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Run import tests for all .py files
-        run: |
-          for file in *.py; do
-            echo "Checking $file..."
-            python -c "import $(basename \"$file\" .py)"
-          done
+   run: |
+     for file in *.py; do
+       module=$(basename "$file" .py)
+       echo "Checking $file..."
+       python -c "import $module"
+     done
+
 
       - name: Run pytest for golden_qa.py
         run: |
