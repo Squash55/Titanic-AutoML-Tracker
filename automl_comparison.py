@@ -9,6 +9,13 @@ from sklearn.ensemble import RandomForestClassifier
 from tpot import TPOTClassifier
 import time
 
+# Optional import for AutoGluon
+try:
+    from autogluon.tabular import TabularPredictor
+    AUTOGLUON_AVAILABLE = True
+except ImportError:
+    AUTOGLUON_AVAILABLE = False
+
 
 @st.cache_data
 def load_titanic_data():
@@ -40,7 +47,7 @@ def run_automl_comparison():
         results.append(("TPOT", acc, end - start))
         st.success(f"TPOT accuracy: {acc:.3f}, time: {end - start:.1f}s")
 
-    # Baseline model (Random Forest)
+    # Random Forest Baseline
     if st.button("🌲 Run RandomForest Baseline"):
         start = time.time()
         model = RandomForestClassifier(random_state=42)
@@ -50,11 +57,26 @@ def run_automl_comparison():
         results.append(("RandomForest", acc, end - start))
         st.success(f"RandomForest accuracy: {acc:.3f}, time: {end - start:.1f}s")
 
-    # Display results
+    # AutoGluon Tabular
+    if st.button("🧠 Run AutoGluon"):
+        if not AUTOGLUON_AVAILABLE:
+            st.error("❌ AutoGluon is not installed. Run: pip install autogluon")
+        else:
+            start = time.time()
+            train_data = X_train.copy()
+            train_data["Survived"] = y_train.values
+            predictor = TabularPredictor(label="Survived", verbosity=0).fit(train_data)
+            y_pred = predictor.predict(X_test)
+            acc = accuracy_score(y_test, y_pred)
+            end = time.time()
+            results.append(("AutoGluon", acc, end - start))
+            st.success(f"AutoGluon accuracy: {acc:.3f}, time: {end - start:.1f}s")
+
+    # Show results table + bar chart
     if results:
         df = pd.DataFrame(results, columns=["Model", "Accuracy", "Training Time (s)"])
         st.markdown("### 📊 Comparison Results")
         st.dataframe(df)
         st.bar_chart(df.set_index("Model")[["Accuracy", "Training Time (s)"]])
     else:
-        st.info("Click buttons above to compare AutoML models.")
+        st.info("Click any button above to run and compare AutoML tools.")
