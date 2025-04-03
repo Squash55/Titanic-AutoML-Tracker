@@ -1,4 +1,4 @@
-st.write("✅ Ensemble Builder module is loading")
+
 # ensemble_builder.py
 
 import streamlit as st
@@ -12,7 +12,7 @@ from tpot_connector import __dict__ as _tpot_cache
 def run_ensemble_builder():
     st.subheader("🧬 Ensemble Builder (TPOT + RandomForest)")
 
-    st.write("✅ Ensemble Builder module is loading")  # DEBUG LINE
+    st.write("✅ Ensemble Builder module is loading")  # Debug confirmation
 
     if "latest_tpot_model" not in _tpot_cache and "latest_rf_model" not in _tpot_cache:
         st.warning("⚠️ No models found in memory. Please run TPOT and RandomForest first.")
@@ -22,6 +22,10 @@ def run_ensemble_builder():
     rf_model = _tpot_cache.get("latest_rf_model")
     X_test = _tpot_cache.get("latest_X_test")
     y_test = _tpot_cache.get("latest_y_test")
+
+    st.write(f"📦 TPOT loaded: {tpot_model is not None}")
+    st.write(f"📦 RF loaded: {rf_model is not None}")
+    st.write(f"📊 Test set available: {X_test is not None and y_test is not None}")
 
     if not tpot_model or not rf_model:
         st.warning("⚠️ Both TPOT and RandomForest models must be trained first.")
@@ -38,21 +42,23 @@ def run_ensemble_builder():
     )
 
     try:
-        ensemble.fit(X_test, y_test)  # Fit is required to set up internal validation
-    except Exception:
-        pass  # Some fitted models (like pipelines) may not need refitting
+        ensemble.fit(X_test, y_test)
+    except Exception as e:
+        st.info(f"ℹ️ Skipped ensemble.fit due to pipeline constraints: {type(e).__name__}: {e}")
 
-    y_pred = ensemble.predict(X_test)
-    acc = accuracy_score(y_test, y_pred)
+    try:
+        y_pred = ensemble.predict(X_test)
+        acc = accuracy_score(y_test, y_pred)
 
-    # Store the ensemble model
-    _tpot_cache["latest_ensemble_model"] = ensemble
+        # Store the ensemble model
+        _tpot_cache["latest_ensemble_model"] = ensemble
 
-    st.success(f"✅ Ensemble accuracy on test set: **{acc:.3f}**")
-
-    st.markdown("### 📊 Sample Predictions (first 10)")
-    sample = pd.DataFrame({
-        "Actual": y_test[:10].values,
-        "Ensemble Prediction": y_pred[:10]
-    })
-    st.dataframe(sample)
+        st.success(f"✅ Ensemble accuracy on test set: **{acc:.3f}**")
+        st.markdown("### 📊 Sample Predictions (first 10)")
+        sample = pd.DataFrame({
+            "Actual": y_test[:10].values,
+            "Ensemble Prediction": y_pred[:10]
+        })
+        st.dataframe(sample)
+    except Exception as e:
+        st.error(f"❌ Ensemble prediction failed: {type(e).__name__}: {e}")
