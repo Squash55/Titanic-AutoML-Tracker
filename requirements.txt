@@ -3,10 +3,10 @@ tpot
 fpdf
 streamlit
 xgboost
-shap
 pandas
 numpy
 scikit-learn
-matplotlib
+shap==0.41.0
+matplotlib==3.7.1
 setuptools
 lightgbm
