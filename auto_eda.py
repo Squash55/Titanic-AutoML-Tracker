@@ -204,18 +204,36 @@ def render_jittered_categorical(df):
 import shap
 
 def render_nomogram_simulation(df):
-    st.markdown("### 🧮 Nomogram Simulation with Sliders")
+    st.markdown("### 🧮 Nomogram Simulation with SHAP-Ranked Sliders")
 
-    model = _tpot_cache.get("latest_tpot_model") or _tpot_cache.get("latest_rf_model")
+    model_type = st.radio("Select model to simulate:", ["TPOT", "RandomForest"], horizontal=True)
+    if model_type == "TPOT":
+        model = _tpot_cache.get("latest_tpot_model")
+    else:
+        model = _tpot_cache.get("latest_rf_model")
+
     if model is None:
-        st.warning("⚠️ No model found. Train TPOT or RandomForest first.")
+        st.warning("⚠️ Selected model not found. Train it first.")
         return
 
     numeric_cols = df.select_dtypes(include=["float64", "int64"]).columns.tolist()
+    df_numeric = df[numeric_cols].dropna()
+
+    try:
+        explainer = shap.Explainer(model, df_numeric)
+        shap_values = explainer(df_numeric)
+        mean_abs_shap = np.abs(shap_values.values).mean(axis=0)
+        feature_importance = dict(sorted(zip(numeric_cols, mean_abs_shap), key=lambda x: x[1], reverse=True))
+        top_features = list(feature_importance.keys())[:8]
+        st.caption("⚖️ Features ranked by SHAP impact.")
+    except Exception as e:
+        st.warning("SHAP failed — using raw order of features.")
+        top_features = numeric_cols[:8]
+
     input_vals = {}
     st.markdown("Adjust sliders to simulate prediction:")
 
-    for col in numeric_cols[:8]:  # limit for layout
+    for col in top_features:
         min_val = float(df[col].min())
         max_val = float(df[col].max())
         step = (max_val - min_val) / 100
@@ -230,19 +248,11 @@ def render_nomogram_simulation(df):
         st.error(f"Prediction failed: {e}")
 
     try:
-        explainer = shap.Explainer(model, df[numeric_cols])
         shap_vals = explainer(input_df)
         fig = shap.plots.waterfall(shap_vals[0], show=False)
         st.pyplot(fig)
     except Exception as e:
-        st.warning("SHAP explanation unavailable for this model or input.")
-
-# Auto EDA extension: 3D Rotating Surface Plot
-
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from sklearn.linear_model import LinearRegression
-
+        st.warning("SHAP explanation unavailable for this input.")
 def render_rotating_3d_surface(df):
     st.markdown("### 🌐 3D Rotating Plot")
 
