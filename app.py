@@ -28,10 +28,10 @@ except ImportError:
 
 try:
     from automl_comparison import run_automl_comparison
-except Exception:
-    def run_automl_comparison():
-        import streamlit as st
-        st.error("❌ AutoML Comparison panel failed to load.")
+except Exception as e:
+    import streamlit as st
+    st.error(f"❌ AutoML Comparison panel failed to load: {type(e).__name__}: {e}")
+
 
 try:
     from shap_comparison import run_shap_comparison
