@@ -15,6 +15,11 @@ try:
 except ImportError:
     def run_shap_waterfall():
         st.error("❌ SHAP Waterfall Panel failed to load.")
+try:
+    from pdf_report import run_pdf_report
+except ImportError:
+    def run_pdf_report():
+        st.error("❌ PDF Report module failed to load.")
 
 # Notebook Scout
 try:
@@ -38,7 +43,7 @@ except ImportError:
 
 # -- Sidebar navigation --
 st.sidebar.title("📊 Navigation")
-tab = st.sidebar.radio("Choose a Tab:", ["AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel", "Notebook Scout", "SHAP Waterfall"])
+tab = st.sidebar.radio("Choose a Tab:", ["AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel", "Notebook Scout", "SHAP Waterfall", "PDF Report"])
 
 # -- Tab 1: AutoML Launcher --
 def run_automl_launcher():
@@ -132,4 +137,6 @@ elif tab == "Notebook Scout":
     run_notebook_scout()
 elif tab == "SHAP Waterfall":
     run_shap_waterfall()
+elif tab == "PDF Report":
+    run_pdf_report()
 
