@@ -1,4 +1,3 @@
-
 # automl_comparison.py
 
 import streamlit as st
@@ -8,6 +7,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier
 from tpot import TPOTClassifier
 import time
+
+from tpot_connector import __dict__ as _tpot_cache
 
 
 @st.cache_data
@@ -27,7 +28,6 @@ def run_automl_comparison():
     st.subheader("🤖 AutoML Comparison Panel")
 
     X_train, X_test, y_train, y_test = load_titanic_data()
-
     results = []
 
     # TPOT AutoML
@@ -40,9 +40,15 @@ def run_automl_comparison():
         results.append(("TPOT", acc, end - start))
         st.success(f"TPOT accuracy: {acc:.3f}, time: {end - start:.1f}s")
 
+        # Save to shared memory
+        _tpot_cache["latest_tpot_model"] = tpot.fitted_pipeline_
+        _tpot_cache["latest_X_train"] = X_train
+        _tpot_cache["latest_X_test"] = X_test
+        _tpot_cache["latest_y_train"] = y_train
+        _tpot_cache["latest_y_test"] = y_test
+
     # Random Forest Baseline
     if st.button("🌲 Run RandomForest Baseline"):
-        _tpot_cache["latest_rf_model"] = model
         start = time.time()
         model = RandomForestClassifier(random_state=42)
         model.fit(X_train, y_train)
@@ -50,6 +56,13 @@ def run_automl_comparison():
         end = time.time()
         results.append(("RandomForest", acc, end - start))
         st.success(f"RandomForest accuracy: {acc:.3f}, time: {end - start:.1f}s")
+
+        # Save to shared memory
+        _tpot_cache["latest_rf_model"] = model
+        _tpot_cache["latest_X_train"] = X_train
+        _tpot_cache["latest_X_test"] = X_test
+        _tpot_cache["latest_y_train"] = y_train
+        _tpot_cache["latest_y_test"] = y_test
 
     # Show results table + bar chart
     if results:
