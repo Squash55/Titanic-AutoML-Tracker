@@ -10,21 +10,30 @@ try:
 except ImportError:
     def run_shap_panel():
         st.error("❌ SHAP Panel failed to load. Check shap_interpretability.py is present and correctly named.")
+        
 try:
     from shap_waterfall import run_shap_waterfall
 except ImportError:
     def run_shap_waterfall():
         st.error("❌ SHAP Waterfall Panel failed to load.")
+        
 try:
     from pdf_report import run_pdf_report
 except ImportError:
     def run_pdf_report():
         st.error("❌ PDF Report module failed to load.")
+        
 try:
     from tpot_saver import run_tpot_saver
 except ImportError:
     def run_tpot_saver():
         st.error("❌ Saved Models panel failed to load.")
+        
+try:
+    from experiment_tracker import run_experiment_tracker
+except:
+    def run_experiment_tracker():
+        st.error("❌ Experiment Tracker panel failed to load.")
 
 try:
     from automl_comparison import run_automl_comparison
@@ -73,7 +82,7 @@ except ImportError:
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison"
+    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker"
 ])
 
 
