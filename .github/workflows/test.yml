@@ -25,7 +25,7 @@ jobs:
         run: |
           for file in *.py; do
             echo "Checking $file..."
-            python -c "import $(basename "$file" .py)"
+            python -c "import $(basename \"$file\" .py)"
           done
 
       - name: Run pytest for golden_qa.py
@@ -77,34 +77,29 @@ jobs:
           else
             echo "✅ requirements.txt found"
           fi
-
-   - name: 🔍 Check for duplicate imports (non-fatal warning)
-    run: |
-      echo "🔎 Scanning for duplicate imports..."
-      grep -h '^import ' *.py | sort | uniq -d > duplicates.txt || true
-      if [ -s duplicates.txt ]; then
-        echo "⚠️ Warning: Duplicate imports found:"
-        cat duplicates.txt
-        echo "✅ Test continued despite duplicates."
-      else
-        echo "✅ No duplicate imports found."
-      fi
-
+      - name: 🔍 Check for duplicate imports (non-fatal warning)
+        run: |
+          echo "🔎 Scanning for duplicate imports..."
+          grep -h '^import ' *.py | sort | uniq -d > duplicates.txt || true
+          if [ -s duplicates.txt ]; then
+            echo "⚠️ Warning: Duplicate imports found:"
+            cat duplicates.txt
+            echo "✅ Test continued despite duplicates."
+          else
+            echo "✅ No duplicate imports found."
+          fi
 
   check_linting:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v3
-
-    - name: Install Flake8
-      run: |
-        pip install flake8
-
-    - name: Run flake8
-      run: |
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-
-    - name: 🧪 Run pytest for golden_qa.py
-      run: |
-        pip install pytest
-        pytest test_golden_qa.py
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Flake8
+        run: |
+          pip install flake8
+      - name: Run flake8
+        run: |
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: 🧪 Run pytest for golden_qa.py
+        run: |
+          pip install pytest
+          pytest test_golden_qa.py
