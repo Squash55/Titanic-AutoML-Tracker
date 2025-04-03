@@ -1,4 +1,3 @@
-
 # shap_comparison.py
 
 import streamlit as st
@@ -16,14 +15,16 @@ def run_shap_comparison():
     X_train = _tpot_cache.get("latest_X_train")
 
     if X_train is None:
-        st.warning("⚠️ Training data not found. Please run a model from AutoML Comparison or Launcher first.")
+        st.warning("⚠️ Training data not found. Please run AutoML Comparison first.")
         return
 
     if not tpot_model and not rf_model:
-        st.warning("⚠️ No models found. Please train TPOT and/or RandomForest.")
+        st.warning("⚠️ No models found. Train TPOT and/or RandomForest in the comparison panel.")
         return
 
-    if tpot_model:
+    tab_option = st.radio("Select model to compare SHAP values:", ["TPOT", "RandomForest"], horizontal=True)
+
+    if tab_option == "TPOT" and tpot_model:
         st.markdown("### 🔍 SHAP Summary for TPOT Model")
         try:
             explainer = shap.Explainer(tpot_model, X_train)
@@ -32,9 +33,9 @@ def run_shap_comparison():
             shap.plots.beeswarm(shap_values, max_display=10, show=False)
             st.pyplot(fig)
         except Exception as e:
-            st.error(f"❌ TPOT SHAP failed: {type(e).__name__}: {e}")
+            st.error(f"❌ SHAP failed for TPOT: {type(e).__name__}: {e}")
 
-    if rf_model:
+    elif tab_option == "RandomForest" and rf_model:
         st.markdown("### 🌲 SHAP Summary for RandomForest")
         try:
             explainer = shap.Explainer(rf_model, X_train)
@@ -43,7 +44,6 @@ def run_shap_comparison():
             shap.plots.beeswarm(shap_values, max_display=10, show=False)
             st.pyplot(fig)
         except Exception as e:
-            st.error(f"❌ RandomForest SHAP failed: {type(e).__name__}: {e}")
-
-    if tpot_model and rf_model:
-        st.success("✅ SHAP comparisons for both models complete.")
+            st.error(f"❌ SHAP failed for RandomForest: {type(e).__name__}: {e}")
+    else:
+        st.warning("⚠️ Model not trained yet. Please run training first.")
