@@ -101,7 +101,7 @@ jobs:
       - name: Run flake8
         run: |
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      - name: 🧪 Run pytest for golden_qa.py
+      - name: Run pytest for all tests
         run: |
-          pip install pytest
-          pytest test_golden_qa.py
+          pytest
+
