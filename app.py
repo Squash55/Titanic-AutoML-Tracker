@@ -24,6 +24,12 @@ except ImportError:
         st.error("❌ PDF Report module failed to load.")
         
 try:
+    from auto_threshold_optimizer import run_threshold_optimizer
+except:
+    def run_threshold_optimizer():
+        st.error("❌ Threshold Optimization panel failed to load.")
+
+try:
     from tpot_saver import run_tpot_saver
 except ImportError:
     def run_tpot_saver():
@@ -82,7 +88,7 @@ except ImportError:
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker"
+    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer"
 ])
 
 
