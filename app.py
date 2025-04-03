@@ -52,6 +52,11 @@ except:
     def run_shap_comparison():
         st.error("❌ SHAP Comparison Panel failed to load.")
 
+try:
+    from auto_eda import run_auto_eda
+except:
+    def run_auto_eda():
+        st.error("❌ Auto EDA panel failed to load.")
 
 try:
     from shap_comparison import run_shap_comparison
@@ -94,7 +99,7 @@ except:
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models"
+    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA" 
 ])
 
 
@@ -202,6 +207,8 @@ elif tab == "SHAP Comparison":
     run_shap_comparison()
 elif tab == "Saved Models":
     run_saved_models_panel()
+elif tab == "Auto EDA":
+    run_auto_eda()
 
 
 
