@@ -1,34 +1,55 @@
+
 # golden_qa.py
-import streamlit as st
 
-# DO NOT use st.set_page_config here — only in app.py
+import shap
+import xgboost as xgb
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.datasets import load_breast_cancer
 
-st.title("🔮 Golden Questions + Smart Answers")
 
-st.markdown("Choose a diagnostic question from the list below. Toggle 'Show Smart Answer' to see an expert-level insight.")
+def load_data():
+    data = load_breast_cancer()
+    X = pd.DataFrame(data.data, columns=data.feature_names)
+    y = data.target
+    return X, y
 
-# Sample golden questions
-questions = [
-    "Which features most influence survival predictions?",
-    "Is there a gender gap in model accuracy?",
-    "What does the model struggle with most?",
-    "Are there any signs of overfitting?",
-    "What improvements could boost predictive performance?"
-]
 
-selected_question = st.selectbox("Select a Golden Question:", questions)
-show_answer = st.checkbox("💡 Show Smart Answer")
+def train_model(X, y):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    model = xgb.XGBClassifier(use_label_encoder=False, eval_metric='logloss')
+    model.fit(X_train, y_train)
+    return model, X_train
 
-# Display answer if requested
-if show_answer:
-    answers = {
-        questions[0]: "Smart Answer: Based on SHAP and model importance, 'Sex', 'Pclass', and 'Fare' are the top survival predictors.",
-        questions[1]: "Smart Answer: Yes, females have significantly higher survival rates, and models often learn this bias early.",
-        questions[2]: "Smart Answer: Models typically struggle with middle-age males in 3rd class with lower fares — prediction uncertainty is highest here.",
-        questions[3]: "Smart Answer: If training accuracy is high but test accuracy drops, overfitting is likely. Compare those scores.",
-        questions[4]: "Smart Answer: Consider feature engineering (e.g., family size), scaling Fare, and trying ensemble methods like XGBoost."
+
+def get_shap_summary(model, X_train):
+    explainer = shap.Explainer(model)
+    shap_values = explainer(X_train)
+    summary_df = pd.DataFrame({
+        'Feature': X_train.columns,
+        'Mean SHAP Value': abs(shap_values.values).mean(axis=0)
+    }).sort_values(by='Mean SHAP Value', ascending=False)
+    return summary_df
+
+
+def get_golden_questions() -> list:
+    return [
+        "What are the top features driving the model predictions?",
+        "How can we interpret the model’s decisions?",
+        "Which features have the most consistent influence?",
+        "Are there any features with unexpected impact?",
+    ]
+
+
+def get_smart_answers() -> dict:
+    X, y = load_data()
+    model, X_train = train_model(X, y)
+    summary_df = get_shap_summary(model, X_train)
+
+    top_features = summary_df.head(3)['Feature'].tolist()
+    return {
+        "What are the top features driving the model predictions?": f"The top features are: {', '.join(top_features)}.",
+        "How can we interpret the model’s decisions?": "SHAP values indicate how each feature impacts predictions at the individual level.",
+        "Which features have the most consistent influence?": f"Based on SHAP mean values, features like {top_features[0]} have consistent impact.",
+        "Are there any features with unexpected impact?": "SHAP summary can help uncover surprising drivers that weren’t initially expected."
     }
-    st.markdown(f"### ✅ Answer")
-    st.success(answers.get(selected_question, "Answer not available yet."))
-else:
-    st.info("Enable 'Show Smart Answer' to view an AI-generated insight.")
