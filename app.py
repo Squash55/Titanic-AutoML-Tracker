@@ -1,9 +1,7 @@
-# app.py
 import streamlit as st
 import traceback  # <-- move this right after streamlit
 
 st.set_page_config(page_title="Titanic AutoML App", layout="wide")
-
 
 # -- Safely import SHAP Panel --
 try:
@@ -21,13 +19,11 @@ except ImportError:
 # Near the top
 try:
     from auto_eda import run_auto_eda
-except Exception as e:
+except Exception:
     import traceback
     def run_auto_eda():
         st.error("❌ Auto EDA panel failed to load.")
-        st.text(f"{type(e).__name__}: {e}")
         st.code(traceback.format_exc())
-
         
 try:
     from pdf_report import run_pdf_report
