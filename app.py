@@ -21,8 +21,12 @@ except ImportError:
 try:
     from auto_eda import run_auto_eda
 except Exception as e:
+    import traceback
     def run_auto_eda():
-        st.error(f"❌ Auto EDA panel failed to load. {type(e).__name__}: {e}")
+        st.error("❌ Auto EDA panel failed to load.")
+        st.text(f"{type(e).__name__}: {e}")
+        st.text(traceback.format_exc())
+
         
 try:
     from pdf_report import run_pdf_report
