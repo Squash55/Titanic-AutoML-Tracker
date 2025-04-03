@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import shap
 import numpy as np
-from tpot_connector import __dict__ as _tpot_cache
+from tpot_connector import _tpot_cache
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import MinMaxScaler
 import plotly.express as px
