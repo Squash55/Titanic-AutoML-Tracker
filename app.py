@@ -10,6 +10,11 @@ try:
 except ImportError:
     def run_shap_panel():
         st.error("❌ SHAP Panel failed to load. Check shap_interpretability.py is present and correctly named.")
+try:
+    from shap_waterfall import run_shap_waterfall
+except ImportError:
+    def run_shap_waterfall():
+        st.error("❌ SHAP Waterfall Panel failed to load.")
 
 # Notebook Scout
 try:
@@ -33,7 +38,7 @@ except ImportError:
 
 # -- Sidebar navigation --
 st.sidebar.title("📊 Navigation")
-tab = st.sidebar.radio("Choose a Tab:", ["AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel", "Notebook Scout"])
+tab = st.sidebar.radio("Choose a Tab:", ["AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel", "Notebook Scout", "SHAP Waterfall"])
 
 # -- Tab 1: AutoML Launcher --
 def run_automl_launcher():
@@ -125,3 +130,6 @@ elif tab == "SHAP Panel":
     run_shap_panel()
 elif tab == "Notebook Scout":
     run_notebook_scout()
+elif tab == "SHAP Waterfall":
+    run_shap_waterfall()
+
