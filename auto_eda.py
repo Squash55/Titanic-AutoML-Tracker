@@ -41,35 +41,27 @@ def run_auto_eda():
     st.subheader("📊 Auto-EDA with Smart Interpretations")
 
     df = _tpot_cache.get("latest_X_train")
-
     if df is None:
         st.warning("⚠️ No training data found. Please run AutoML Comparison first.")
         return
 
-    numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns.tolist()
+    tabs = st.tabs(["📈 Summary Plots", "🧭 Parallel Coordinates"])
 
-    st.markdown("### 🔍 Numeric Feature Distributions")
+    with tabs[0]:
+        numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns.tolist()
+        st.markdown("### 🔍 Numeric Feature Distributions")
+        for col in numeric_cols:
+            st.markdown(f"#### 📈 {col}")
+            fig, ax = plt.subplots()
+            sns.histplot(df[col], kde=True, ax=ax)
+            st.pyplot(fig)
+            st.markdown("**🧠 Rules-Based Interpretation**")
+            st.info(interpret_stats_rules(df[col]))
+            st.markdown("**🤖 AI-Based Interpretation**")
+            st.success(interpret_ai_lowtemp(col, df[col]))
 
-    for col in numeric_cols:
-        st.markdown(f"#### 📈 {col}")
-
-        fig, ax = plt.subplots()
-        sns.histplot(df[col], kde=True, ax=ax)
-        st.pyplot(fig)
-
-        st.markdown("**🧠 Rules-Based Interpretation**")
-        st.info(interpret_stats_rules(df[col]))
-
-        st.markdown("**🤖 AI-Based Interpretation**")
-        st.success(interpret_ai_lowtemp(col, df[col]))
-
-# Auto EDA extension: Parallel Coordinates Plot
-
-import seaborn as sns
-import matplotlib.pyplot as plt
-from pandas.plotting import parallel_coordinates
-from sklearn.preprocessing import MinMaxScaler
-
+    with tabs[1]:
+        render_parallel_coordinates(df)
 def render_parallel_coordinates(df, stratify_col="Survived", normalize=True):
     st.markdown("### 🧭 Parallel Coordinates Plot")
 
