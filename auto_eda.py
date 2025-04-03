@@ -45,7 +45,7 @@ def run_auto_eda():
         st.warning("⚠️ No training data found. Please run AutoML Comparison first.")
         return
 
-    tabs = st.tabs(["📈 Summary Plots", "🧭 Parallel Coordinates", "🎯 Scatter + R²", "🌧 Raincloud Plot", "🔴🔵 Jittered Categorical", "🧮 Nomogram"])
+    tabs = st.tabs(["📈 Summary Plots", "🧭 Parallel Coordinates", "🎯 Scatter + R²", "🌧 Raincloud Plot", "🔴🔵 Jittered Categorical", "🧮 Nomogram", "🌐 3D Rotating Plot"])
 
     with tabs[0]:
         numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns.tolist()
@@ -74,6 +74,9 @@ def run_auto_eda():
 
     with tabs[5]:
         render_nomogram_simulation(df)
+
+    with tabs[6]:
+        render_rotating_3d_surface(df)
         render_parallel_coordinates(df)
 def render_parallel_coordinates(df, stratify_col="Survived", normalize=True):
     st.markdown("### 🧭 Parallel Coordinates Plot")
@@ -233,3 +236,37 @@ def render_nomogram_simulation(df):
         st.pyplot(fig)
     except Exception as e:
         st.warning("SHAP explanation unavailable for this model or input.")
+
+# Auto EDA extension: 3D Rotating Surface Plot
+
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from sklearn.linear_model import LinearRegression
+
+def render_rotating_3d_surface(df):
+    st.markdown("### 🌐 3D Rotating Plot")
+
+    numeric_cols = df.select_dtypes(include=["float64", "int64"]).columns.tolist()
+    x_col = st.selectbox("X Axis:", numeric_cols, index=0)
+    y_col = st.selectbox("Y Axis:", numeric_cols, index=1)
+    z_col = st.selectbox("Z (target):", numeric_cols, index=2)
+
+    X = df[[x_col, y_col]].values
+    Z = df[z_col].values
+    model = LinearRegression()
+    model.fit(X, Z)
+    Z_pred = model.predict(X)
+
+    r2 = r2_score(Z, Z_pred)
+    st.success(f"R² of surface: {r2:.3f}")
+
+    fig = plt.figure(figsize=(10, 6))
+    ax = fig.add_subplot(111, projection="3d")
+
+    ax.plot_trisurf(X[:, 0], X[:, 1], Z_pred, cmap=cm.viridis, alpha=0.6)
+    ax.scatter(X[:, 0], X[:, 1], Z, c=Z, cmap="coolwarm", s=30, depthshade=True)
+
+    ax.set_xlabel(x_col)
+    ax.set_ylabel(y_col)
+    ax.set_zlabel(z_col)
+    st.pyplot(fig)
