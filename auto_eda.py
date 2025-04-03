@@ -1,5 +1,5 @@
 import streamlit as st
-from tpot_connector import __dict__ as _tpot_cache
+from tpot_connector import __dict__ as _tpot_cache  # ✅ this is correct
 
 st.write("X_train in cache:", _tpot_cache.get("latest_X_train"))
 st.write("y_train in cache:", _tpot_cache.get("latest_y_train"))
@@ -10,11 +10,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import shap
 import numpy as np
-from tpot_connector import _tpot_cache
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import MinMaxScaler
 import plotly.express as px
 import plotly.graph_objects as go
+
 
 def run_auto_eda():
     st.title("📊 Auto EDA Dashboard")
