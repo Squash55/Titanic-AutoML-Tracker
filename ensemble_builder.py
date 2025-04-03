@@ -12,6 +12,12 @@ from tpot_connector import __dict__ as _tpot_cache
 def run_ensemble_builder():
     st.subheader("🧬 Ensemble Builder (TPOT + RandomForest)")
 
+    st.write("✅ Ensemble Builder module is loading")  # DEBUG LINE
+
+    if "latest_tpot_model" not in _tpot_cache and "latest_rf_model" not in _tpot_cache:
+        st.warning("⚠️ No models found in memory. Please run TPOT and RandomForest first.")
+        return
+
     tpot_model = _tpot_cache.get("latest_tpot_model")
     rf_model = _tpot_cache.get("latest_rf_model")
     X_test = _tpot_cache.get("latest_X_test")
