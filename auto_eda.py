@@ -1,282 +1,133 @@
-# auto_eda.py
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import shap
+import numpy as np
 from tpot_connector import __dict__ as _tpot_cache
-
-def interpret_stats_rules(series):
-    msg = []
-    if series.isnull().sum() > 0:
-        msg.append("This column contains missing values.")
-    if series.nunique() == 1:
-        msg.append("All values are identical — not useful for modeling.")
-    if series.dtype in ['int64', 'float64']:
-        if series.skew() > 1:
-            msg.append("The distribution is right-skewed (long tail on the right).")
-        elif series.skew() < -1:
-            msg.append("The distribution is left-skewed (long tail on the left).")
-        if series.kurt() > 3:
-            msg.append("This distribution has heavy tails (high kurtosis).")
-        if series.mean() != series.median():
-            msg.append(f"The mean ({series.mean():.2f}) and median ({series.median():.2f}) differ — possible outliers.")
-    return " ".join(msg) or "No major issues detected statistically."
-
-def interpret_ai_lowtemp(col_name, series):
-    # Simulated low-temp AI: formatted summary using real stats
-    try:
-        summary = f"The feature **{col_name}** has a mean of {series.mean():.2f}, median {series.median():.2f}, and standard deviation {series.std():.2f}."
-        if series.skew() > 1:
-            summary += " Values are concentrated on the lower end with a few high outliers."
-        elif series.skew() < -1:
-            summary += " Values are concentrated on the higher end with a few low outliers."
-        if series.kurt() > 3:
-            summary += " The feature exhibits heavy tails — some extreme values may exist."
-        return summary
-    except:
-        return "AI interpretation is unavailable for non-numeric data."
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import MinMaxScaler
+import plotly.express as px
+import plotly.graph_objects as go
 
 def run_auto_eda():
-    st.subheader("📊 Auto-EDA with Smart Interpretations")
+    st.title("📊 Auto EDA Dashboard")
 
     df = _tpot_cache.get("latest_X_train")
-    if df is None:
-        st.warning("⚠️ No training data found. Please run AutoML Comparison first.")
+    y = _tpot_cache.get("latest_y_train")
+    model = _tpot_cache.get("latest_tpot_model") or _tpot_cache.get("latest_rf_model")
+
+    if df is None or y is None:
+        st.warning("Train a model first to populate Auto EDA.")
         return
-
-    tabs = st.tabs(["📈 Summary Plots", "🧭 Parallel Coordinates", "🎯 Scatter + R²", "🌧 Raincloud Plot", "🔴🔵 Jittered Categorical", "🧮 Nomogram", "🌐 3D Rotating Plot"])
-
-    with tabs[0]:
-        numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns.tolist()
-        st.markdown("### 🔍 Numeric Feature Distributions")
-        for col in numeric_cols:
-            st.markdown(f"#### 📈 {col}")
-            fig, ax = plt.subplots()
-            sns.histplot(df[col], kde=True, ax=ax)
-            st.pyplot(fig)
-            st.markdown("**🧠 Rules-Based Interpretation**")
-            st.info(interpret_stats_rules(df[col]))
-            st.markdown("**🤖 AI-Based Interpretation**")
-            st.success(interpret_ai_lowtemp(col, df[col]))
-
-    with tabs[1]:
-        render_parallel_coordinates(df)
-
-    with tabs[2]:
-        render_scatter_rsquared(df)
-
-    with tabs[3]:
-        render_raincloud_plot(df)
-
-    with tabs[4]:
-        render_jittered_categorical(df)
-
-    with tabs[5]:
-        render_nomogram_simulation(df)
-
-    with tabs[6]:
-        render_rotating_3d_surface(df)
-        render_parallel_coordinates(df)
-def render_parallel_coordinates(df, stratify_col="Survived", normalize=True):
-    st.markdown("### 🧭 Parallel Coordinates Plot")
-
-    filter_col = st.selectbox("Filter by column:", df.columns, index=0)
-    unique_vals = df[filter_col].dropna().unique().tolist()
-    selected_vals = st.multiselect("Select values to include:", unique_vals, default=unique_vals)
-
-    filtered_df = df[df[filter_col].isin(selected_vals)]
-
-    if normalize:
-        norm_df = filtered_df.copy()
-        numeric_cols = norm_df.select_dtypes(include=["int64", "float64"]).columns
-        scaler = MinMaxScaler()
-        norm_df[numeric_cols] = scaler.fit_transform(norm_df[numeric_cols])
-        st.caption("🔄 Data normalized using Min-Max scaling.")
-    else:
-        norm_df = filtered_df.copy()
-
-    plot_cols = st.multiselect("Choose columns to plot:", norm_df.columns, default=norm_df.select_dtypes(include=["float64", "int64"]).columns.tolist()[:5])
-
-    if stratify_col not in norm_df.columns or len(plot_cols) < 2:
-        st.warning("Select at least two columns and a valid stratification column.")
-        return
-
-    try:
-        fig, ax = plt.subplots(figsize=(10, 4))
-        parallel_coordinates(norm_df[[stratify_col] + plot_cols], stratify_col, ax=ax, alpha=0.7)
-        st.pyplot(fig)
-    except Exception as e:
-        st.error(f"❌ Failed to render parallel coordinates: {e}")
-
-# Auto EDA extension: Scatterplot + R²
-
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import r2_score
-
-def render_scatter_rsquared(df):
-    st.markdown("### 🎯 Scatterplot + Linear Fit + R²")
-
-    numeric_cols = df.select_dtypes(include=["float64", "int64"]).columns.tolist()
-    x_feature = st.selectbox("X Axis", numeric_cols, index=0)
-    y_feature = st.selectbox("Y Axis", numeric_cols, index=1)
-
-    X = df[[x_feature]].values
-    y = df[y_feature].values
-
-    model = LinearRegression()
-    model.fit(X, y)
-    y_pred = model.predict(X)
-    r2 = r2_score(y, y_pred)
-
-    fig, ax = plt.subplots()
-    ax.scatter(X, y, alpha=0.6)
-    ax.plot(X, y_pred, color="red", linewidth=2, label=f"Linear Fit (R² = {r2:.3f})")
-    ax.set_xlabel(x_feature)
-    ax.set_ylabel(y_feature)
-    ax.legend()
-    st.pyplot(fig)
-
-    st.success(f"R² Score: {r2:.3f}")
-
-# Auto EDA extension: Raincloud Plot
-
-try:
-    import ptitprince as pt
-except ImportError:
-    import subprocess
-    subprocess.run(["pip", "install", "ptitprince"])
-    import ptitprince as pt
-
-def render_raincloud_plot(df):
-    st.markdown("### 🌧 Raincloud Plot")
-
-    stratify_col = st.selectbox("Group by:", df.columns, index=0)
-    numeric_cols = df.select_dtypes(include=["float64", "int64"]).columns.tolist()
-    y_feature = st.selectbox("Y Axis (numeric):", numeric_cols)
-
-    filtered_df = df[[stratify_col, y_feature]].dropna()
-
-    try:
-        fig, ax = plt.subplots(figsize=(10, 4))
-        pt.RainCloud(x=stratify_col, y=y_feature, data=filtered_df,
-                     palette="Set2", bw=.2, width_viol=.6, ax=ax,
-                     orient="h", alpha=.65, jitter=1)
-        st.pyplot(fig)
-    except Exception as e:
-        st.error(f"❌ Raincloud plot failed: {e}")
-
-# Auto EDA extension: Red/Blue Jittered Categorical Plot
-
-import numpy as np
-
-def render_jittered_categorical(df):
-    st.markdown("### 🔴🔵 Jittered Categorical Plot")
 
     df = df.copy()
-    cat_x = st.selectbox("X Axis (categorical):", df.select_dtypes(include=["object", "category"]).columns.tolist())
-    cat_y = st.selectbox("Y Axis (categorical):", [col for col in df.columns if df[col].dtype == "object" or df[col].dtype.name == "category" or df[col].nunique() < 10 and col != cat_x])
-    outcome = st.selectbox("Outcome (0/1):", df.select_dtypes(include=["int64", "float64"]).columns.tolist())
+    df['target'] = y
 
-    if cat_x not in df.columns or cat_y not in df.columns or outcome not in df.columns:
-        st.warning("Select valid columns to plot.")
-        return
+    tab = st.selectbox("Select EDA View", [
+        "Main Effects",
+        "Pairwise Scatter + R²",
+        "Parallel Coordinates",
+        "Nomogram",
+        "Raincloud",
+        "Jittered Categorical Plot",
+        "3D Rotating Surface"
+    ])
 
-    fig, ax = plt.subplots()
-
-    jitter_strength = st.slider("Jitter amount", 0.1, 0.5, 0.2, 0.05)
-    for _, row in df[[cat_x, cat_y, outcome]].dropna().iterrows():
-        color = "blue" if row[outcome] == 0 else "red"
-        x_jitter = np.random.uniform(-jitter_strength, jitter_strength)
-        y_jitter = np.random.uniform(-jitter_strength, jitter_strength)
-        ax.plot(
-            [row[cat_x] + x_jitter], [row[cat_y] + y_jitter],
-            marker='o', markersize=6, color=color, alpha=0.5
-        )
-
-    ax.set_xlabel(cat_x)
-    ax.set_ylabel(cat_y)
-    ax.set_title("Red = 1, Blue = 0")
-    st.pyplot(fig)
-
-# Auto EDA extension: Nomogram Simulation
-
-import shap
-
-def render_nomogram_simulation(df):
-    st.markdown("### 🧮 Nomogram Simulation with SHAP-Ranked Sliders")
-
-    model_type = st.radio("Select model to simulate:", ["TPOT", "RandomForest"], horizontal=True)
-    if model_type == "TPOT":
-        model = _tpot_cache.get("latest_tpot_model")
-    else:
-        model = _tpot_cache.get("latest_rf_model")
-
-    if model is None:
-        st.warning("⚠️ Selected model not found. Train it first.")
-        return
-
-    numeric_cols = df.select_dtypes(include=["float64", "int64"]).columns.tolist()
-    df_numeric = df[numeric_cols].dropna()
-
-    try:
-        explainer = shap.Explainer(model, df_numeric)
-        shap_values = explainer(df_numeric)
-        mean_abs_shap = np.abs(shap_values.values).mean(axis=0)
-        feature_importance = dict(sorted(zip(numeric_cols, mean_abs_shap), key=lambda x: x[1], reverse=True))
-        top_features = list(feature_importance.keys())[:8]
-        st.caption("⚖️ Features ranked by SHAP impact.")
-    except Exception as e:
-        st.warning("SHAP failed — using raw order of features.")
-        top_features = numeric_cols[:8]
-
-    input_vals = {}
-    st.markdown("Adjust sliders to simulate prediction:")
-
-    for col in top_features:
-        min_val = float(df[col].min())
-        max_val = float(df[col].max())
-        step = (max_val - min_val) / 100
-        default = float(df[col].mean())
-        input_vals[col] = st.slider(f"{col}", min_val, max_val, default, step=step)
-
-    input_df = pd.DataFrame([input_vals])
-    try:
-        prob = model.predict_proba(input_df)[0][1]
-        st.success(f"Predicted probability of class 1: **{prob:.3f}**")
-    except Exception as e:
-        st.error(f"Prediction failed: {e}")
-
-    try:
-        shap_vals = explainer(input_df)
-        fig = shap.plots.waterfall(shap_vals[0], show=False)
+    if tab == "Main Effects":
+        st.subheader("📈 Main Effects Plot")
+        fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(16, 6))
+        for i, col in enumerate(df.select_dtypes("number").columns[:8]):
+            row, coln = divmod(i, 4)
+            sns.lineplot(x=df[col], y=df['target'], ax=axes[row, coln])
+            axes[row, coln].set_title(col)
         st.pyplot(fig)
-    except Exception as e:
-        st.warning("SHAP explanation unavailable for this input.")
-def render_rotating_3d_surface(df):
-    st.markdown("### 🌐 3D Rotating Plot")
 
-    numeric_cols = df.select_dtypes(include=["float64", "int64"]).columns.tolist()
-    x_col = st.selectbox("X Axis:", numeric_cols, index=0)
-    y_col = st.selectbox("Y Axis:", numeric_cols, index=1)
-    z_col = st.selectbox("Z (target):", numeric_cols, index=2)
+    elif tab == "Pairwise Scatter + R²":
+        st.subheader("📉 Linear Scatter + R²")
+        feat_x = st.selectbox("X Variable", df.columns)
+        feat_y = "target"
+        model = LinearRegression()
+        X_ = df[[feat_x]].values
+        y_ = df[feat_y].values
+        model.fit(X_, y_)
+        r2 = model.score(X_, y_)
+        fig = px.scatter(df, x=feat_x, y=feat_y, trendline="ols", title=f"R² = {r2:.2f}")
+        st.plotly_chart(fig)
 
-    X = df[[x_col, y_col]].values
-    Z = df[z_col].values
-    model = LinearRegression()
-    model.fit(X, Z)
-    Z_pred = model.predict(X)
+    elif tab == "Parallel Coordinates":
+        st.subheader("🪄 Parallel Coordinates (Normalized)")
+        num_df = df.select_dtypes(include=["number"]).copy()
+        if len(num_df.columns) < 2:
+            st.warning("Not enough numeric columns.")
+            return
+        scaler = MinMaxScaler()
+        norm_df = pd.DataFrame(scaler.fit_transform(num_df), columns=num_df.columns)
+        fig = px.parallel_coordinates(norm_df, color="target")
+        st.plotly_chart(fig)
 
-    r2 = r2_score(Z, Z_pred)
-    st.success(f"R² of surface: {r2:.3f}")
+    elif tab == "Nomogram":
+        st.subheader("🧮 Nomogram Simulation")
+        model_type = st.radio("Select model", ["TPOT", "RandomForest"], horizontal=True)
+        model = _tpot_cache.get("latest_tpot_model") if model_type == "TPOT" else _tpot_cache.get("latest_rf_model")
+        if model is None:
+            st.warning("Model not available.")
+            return
 
-    fig = plt.figure(figsize=(10, 6))
-    ax = fig.add_subplot(111, projection="3d")
+        try:
+            explainer = shap.Explainer(model, df.drop("target", axis=1))
+            shap_vals = explainer(df.drop("target", axis=1))
+            shap_imp = np.abs(shap_vals.values).mean(axis=0)
+            ranked = dict(sorted(zip(df.columns[:-1], shap_imp), key=lambda x: x[1], reverse=True))
+            top_features = list(ranked.keys())[:8]
+        except:
+            top_features = df.columns[:8]
 
-    ax.plot_trisurf(X[:, 0], X[:, 1], Z_pred, cmap=cm.viridis, alpha=0.6)
-    ax.scatter(X[:, 0], X[:, 1], Z, c=Z, cmap="coolwarm", s=30, depthshade=True)
+        input_vals = {}
+        for col in top_features:
+            input_vals[col] = st.slider(col, float(df[col].min()), float(df[col].max()), float(df[col].mean()))
+        input_df = pd.DataFrame([input_vals])
+        try:
+            prob = model.predict_proba(input_df)[0][1]
+            st.success(f"Prediction = {prob:.3f}")
+            shap_val = explainer(input_df)
+            fig = shap.plots.waterfall(shap_val[0], show=False)
+            st.pyplot(fig)
+        except:
+            st.warning("SHAP or prediction failed.")
 
-    ax.set_xlabel(x_col)
-    ax.set_ylabel(y_col)
-    ax.set_zlabel(z_col)
-    st.pyplot(fig)
+    elif tab == "Raincloud":
+        st.subheader("🌧️ Raincloud Plot")
+        import ptitprince as pt
+        fig, ax = plt.subplots(figsize=(10, 5))
+        pt.RainCloud(x='target', y=df.columns[0], data=df, palette="Set2", bw=.2, width_viol=.6, ax=ax)
+        st.pyplot(fig)
+
+    elif tab == "Jittered Categorical Plot":
+        st.subheader("🔴🔵 Jittered Category Scatter")
+        cat_col = st.selectbox("Choose category", df.select_dtypes("object").columns.tolist() or ["None"])
+        if cat_col == "None":
+            st.warning("No categorical data found.")
+            return
+        fig = px.strip(df, x=cat_col, y="target", color="target", stripmode="overlay", jitter=0.3)
+        st.plotly_chart(fig)
+
+    elif tab == "3D Rotating Surface":
+        st.subheader("🌀 3D Rotating Readiness Surface")
+        x = st.selectbox("X axis", df.select_dtypes("number").columns)
+        y = st.selectbox("Y axis", df.select_dtypes("number").columns, index=1)
+        z = "target"
+        surface_model = LinearRegression()
+        X_grid = df[[x, y]].values
+        Z_target = df[z].values
+        surface_model.fit(X_grid, Z_target)
+        grid_x, grid_y = np.meshgrid(
+            np.linspace(df[x].min(), df[x].max(), 30),
+            np.linspace(df[y].min(), df[y].max(), 30)
+        )
+        grid_pred = surface_model.predict(np.c_[grid_x.ravel(), grid_y.ravel()]).reshape(grid_x.shape)
+        fig = go.Figure(data=[
+            go.Surface(z=grid_pred, x=grid_x, y=grid_y, opacity=0.6),
+            go.Scatter3d(x=df[x], y=df[y], z=df[z], mode='markers', marker=dict(size=3, color=df[z], colorscale='Viridis'))
+        ])
+        st.plotly_chart(fig)
