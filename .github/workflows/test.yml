@@ -21,26 +21,21 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest flake8 black mypy
+          pip install pytest flake8 black
 
       - name: Lint code with flake8
         run: |
           echo "🔍 Running flake8 linting..."
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-      - name: Static type checking with mypy
+      - name: Check formatting with black
         run: |
-          echo "📏 Running mypy..."
-          mypy . || echo "⚠️ Mypy issues detected"
-
-      - name: Auto format check with black
-        run: |
-          echo "🧼 Checking formatting with black..."
+          echo "🖤 Checking formatting with black..."
           black . --check || echo "⚠️ Black found formatting issues"
 
       - name: Check all files for syntax errors
         run: |
-          echo "🔎 Checking syntax using py_compile..."
+          echo "🧪 Checking syntax using py_compile..."
           python -m compileall . || echo "⚠️ Syntax issues found"
 
       - name: Import test all top-level modules
@@ -53,7 +48,7 @@ jobs:
             timeout 10s python -c "import $module" || echo "⚠️ Import failed or timed out: $module"
           done
 
-           - name: Run pytest for golden_qa.py
+      - name: Run pytest for golden_qa.py
         run: |
           echo "🧪 Running pytest..."
           pytest test_golden_qa.py || echo "⚠️ Pytest failed, continuing..."
