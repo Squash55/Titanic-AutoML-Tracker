@@ -8,6 +8,12 @@ st.set_page_config(page_title="Titanic AutoML App", layout="wide")
 
 from tpot_connector import _tpot_cache
 
+try:
+    from smart_hpo_recommender import run_smart_hpo_recommender
+except ImportError:
+    def run_smart_hpo_recommender():
+        st.error("❌ Smart HPO Recommender failed to load.")
+
 # -- SHAP Comparison Panel Safe Import --
 try:
     from shap_comparison import run_shap_comparison
@@ -260,6 +266,8 @@ elif tab == "SHAP Comparison":
     run_shap_comparison()
 elif tab == "SHAP Comparison":
     run_shap_comparison()
+elif tab == "Smart HPO Recommender":
+    run_smart_hpo_recommender()
 
 
 
