@@ -5,7 +5,6 @@ from scipy.stats import normaltest
 from sklearn.preprocessing import PowerTransformer
 from tpot_connector import _tpot_cache
 
-
 def run_smart_hpo_recommender():
     st.title("🧠 Smart Algorithm Recommender + HPO Launcher")
     st.markdown("""
@@ -34,10 +33,13 @@ def run_smart_hpo_recommender():
     st.markdown("### 📈 Feature Normality Check & Power Transformation")
     normality_results = []
     transformed_features = []
+    all_numeric_cols = df.select_dtypes(include='number').columns.tolist()
 
-    for col in df.select_dtypes(include='number').columns:
+    manual_selection = st.multiselect("Select features to power transform (overrides auto-detect):", all_numeric_cols)
+
+    for col in all_numeric_cols:
         stat, p = normaltest(df[col].dropna())
-        if p < 0.05:
+        if p < 0.05 or col in manual_selection:
             st.warning(f"{col}: ❌ Not Normally Distributed (p = {p:.4f}) — Power Transform Recommended")
             transformed_features.append(col)
         else:
@@ -56,7 +58,7 @@ def run_smart_hpo_recommender():
 
     st.markdown("""
 ℹ️ Features failing the normality test may benefit from power transformations (e.g., Box-Cox or Yeo-Johnson),
-which can be applied automatically in the preprocessing pipeline.
+which can be applied automatically in the preprocessing pipeline. You may override this detection manually above.
     """)
 
     # AI Recommends This
@@ -162,5 +164,5 @@ This will train your selected model and unlock Threshold Optimization, SHAP, and
 🧠 Current VC limit: {vc_dim} — Expect simpler models if set low. Reasonable target: 30–50 for balanced generalization vs flexibility.
     """)
 
-    if st.button("🚀 Go to DAIVID HPO Engine"):
-        st.session_state.tab = "DAIVID HPO Engine"
+    if st.button("🚀 Go to DAIVID HPO Trainer"):
+        st.session_state.tab = "DAIVID HPO Trainer"
