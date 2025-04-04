@@ -2,59 +2,62 @@
 # daivid_hpo_engine.py
 import streamlit as st
 import pandas as pd
-import numpy as np
-import time
+import optuna
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, roc_auc_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.neural_network import MLPClassifier
+from xgboost import XGBClassifier
 from tpot_connector import _tpot_cache
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-import matplotlib.pyplot as plt
-
 
 def run_daivid_hpo_engine():
-    st.title("🧪 DAIVID HPO Engine")
-    st.markdown("This module performs hyperparameter optimization using the selected configuration from the Smart HPO panel.")
+    st.title("⚙️ DAIVID HPO Engine")
+    st.markdown("This engine trains a model using your selected HPO configuration.")
 
-    config = _tpot_cache.get("last_hpo_config", {})
-    df = _tpot_cache.get("X_train")
+    config = _tpot_cache.get("last_hpo_config")
+    X = _tpot_cache.get("X_train")
     y = _tpot_cache.get("y_train")
 
-    if df is None or y is None:
-        st.warning("⚠️ Training data not found. Please run AutoML first.")
+    if config is None or X is None or y is None:
+        st.warning("⚠️ Missing HPO config or training data. Please run the Smart HPO Recommender first.")
         return
 
-    if not config:
-        st.warning("⚠️ No HPO configuration found. Please configure Smart HPO first.")
-        return
-
-    st.markdown("### 🔍 Current HPO Configuration")
+    st.markdown("### 🔍 Configuration Summary")
     st.json(config)
 
-    # Simulate model training
-    st.markdown("### 📊 Training Progress")
-    progress = st.progress(0)
-    for i in range(1, 101):
-        time.sleep(0.01)
-        progress.progress(i)
+    model_name = config["model"]
+    test_size = config["test_size"] / 100
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
 
-    st.success("🎉 HPO simulation complete! Model trained with top config.")
+    if model_name == "Random Forest":
+        model = RandomForestClassifier(n_estimators=100, random_state=42)
+    elif model_name == "Logistic Regression":
+        model = LogisticRegression(max_iter=1000)
+    elif model_name == "Neural Network":
+        model = MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=300)
+    elif model_name == "XGBoost":
+        model = XGBClassifier(use_label_encoder=False, eval_metric="logloss")
+    else:
+        st.error(f"Unsupported model: {model_name}")
+        return
 
-    # Simulate confusion matrix
-    st.markdown("### 🔢 Simulated Confusion Matrix")
-    y_true = np.random.randint(0, 2, 100)
-    y_pred = y_true.copy()
-    y_pred[:10] = 1 - y_pred[:10]  # Add some errors
+    with st.spinner("Training model..."):
+        model.fit(X_train, y_train)
+        preds = model.predict(X_test)
+        proba = model.predict_proba(X_test)[:, 1] if hasattr(model, "predict_proba") else None
 
-    cm = confusion_matrix(y_true, y_pred)
-    fig, ax = plt.subplots()
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-    disp.plot(ax=ax)
-    st.pyplot(fig)
+    acc = accuracy_score(y_test, preds)
+    st.success(f"✅ Accuracy: {acc:.4f}")
+    if proba is not None:
+        auc = roc_auc_score(y_test, proba)
+        st.info(f"ROC AUC: {auc:.4f}")
 
-    st.markdown("### 🧭 What's Next?")
-    st.info("""
-✅ You've trained a model using Smart HPO.
+    _tpot_cache["model"] = model
+    _tpot_cache["X_test"] = X_test
+    _tpot_cache["y_test"] = y_test
+    _tpot_cache["y_pred"] = preds
+    if proba is not None:
+        _tpot_cache["y_pred_proba"] = proba
 
-➡️ **Next Step:**
-- Analyze SHAP values in the SHAP Panel
-- Use Threshold Optimizer to improve performance
-- Export results and models
-    """)
+    st.markdown("✅ Model stored in session. You can now run SHAP, Golden Q&A, and Threshold Optimization.")
