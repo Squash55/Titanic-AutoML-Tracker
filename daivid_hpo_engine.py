@@ -22,7 +22,8 @@ warnings.filterwarnings("ignore")
 from tpot_connector import _tpot_cache
 
 def run_daivid_hpo_engine():
-    st.title("⚙️ DAIVID HPO Engine")
+    st.title("DAIVID HPO Engine")
+    st.write("🚧 Coming soon: Smart Optuna/Grid/RandomizedSearchCV integration here.")
 
     cfg = _tpot_cache.get("last_hpo_config")
     X = _tpot_cache.get("X_train")
