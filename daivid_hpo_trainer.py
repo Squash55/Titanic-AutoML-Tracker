@@ -12,7 +12,7 @@ from sklearn.neural_network import MLPClassifier
 
 
 def run_daivid_hpo_trainer():
-    st.title("🧪 DAIVID HPO Engine")
+    st.title("🧪 DAIVID HPO Trainer")
     st.markdown("""
     This module performs hyperparameter optimization using the selected configuration from the Smart HPO panel.
     """)
