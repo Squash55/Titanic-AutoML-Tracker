@@ -21,13 +21,6 @@ try:
 except ImportError:
     def run_shap_waterfall():
         st.error("❌ SHAP Waterfall Panel failed to load.")
-        
-# -- DOE Panel Safe Import --
-try:
-  from doe_panel import run_doe_panel
-except ImportError:
-  def run_doe_panel(df=None, model=None):
-    st.error("❌ DOE Panel failed to load. Ensure doe_panel.py exists and is error-free.")
 
 # Near the top
 try:
@@ -225,8 +218,10 @@ elif tab == "Saved Models":
 elif tab == "Auto EDA":
     run_auto_eda()
 elif tab == "DOE Panel":
-    # ⚠️ Replace 'X_train' and 'model' with your actual dataset and model variables
-    run_doe_panel(df=X_train, model=model)
+    if "X_train" in st.session_state and "model" in st.session_state:
+        run_doe_panel(df=st.session_state["X_train"], model=st.session_state["model"])
+    else:
+        st.warning("🚧 Required objects missing. Train a model first to use the DOE panel.")
 
 
 
