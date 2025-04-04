@@ -1,5 +1,9 @@
 # smart_hpo_recommender.py
 import streamlit as st
+
+def run_daivid_hpo_engine():
+    st.title("🚀 DAIVID HPO Engine")
+    st.success("Placeholder: This is where the full HPO sweep will be launched and visualized.")
 import pandas as pd
 from tpot_connector import _tpot_cache
 
