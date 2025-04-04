@@ -12,3 +12,4 @@ joblib==1.2.0
 fpdf==1.7.2
 seaborn
 ptitprince
+optuna>=3.0
