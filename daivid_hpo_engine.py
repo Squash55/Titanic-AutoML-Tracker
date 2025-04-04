@@ -1,110 +1,134 @@
-# smart_hpo_recommender.py
-import streamlit as st
 
-def run_daivid_hpo_engine():
-    st.title("🚀 DAIVID HPO Engine")
-    st.success("Placeholder: This is where the full HPO sweep will be launched and visualized.")
+# daivid_hpo_engine.py
+import streamlit as st
+import optuna
+from sklearn.model_selection import train_test_split
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neural_network import MLPClassifier
+from xgboost import XGBClassifier
 import pandas as pd
+import shap
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+import warnings
+warnings.filterwarnings("ignore")
+
 from tpot_connector import _tpot_cache
 
+def run_daivid_hpo_engine():
+    st.title("⚙️ DAIVID HPO Engine")
 
-def run_smart_hpo_recommender():
-    st.title("🧠 Smart Algorithm Recommender + HPO Launcher")
-    st.markdown("""
-    This panel recommends optimal algorithms based on your dataset characteristics and enables smart hyperparameter sweeps
-    with support for feature interactions, regularization, calibrated learners, and early stopping (where supported).
-    """)
-
-    df = _tpot_cache.get("X_train")
+    cfg = _tpot_cache.get("last_hpo_config")
+    X = _tpot_cache.get("X_train")
     y = _tpot_cache.get("y_train")
 
-    if df is None or y is None:
-        st.warning("⚠️ No training data found. Please run AutoML first.")
+    if cfg is None or X is None or y is None:
+        st.error("❌ Configuration or training data not found. Please run AutoML and Smart Recommender first.")
         return
 
-    st.markdown("### 📋 Dataset Snapshot")
-    st.dataframe(df.head())
+    st.markdown("### ⚗️ HPO Config Overview")
+    st.json(cfg)
 
-    # Basic Profiling
-    st.markdown("### 🧬 Dataset Diagnostics")
-    st.write(f"Shape: {df.shape}")
-    st.write(f"Missing Values: {df.isnull().sum().sum()}")
-    st.write(f"Numeric Features: {df.select_dtypes(include='number').shape[1]}")
-    st.write(f"Categorical Features: {df.select_dtypes(exclude='number').shape[1]}")
+    test_size = cfg["test_size"] / 100
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, stratify=y)
+    st.markdown("### 📊 Live Training Progress")
+    progress = st.progress(0)
 
-    # AI Recommends This
-    st.markdown("### 🤖 AI Recommends These Algorithms")
-    recs = []
-    if df.shape[0] > 2000:
-        recs.append("XGBoost")
-    if df.select_dtypes(include='number').shape[1] < 10:
-        recs.append("Logistic Regression")
-    if df.select_dtypes(exclude='number').shape[1] > 3:
-        recs.append("CatBoost")
-    if df.shape[1] > 15:
-        recs.append("Random Forest")
-    if df.select_dtypes(include='number').shape[1] > 20:
-        recs.append("Neural Network")
+    model_name = cfg["model"]
+    def get_model(trial):
+        if model_name == "Random Forest":
+            return RandomForestClassifier(
+                n_estimators=trial.suggest_int("n_estimators", 50, 200),
+                max_depth=trial.suggest_int("max_depth", 3, 10),
+                min_samples_split=trial.suggest_int("min_samples_split", 2, 10)
+            )
+        elif model_name == "Logistic Regression":
+            return LogisticRegression(
+                C=trial.suggest_float("C", 0.001, 10.0, log=True),
+                penalty="l2",
+                solver="lbfgs"
+            )
+        elif model_name == "XGBoost":
+            return XGBClassifier(
+                n_estimators=trial.suggest_int("n_estimators", 50, 200),
+                learning_rate=trial.suggest_float("learning_rate", 0.01, 0.3),
+                max_depth=trial.suggest_int("max_depth", 3, 10),
+                use_label_encoder=False,
+                eval_metric="logloss"
+            )
+        elif model_name == "Neural Network":
+            return MLPClassifier(
+                hidden_layer_sizes=(trial.suggest_int("layer1", 32, 128), trial.suggest_int("layer2", 16, 64)),
+                activation="relu",
+                solver="adam",
+                max_iter=200
+            )
 
-    st.success(
-        "Top Algorithm Suggestions: " + ", ".join(recs) if recs else "Unable to determine best models — run EDA first."
-    )
+    norm = cfg["norm"]
+    if norm == "MinMax":
+        scaler = MinMaxScaler()
+    elif norm == "Z-Score":
+        scaler = StandardScaler()
+    elif norm == "Robust":
+        scaler = RobustScaler()
+    else:
+        scaler = None
 
-    st.markdown("---")
-    st.markdown("### 🛠️ HPO Configuration")
+    def objective(trial):
+        model = get_model(trial)
+        pipe_steps = []
+        if scaler:
+            pipe_steps.append(("scaler", scaler))
+        pipe_steps.append(("model", model))
+        pipeline = Pipeline(pipe_steps)
 
-    model_choice = st.selectbox("Choose Model to Tune:", recs or ["Random Forest", "XGBoost", "Logistic Regression", "Neural Network"])
+        if cfg["calibrated"]:
+            pipeline = CalibratedClassifierCV(pipeline)
 
-    st.markdown("**Early Stopping** (if supported)")
-    use_early_stopping = st.checkbox("Enable Early Stopping", value=True)
+        pipeline.fit(X_train, y_train)
+        score = pipeline.score(X_test, y_test)
+        return score
 
-    st.markdown("**Include Calibrated Learner**")
-    calibrate = st.checkbox("Yes, calibrate this model")
+    study = optuna.create_study(direction="maximize")
+    study.optimize(objective, n_trials=cfg["max_models"], n_jobs=-1 if cfg["parallel"] else 1)
 
-    st.markdown("**Feature Engineering Options**")
-    test_interactions = st.checkbox("Test 2- and 3-way Interactions", value=False)
-    test_feature_counts = st.slider("Max # Features to Test", 3, df.shape[1], min(10, df.shape[1]))
+    st.success(f"✅ Best trial: {study.best_trial.value:.4f}")
+    best_model = get_model(study.best_trial)
+    best_model.fit(X_train, y_train)
 
-    st.markdown("**Data Preprocessing Options**")
-    norm = st.selectbox("Normalization Method:", ["None", "MinMax", "Z-Score", "Robust"])
-    encoding = st.selectbox("Categorical Encoding:", ["OneHot", "Ordinal", "Binary"])
-    bin_method = st.selectbox("Binning Method:", ["None", "Quantile", "Uniform", "Entropy"])
-    bin_count = st.slider("# of Bins", 2, 10, 4)
+    y_pred = best_model.predict(X_test)
+    y_proba = best_model.predict_proba(X_test)[:, 1]
 
-    st.markdown("**Training Split**")
-    test_size = st.slider("Test Size %", 10, 50, 20)
+    st.markdown("### 🔍 Confusion Matrix")
+    fig, ax = plt.subplots()
+    sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt="d", cmap="Blues", ax=ax)
+    st.pyplot(fig)
 
-    st.markdown("**HPO Budget**")
-    max_models = st.slider("Max Models to Test", 5, 50, 15)
-    parallel_mode = st.checkbox("🔁 Run in Parallel (Dask mode)", value=True)
+    st.markdown("### 📈 Classification Report")
+    st.text(classification_report(y_test, y_pred))
 
-    if st.button("🚀 Launch Smart HPO"):
-        st.success(f"Running {model_choice} with HPO on up to {max_models} models...")
-        st.code("[Simulated launch — future: connect to HPO engine w/ grid, random, or Bayesian sweeps]")
+    st.markdown("### 🔬 SHAP Interpretability")
+    try:
+        explainer = shap.Explainer(best_model, X_train)
+        shap_values = explainer(X_train)
+        fig2 = shap.plots.beeswarm(shap_values, show=False)
+        st.pyplot(bbox_inches='tight')
+    except:
+        st.warning("SHAP not available for this model.")
 
-        # Cache config if needed elsewhere
-        _tpot_cache["last_hpo_config"] = {
-            "model": model_choice,
-            "early_stopping": use_early_stopping,
-            "calibrated": calibrate,
-            "interactions": test_interactions,
-            "max_features": test_feature_counts,
-            "norm": norm,
-            "encoding": encoding,
-            "bins": (bin_method, bin_count),
-            "test_size": test_size,
-            "max_models": max_models,
-            "parallel": parallel_mode
-        }
+    _tpot_cache["daivid_model"] = best_model
+    _tpot_cache["y_test"] = y_test
+    _tpot_cache["y_pred_proba"] = y_proba
 
-    # Smart Trail Marker
-    st.markdown("---")
-    st.markdown("### 🧭 What's Next?")
-    st.info("""
-✅ You've configured your Smart HPO settings.
-
-➡️ **Next Step: Launch the DAIVID HPO Engine**
-This will train your selected model and unlock Threshold Optimization, SHAP, and Golden Q&A.
-    """)
-    if st.button("🚀 Go to DAIVID HPO Engine"):
-        st.session_state.tab = "DAIVID HPO Engine"
+    st.markdown("### ✅ Next Steps")
+    st.success("Model and SHAP values cached. You may now go to Threshold Optimizer or SHAP Panel.")
+    if st.button("Go to SHAP Panel"):
+        st.session_state.tab = "SHAP Panel"
+    if st.button("Go to Threshold Optimizer"):
+        st.session_state.tab = "Threshold Optimizer"
