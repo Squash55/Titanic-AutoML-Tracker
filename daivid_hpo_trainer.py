@@ -10,24 +10,28 @@ from sklearn.linear_model import LogisticRegression
 from xgboost import XGBClassifier
 from sklearn.neural_network import MLPClassifier
 
-
 def run_daivid_hpo_trainer():
-    st.title("🧪 DAIVID HPO Trainer")
-    st.markdown("""
-    This module performs hyperparameter optimization using the selected configuration from the Smart HPO panel.
-    """)
+    try:
+        st.title("🧪 DAIVID HPO Trainer")
+        st.markdown("""
+        This module performs hyperparameter optimization using the selected configuration from the Smart HPO panel.
+        """)
 
-    config = _tpot_cache.get("last_hpo_config")
-    X = _tpot_cache.get("X_train")
-    y = _tpot_cache.get("y_train")
+        config = _tpot_cache.get("last_hpo_config")
+        X = _tpot_cache.get("X_train")
+        y = _tpot_cache.get("y_train")
 
-    if config is None or X is None or y is None:
-        st.warning("⚠️ Training data not found. Please run AutoML first.")
-        return
+        if config is None or X is None or y is None:
+            st.warning("⚠️ Training data not found. Please run AutoML first.")
+            return
 
-    st.markdown("### ⚙️ HPO Training in Progress")
-    st.code(config)
+        st.markdown("### ⚙️ HPO Training in Progress")
+        st.code(config)
 
+        # (You can add your HPO logic here...)
+    except Exception as e:
+        st.error(f"❌ DAIVID HPO Trainer failed to load: {type(e).__name__}: {e}")
+    
     # Allow user to select scoring metric
     scoring_map = {
         "AUC": (roc_auc_score, "roc_auc"),
