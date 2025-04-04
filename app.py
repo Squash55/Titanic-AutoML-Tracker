@@ -18,7 +18,8 @@ try:
     from smart_hpo_recommender import run_smart_hpo_recommender
 except ImportError:
     def run_smart_hpo_recommender():
-        st.error("❌ Smart HPO Recommender failed to load.")
+        st.error("❌ Smart HPO Recommender failed to load. Ensure smart_hpo_recommender.py exists and is error-free.")
+
 # -- DAIVID HPO Engine Safe Import --
 try:
     from daivid_hpo_engine import run_daivid_hpo_engine
@@ -149,7 +150,7 @@ except:
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA",  "DOE Panel", "Threshold Optimizer", "AutoML Comparison", "SHAP Comparison", "Smart HPO Recommender", "DAIVID HPO Engine", "Distribution Auditor" 
+    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA",  "DOE Panel", "Threshold Optimizer", "AutoML Comparison", "SHAP Comparison", "Smart HPO Recommender", "DAIVID HPO Engine", "Distribution Auditor", "Smart HPO Recommender" 
 ])
 
 
@@ -286,6 +287,8 @@ elif tab == "DAIVID HPO Engine":
     run_daivid_hpo_engine()
 elif tab == "Distribution Auditor":
     run_distribution_auditor()
+elif tab == "Smart HPO Recommender":
+    run_smart_hpo_recommender()
 
 
 
