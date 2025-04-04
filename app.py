@@ -7,6 +7,12 @@ import traceback  # <-- move this right after streamlit
 st.set_page_config(page_title="Titanic AutoML App", layout="wide")
 
 from tpot_connector import _tpot_cache
+# -- AutoML Comparison Safe Import --
+try:
+    from automl_comparison import run_automl_comparison
+except ImportError:
+    def run_automl_comparison():
+        st.error("❌ AutoML Comparison panel failed to load. Ensure automl_comparison.py exists.")
 # -- Threshold Optimizer Safe Import --
 try:
     from threshold_optimizer import run_threshold_optimizer
@@ -117,7 +123,7 @@ except:
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA",  "DOE Panel", "Threshold Optimizer" 
+    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA",  "DOE Panel", "Threshold Optimizer", "AutoML Comparison" 
 ])
 
 
