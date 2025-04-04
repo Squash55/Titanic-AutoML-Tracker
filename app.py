@@ -1,3 +1,6 @@
+import os
+print("Current files:", os.listdir())
+
 import streamlit as st
 import traceback  # <-- move this right after streamlit
 
