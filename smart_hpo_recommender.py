@@ -6,7 +6,7 @@ from sklearn.preprocessing import PowerTransformer
 from tpot_connector import _tpot_cache
 
 def run_smart_hpo_recommender():
-    st.title("🧠 Smart Algorithm Recommender + HPO Launcher")
+    st.title("\U0001F9E0 Smart Algorithm Recommender + HPO Launcher")
     st.markdown("""
     This panel recommends optimal algorithms based on your dataset characteristics and enables smart hyperparameter sweeps
     with support for feature interactions, regularization, calibrated learners, and early stopping (where supported).
@@ -62,7 +62,7 @@ which can be applied automatically in the preprocessing pipeline. You may overri
     """)
 
     # AI Recommends This
-    st.markdown("### 🤖 AI Recommends These Algorithms")
+    st.markdown("### \U0001F916 AI Recommends These Algorithms")
     recs = []
     if df.shape[0] > 2000:
         recs.append("XGBoost")
@@ -80,7 +80,7 @@ which can be applied automatically in the preprocessing pipeline. You may overri
     )
 
     st.markdown("---")
-    st.markdown("### 🛠️ HPO Configuration")
+    st.markdown("### \U0001F6E0️ HPO Configuration")
 
     model_choice = st.selectbox("Choose Model to Tune:", recs or ["Random Forest", "XGBoost", "Logistic Regression", "Neural Network"])
 
@@ -130,7 +130,7 @@ which can be applied automatically in the preprocessing pipeline. You may overri
     vc_dim = st.slider("Max VC Dimension (Complexity Limit)", 5, 100, 30)
     st.caption("The VC (Vapnik–Chervonenkis) dimension is a theoretical upper bound on a model's complexity and generalization capacity.")
 
-    if st.button("🚀 Launch Smart HPO"):
+    if st.button("\U0001F680 Launch Smart HPO"):
         st.success(f"Running {model_choice} with HPO on up to {max_models} models...")
         st.code("[Simulated launch — future: connect to HPO engine w/ grid, random, or Bayesian sweeps]")
 
@@ -154,7 +154,7 @@ which can be applied automatically in the preprocessing pipeline. You may overri
 
     # Smart Trail Marker
     st.markdown("---")
-    st.markdown("### 🧭 What's Next?")
+    st.markdown("### \U0001F9ED What's Next?")
     st.info(f"""
 ✅ You've configured your Smart HPO settings.
 
