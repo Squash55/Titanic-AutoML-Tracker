@@ -19,11 +19,13 @@ except ImportError:
     def run_daivid_hpo_engine():
         st.error("❌ DAIVID HPO Engine failed to load.")
 
+# -- DAIVID HPO Engine Safe Import --
 try:
     from daivid_hpo_engine import run_daivid_hpo_engine
 except ImportError:
     def run_daivid_hpo_engine():
-        st.error("❌ DAIVID HPO Engine failed to load.")
+        st.error("❌ DAIVID HPO Engine failed to load. Ensure daivid_hpo_engine.py exists and is error-free.")
+
 
 # -- SHAP Comparison Panel Safe Import --
 try:
