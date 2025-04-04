@@ -4,29 +4,29 @@ import streamlit as st
 # Extracted logic function for smart answers (to be tested)
 def get_smart_answer(question):
     if "strongest predictive power" in question:
-        return "Sex is the most powerful predictor. Females had much higher survival rates."
+        return "Sex is the most powerful predictor. Females had much higher survival rates.", "High", "This pattern holds across multiple models and SHAP visualizations."
     elif "surprising features" in question:
-        return "PassengerId and Ticket number had negligible impact on survival prediction."
+        return "PassengerId and Ticket number had negligible impact on survival prediction.", "Medium", "This observation is consistent, but depends on the model used."
     elif "interactions" in question:
-        return "Interactions between Sex and Pclass reveal that females in 1st class had the highest survival odds."
+        return "Interactions between Sex and Pclass reveal that females in 1st class had the highest survival odds.", "High", "This interaction is supported by both domain knowledge and model outputs."
     elif "Pclass interact with sex" in question:
-        return "Pclass modifies the impact of Sex. Males in 3rd class had the lowest survival, while females in 1st had the highest."
+        return "Pclass modifies the impact of Sex. Males in 3rd class had the lowest survival, while females in 1st had the highest.", "High", "This pattern appears in SHAP interaction plots and survival stats."
     elif "most vulnerable" in question:
-        return "3rd class males aged 20–40 were most vulnerable with very low survival rates."
+        return "3rd class males aged 20–40 were most vulnerable with very low survival rates.", "Medium", "Supported by survival distributions but not always emphasized in models."
     elif "family size" in question:
-        return "Larger families had lower survival rates, while small families or solo travelers had better odds."
+        return "Larger families had lower survival rates, while small families or solo travelers had better odds.", "Medium", "General trend in data, but strength of pattern varies."
     elif "fare impact" in question:
-        return "Higher fares correlated with higher survival, especially for 1st class passengers."
+        return "Higher fares correlated with higher survival, especially for 1st class passengers.", "High", "This pattern is consistent and supported by multiple models."
     elif "cabin data" in question:
-        return "Cabin data was missing for most passengers, but presence of a cabin correlated with higher survival."
+        return "Cabin data was missing for most passengers, but presence of a cabin correlated with higher survival.", "Low", "Evidence is sparse due to high missingness in this variable."
     elif "embarked location" in question:
-        return "Passengers who embarked at Cherbourg had slightly higher survival rates, possibly due to more 1st class travelers."
+        return "Passengers who embarked at Cherbourg had slightly higher survival rates, possibly due to more 1st class travelers.", "Medium", "The pattern exists but could be confounded by class distribution."
     elif "children survival" in question:
-        return "Children under 10 had higher survival rates, especially girls, due to priority evacuation."
+        return "Children under 10 had higher survival rates, especially girls, due to priority evacuation.", "High", "Consistently supported by raw data and SHAP values."
     elif "title or honorific" in question:
-        return "Titles like 'Master' or 'Mrs' showed predictive power, hinting at age and gender roles."
+        return "Titles like 'Master' or 'Mrs' showed predictive power, hinting at age and gender roles.", "Medium", "Useful in feature engineering, but effects vary by dataset."
     else:
-        return None
+        return None, "Unknown", "Confidence could not be determined for this question."
 
 def get_followup_questions(question):
     followups = {
@@ -106,9 +106,14 @@ def run_golden_qa():
         st.markdown("---")
         st.markdown(f"**Golden Question:** {selected_q}")
 
-        answer = get_smart_answer(selected_q)
+        answer, confidence, note = get_smart_answer(selected_q)
         if answer:
             st.success(answer)
+            st.markdown(f"**Confidence:** {confidence}")
+            if confidence != "High":
+                st.info(f"🔎 {note}")
+            else:
+                st.caption(f"{note}")
 
             st.markdown("### 🔁 Suggested Follow-Up Questions")
             for fq in get_followup_questions(selected_q):
