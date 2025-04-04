@@ -1,51 +1,117 @@
 # golden_qa.py
-
 import streamlit as st
-import shap
-from tpot_connector import __dict__ as _tpot_cache
-import numpy as np
+
+# Extracted logic function for smart answers (to be tested)
+def get_smart_answer(question):
+    if "strongest predictive power" in question:
+        return "Sex is the most powerful predictor. Females had much higher survival rates."
+    elif "surprising features" in question:
+        return "PassengerId and Ticket number had negligible impact on survival prediction."
+    elif "interactions" in question:
+        return "Interactions between Sex and Pclass reveal that females in 1st class had the highest survival odds."
+    elif "Pclass interact with sex" in question:
+        return "Pclass modifies the impact of Sex. Males in 3rd class had the lowest survival, while females in 1st had the highest."
+    elif "most vulnerable" in question:
+        return "3rd class males aged 20–40 were most vulnerable with very low survival rates."
+    elif "family size" in question:
+        return "Larger families had lower survival rates, while small families or solo travelers had better odds."
+    elif "fare impact" in question:
+        return "Higher fares correlated with higher survival, especially for 1st class passengers."
+    elif "cabin data" in question:
+        return "Cabin data was missing for most passengers, but presence of a cabin correlated with higher survival."
+    elif "embarked location" in question:
+        return "Passengers who embarked at Cherbourg had slightly higher survival rates, possibly due to more 1st class travelers."
+    elif "children survival" in question:
+        return "Children under 10 had higher survival rates, especially girls, due to priority evacuation."
+    elif "title or honorific" in question:
+        return "Titles like 'Master' or 'Mrs' showed predictive power, hinting at age and gender roles."
+    else:
+        return None
+
+def get_followup_questions(question):
+    followups = {
+        "strongest predictive power": [
+            "What is the second most predictive feature?",
+            "Does the top feature change if we remove Sex?",
+            "Is this feature robust across different models?"
+        ],
+        "surprising features": [
+            "Can we safely drop low-impact features?",
+            "Do these features improve performance when combined?"
+        ],
+        "interactions": [
+            "Which interaction terms should we add to the model?",
+            "Can interactions be visualized in SHAP dependence plots?"
+        ],
+        "Pclass interact with sex": [
+            "Should we create a combined Sex_Pclass variable?",
+            "How does survival vary by this interaction?"
+        ],
+        "most vulnerable": [
+            "Can we detect these groups early with a classifier?",
+            "Do these groups have overlapping feature patterns?"
+        ],
+        "family size": [
+            "What is the optimal family size for survival?",
+            "How does family size interact with class?"
+        ],
+        "fare impact": [
+            "Is Fare a proxy for class or something else?",
+            "Does scaling Fare change its influence?"
+        ],
+        "cabin data": [
+            "Can we impute missing cabin data meaningfully?",
+            "Does having cabin info imply more than location?"
+        ],
+        "embarked location": [
+            "Is survival tied to port or class composition?",
+            "What happens when we exclude Embarked?"
+        ],
+        "children survival": [
+            "What age cutoff best separates children and adults?",
+            "Is there a non-linear effect with age?"
+        ],
+        "title or honorific": [
+            "Should we extract more detailed titles?",
+            "Do titles help fill in missing Age values?"
+        ]
+    }
+    return followups.get(question.lower().split(" ")[0], [])
 
 def run_golden_qa():
-    st.subheader("🧠 Golden Q&A with SHAP & Threshold Intelligence")
+    st.markdown("<h2>🧠 <b><span style='color:white;'>D</span><span style='color:red;'>AI</span><span style='color:white;'>VID</span></b> Golden Question Generator + Smart Answer Panel</h2>", unsafe_allow_html=True)
 
-    model = _tpot_cache.get("latest_tpot_model") or _tpot_cache.get("latest_rf_model")
-    X_train = _tpot_cache.get("latest_X_train")
-    threshold = _tpot_cache.get("selected_threshold")
+    with st.expander("📘 What are Golden Questions?"):
+        st.markdown(
+            "Golden Questions are expert-crafted diagnostic prompts that help identify insights, anomalies, and actionable opportunities from your dataset."
+        )
 
-    if model is None or X_train is None:
-        st.warning("⚠️ No model or training data found. Run TPOT or RandomForest first.")
-        return
+    sample_questions = [
+        "Which feature has the strongest predictive power for survival?",
+        "Are there any surprising features with low impact?",
+        "Do interactions between features reveal any new insights?",
+        "How does class (Pclass) interact with sex to affect survival rates?",
+        "Which groups were most vulnerable during the disaster?",
+        "Did family size impact survival outcomes?",
+        "How did fare amounts influence survival rates?",
+        "What was the effect of missing cabin data?",
+        "Did the location of embarkation influence survival?",
+        "Did children have better survival odds?",
+        "Do honorific titles add predictive value?"
+    ]
 
-    try:
-        explainer = shap.Explainer(model, X_train)
-        shap_values = explainer(X_train)
-        feature_importances = np.abs(shap_values.values).mean(axis=0)
-        top_features = sorted(
-            zip(X_train.columns, feature_importances),
-            key=lambda x: x[1],
-            reverse=True
-        )[:5]
+    selected_q = st.selectbox("Choose a Golden Question:", sample_questions)
 
-        st.markdown("### 🔍 Top Feature Drivers (via SHAP)")
-        for feature, score in top_features:
-            st.markdown(f"- **{feature}** → avg impact: `{score:.3f}`")
+    if st.button("💡 Generate Smart Answer"):
+        st.markdown("---")
+        st.markdown(f"**Golden Question:** {selected_q}")
 
-        st.markdown("### 💡 Golden Insights")
-        if threshold is not None:
-            st.success(f"Current classification threshold is **{threshold:.2f}**.")
-            if threshold < 0.4:
-                st.info("This favors **recall** over precision — you're catching more positives, but may have more false alarms.")
-            elif threshold > 0.6:
-                st.info("This favors **precision** — you’ll reduce false positives, but may miss some positives.")
-            else:
-                st.info("You're using a **balanced threshold**. Adjust only if your business case demands more precision or recall.")
+        answer = get_smart_answer(selected_q)
+        if answer:
+            st.success(answer)
 
-        top_feature_names = [f for f, _ in top_features]
-        st.markdown("### 🧭 Suggested Golden Questions")
-        for f in top_feature_names:
-            st.markdown(f"- Why does **{f}** have such a strong influence?")
-            st.markdown(f"- Can we improve **{f}** during training or feature engineering?")
-            st.markdown(f"- Is **{f}** actionable or just correlated?")
-
-    except Exception as e:
-        st.error(f"❌ SHAP analysis failed: {type(e).__name__}: {e}")
+            st.markdown("### 🔁 Suggested Follow-Up Questions")
+            for fq in get_followup_questions(selected_q):
+                st.markdown(f"- {fq}")
+        else:
+            st.warning("Answer logic for this question hasn't been added yet.")
