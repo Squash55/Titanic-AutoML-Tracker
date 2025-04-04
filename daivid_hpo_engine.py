@@ -1,81 +1,106 @@
-# daivid_hpo_engine.py
+# smart_hpo_recommender.py
 import streamlit as st
 import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
-from sklearn.pipeline import Pipeline
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from xgboost import XGBClassifier
-from sklearn.calibration import CalibratedClassifierCV
-from sklearn.metrics import accuracy_score, f1_score
 from tpot_connector import _tpot_cache
 
 
-def run_daivid_hpo_engine():
-    st.subheader("🧪 DAIVID Auto-HPO Engine")
+def run_smart_hpo_recommender():
+    st.title("🧠 Smart Algorithm Recommender + HPO Launcher")
+    st.markdown("""
+    This panel recommends optimal algorithms based on your dataset characteristics and enables smart hyperparameter sweeps
+    with support for feature interactions, regularization, calibrated learners, and early stopping (where supported).
+    """)
 
-    config = _tpot_cache.get("last_hpo_config")
     df = _tpot_cache.get("X_train")
     y = _tpot_cache.get("y_train")
 
-    if not config or df is None or y is None:
-        st.error("Missing config or training data. Please run Smart HPO Recommender first.")
+    if df is None or y is None:
+        st.warning("⚠️ No training data found. Please run AutoML first.")
         return
 
-    st.info(f"Running HPO for: {config['model']}")
+    st.markdown("### 📋 Dataset Snapshot")
+    st.dataframe(df.head())
 
-    # 1. Split the data
-    X_train, X_test, y_train, y_test = train_test_split(
-        df, y, test_size=config['test_size'] / 100.0, random_state=42
+    # Basic Profiling
+    st.markdown("### 🧬 Dataset Diagnostics")
+    st.write(f"Shape: {df.shape}")
+    st.write(f"Missing Values: {df.isnull().sum().sum()}")
+    st.write(f"Numeric Features: {df.select_dtypes(include='number').shape[1]}")
+    st.write(f"Categorical Features: {df.select_dtypes(exclude='number').shape[1]}")
+
+    # AI Recommends This
+    st.markdown("### 🤖 AI Recommends These Algorithms")
+    recs = []
+    if df.shape[0] > 2000:
+        recs.append("XGBoost")
+    if df.select_dtypes(include='number').shape[1] < 10:
+        recs.append("Logistic Regression")
+    if df.select_dtypes(exclude='number').shape[1] > 3:
+        recs.append("CatBoost")
+    if df.shape[1] > 15:
+        recs.append("Random Forest")
+    if df.select_dtypes(include='number').shape[1] > 20:
+        recs.append("Neural Network")
+
+    st.success(
+        "Top Algorithm Suggestions: " + ", ".join(recs) if recs else "Unable to determine best models — run EDA first."
     )
 
-    # 2. Normalization
-    if config['norm'] == "Z-Score":
-        scaler = StandardScaler()
-    elif config['norm'] == "MinMax":
-        scaler = MinMaxScaler()
-    elif config['norm'] == "Robust":
-        scaler = RobustScaler()
-    else:
-        scaler = None
+    st.markdown("---")
+    st.markdown("### 🛠️ HPO Configuration")
 
-    # 3. Model Selection
-    base_model = None
-    if config['model'] == "Random Forest":
-        base_model = RandomForestClassifier(n_estimators=100, random_state=42)
-    elif config['model'] == "Logistic Regression":
-        base_model = LogisticRegression(max_iter=500)
-    elif config['model'] == "XGBoost":
-        base_model = XGBClassifier(use_label_encoder=False, eval_metric='logloss')
+    model_choice = st.selectbox("Choose Model to Tune:", recs or ["Random Forest", "XGBoost", "Logistic Regression", "Neural Network"])
 
-    if config['calibrated']:
-        base_model = CalibratedClassifierCV(base_model)
+    st.markdown("**Early Stopping** (if supported)")
+    use_early_stopping = st.checkbox("Enable Early Stopping", value=True)
 
-    # 4. Build pipeline
-    steps = []
-    if scaler:
-        steps.append(('scaler', scaler))
-    steps.append(('model', base_model))
-    pipe = Pipeline(steps)
+    st.markdown("**Include Calibrated Learner**")
+    calibrate = st.checkbox("Yes, calibrate this model")
 
-    # 5. Fit model
-    pipe.fit(X_train, y_train)
-    y_pred = pipe.predict(X_test)
-    y_proba = pipe.predict_proba(X_test)[:, 1] if hasattr(pipe, 'predict_proba') else None
+    st.markdown("**Feature Engineering Options**")
+    test_interactions = st.checkbox("Test 2- and 3-way Interactions", value=False)
+    test_feature_counts = st.slider("Max # Features to Test", 3, df.shape[1], min(10, df.shape[1]))
 
-    # 6. Score
-    acc = accuracy_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred)
+    st.markdown("**Data Preprocessing Options**")
+    norm = st.selectbox("Normalization Method:", ["None", "MinMax", "Z-Score", "Robust"])
+    encoding = st.selectbox("Categorical Encoding:", ["OneHot", "Ordinal", "Binary"])
+    bin_method = st.selectbox("Binning Method:", ["None", "Quantile", "Uniform", "Entropy"])
+    bin_count = st.slider("# of Bins", 2, 10, 4)
 
-    st.success(f"Accuracy: {acc:.4f} | F1 Score: {f1:.4f}")
+    st.markdown("**Training Split**")
+    test_size = st.slider("Test Size %", 10, 50, 20)
 
-    # 7. Store to cache
-    _tpot_cache['y_test'] = y_test
-    _tpot_cache['y_pred'] = y_pred
-    _tpot_cache['y_pred_proba'] = y_proba
+    st.markdown("**HPO Budget**")
+    max_models = st.slider("Max Models to Test", 5, 50, 15)
+    parallel_mode = st.checkbox("🔁 Run in Parallel (Dask mode)", value=True)
 
-    _tpot_cache.setdefault("all_models", {})[f"DAIVID_{config['model']}"] = pipe
+    if st.button("🚀 Launch Smart HPO"):
+        st.success(f"Running {model_choice} with HPO on up to {max_models} models...")
+        st.code("[Simulated launch — future: connect to HPO engine w/ grid, random, or Bayesian sweeps]")
 
-    st.success(f"Model '{config['model']}' stored in DAIVID model zoo ✅")
+        # Cache config if needed elsewhere
+        _tpot_cache["last_hpo_config"] = {
+            "model": model_choice,
+            "early_stopping": use_early_stopping,
+            "calibrated": calibrate,
+            "interactions": test_interactions,
+            "max_features": test_feature_counts,
+            "norm": norm,
+            "encoding": encoding,
+            "bins": (bin_method, bin_count),
+            "test_size": test_size,
+            "max_models": max_models,
+            "parallel": parallel_mode
+        }
+
+    # Smart Trail Marker
+    st.markdown("---")
+    st.markdown("### 🧭 What's Next?")
+    st.info("""
+✅ You've configured your Smart HPO settings.
+
+➡️ **Next Step: Launch the DAIVID HPO Engine**
+This will train your selected model and unlock Threshold Optimization, SHAP, and Golden Q&A.
+    """)
+    if st.button("🚀 Go to DAIVID HPO Engine"):
+        st.session_state.tab = "DAIVID HPO Engine"
