@@ -232,11 +232,16 @@ elif tab == "DOE Panel":
         run_doe_panel(df=st.session_state["X_train"], model=st.session_state["model"])
     else:
         st.warning("🚧 Required objects missing. Train a model first to use the DOE panel.")
+# -- Threshold Optimizer Tab --
 elif tab == "Threshold Optimizer":
-    run_threshold_optimizer(
-        y_true=_tpot_cache.get("y_test"),
-        y_proba=_tpot_cache.get("y_pred_proba")
-    )
+    from tpot_connector import _tpot_cache  # 🧠 This must exist earlier in your project
+    y_true = _tpot_cache.get("y_test")
+    y_proba = _tpot_cache.get("y_pred_proba")
+
+    if y_true is not None and y_proba is not None:
+        run_threshold_optimizer(y_true=y_true, y_proba=y_proba)
+    else:
+        st.warning("🟡 TPOT predictions not found. Please run AutoML first.")
 
 
 
