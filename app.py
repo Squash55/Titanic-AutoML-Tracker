@@ -232,7 +232,10 @@ elif tab == "DOE Panel":
     else:
         st.warning("🚧 Required objects missing. Train a model first to use the DOE panel.")
 elif tab == "Threshold Optimizer":
-    run_threshold_optimizer(y_true=_tpot_cache.get("y_test"), y_proba=_tpot_cache.get("y_pred_proba"))
+    run_threshold_optimizer(
+        y_true=_tpot_cache.get("y_test"),
+        y_proba=_tpot_cache.get("y_pred_proba")
+    )
 
 
 
