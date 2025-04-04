@@ -6,6 +6,7 @@ import traceback  # <-- move this right after streamlit
 
 st.set_page_config(page_title="Titanic AutoML App", layout="wide")
 
+from tpot_connector import _tpot_cache
 # -- Threshold Optimizer Safe Import --
 try:
     from threshold_optimizer import run_threshold_optimizer
