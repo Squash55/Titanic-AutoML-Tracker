@@ -7,12 +7,20 @@ import traceback  # <-- move this right after streamlit
 st.set_page_config(page_title="Titanic AutoML App", layout="wide")
 
 from tpot_connector import _tpot_cache
+
+# -- SHAP Comparison Panel Safe Import --
+try:
+    from shap_comparison import run_shap_comparison
+except ImportError:
+    def run_shap_comparison():
+        st.error("❌ SHAP Comparison panel failed to load. Ensure shap_comparison.py is present.")
 # -- AutoML Comparison Safe Import --
 try:
     from automl_comparison import run_automl_comparison
 except ImportError:
     def run_automl_comparison():
         st.error("❌ AutoML Comparison panel failed to load. Ensure automl_comparison.py exists.")
+
 # -- Threshold Optimizer Safe Import --
 try:
     from threshold_optimizer import run_threshold_optimizer
