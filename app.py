@@ -19,6 +19,12 @@ except ImportError:
     def run_daivid_hpo_engine():
         st.error("❌ DAIVID HPO Engine failed to load.")
 
+try:
+    from daivid_hpo_engine import run_daivid_hpo_engine
+except ImportError:
+    def run_daivid_hpo_engine():
+        st.error("❌ DAIVID HPO Engine failed to load.")
+
 # -- SHAP Comparison Panel Safe Import --
 try:
     from shap_comparison import run_shap_comparison
@@ -273,6 +279,8 @@ elif tab == "SHAP Comparison":
     run_shap_comparison()
 elif tab == "Smart HPO Recommender":
     run_smart_hpo_recommender()
+elif tab == "DAIVID HPO Engine":
+    run_daivid_hpo_engine()
 elif tab == "DAIVID HPO Engine":
     run_daivid_hpo_engine()
 
