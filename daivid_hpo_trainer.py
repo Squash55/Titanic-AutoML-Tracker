@@ -28,9 +28,13 @@ def run_daivid_hpo_trainer():
         st.markdown("### ⚙️ HPO Training in Progress")
         st.code(config)
 
-        # (You can add your HPO logic here...)
+        # [Future: plug in Optuna, GridSearch, etc.]
+        st.success("✅ HPO logic will be inserted here based on selected config.")
+        
     except Exception as e:
-        st.error(f"❌ DAIVID HPO Trainer failed to load: {type(e).__name__}: {e}")
+        import traceback
+        st.error(f"❌ DAIVID HPO Trainer failed to run: {type(e).__name__}: {e}")
+        st.code(traceback.format_exc())
     
     # Allow user to select scoring metric
     scoring_map = {
