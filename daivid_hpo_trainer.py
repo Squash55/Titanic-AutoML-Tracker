@@ -30,7 +30,7 @@ def run_daivid_hpo_trainer():
         st.markdown("### ⚙️ HPO Training in Progress")
         st.code(config)
         
-               import optuna
+import optuna
         from sklearn.model_selection import cross_val_score
 
         model_choice = config["model"]
