@@ -290,12 +290,11 @@ elif tab == "Smart HPO Recommender":
     run_smart_hpo_recommender()
 elif tab == "Distribution Auditor":
     run_distribution_auditor()
-elif tab == "Smart HPO Recommender":
-    run_smart_hpo_recommender()
-elif tab == "DAIVID HPO Trainer":
-    run_daivid_hpo_trainer()
 elif tab == "DAIVID HPO Engine":
     run_daivid_hpo_engine()
+elif tab == "DAIVID HPO Trainer":
+    run_daivid_hpo_trainer()
+
 
 
 
