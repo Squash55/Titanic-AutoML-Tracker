@@ -16,14 +16,12 @@ except ImportError:
     def run_shap_waterfall():
         st.error("❌ SHAP Waterfall Panel failed to load.")
         
-# -- Safely import DOE Panel --
 # -- DOE Panel Safe Import --
 try:
   from doe_panel import run_doe_panel
 except ImportError:
-    def run_doe_panel(df=None, model=None):
-        st.error("❌ DOE Panel failed to load. Ensure doe_panel.py exists and is error-free.")
-
+  def run_doe_panel(df=None, model=None):
+    st.error("❌ DOE Panel failed to load. Ensure doe_panel.py exists and is error-free.")
 
 # Near the top
 try:
