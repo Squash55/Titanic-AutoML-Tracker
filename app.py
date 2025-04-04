@@ -131,7 +131,7 @@ except:
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA",  "DOE Panel", "Threshold Optimizer", "AutoML Comparison" 
+    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA",  "DOE Panel", "Threshold Optimizer", "AutoML Comparison", "SHAP Comparison" 
 ])
 
 
@@ -256,6 +256,10 @@ elif tab == "Threshold Optimizer":
         run_threshold_optimizer(y_true=y_true, y_proba=y_proba)
     else:
         st.warning("🟡 TPOT predictions not found. Please run AutoML first.")
+elif tab == "SHAP Comparison":
+    run_shap_comparison()
+elif tab == "SHAP Comparison":
+    run_shap_comparison()
 
 
 
