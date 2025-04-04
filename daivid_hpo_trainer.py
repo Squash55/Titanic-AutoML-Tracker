@@ -29,9 +29,42 @@ def run_daivid_hpo_trainer():
 
         st.markdown("### ⚙️ HPO Training in Progress")
         st.code(config)
+        
+               import optuna
+        from sklearn.model_selection import cross_val_score
 
-        # [Future: plug in Optuna, GridSearch, etc.]
-        st.success("✅ HPO logic will be inserted here based on selected config.")
+        model_choice = config["model"]
+
+        def objective(trial):
+            if model_choice == "Random Forest":
+                from sklearn.ensemble import RandomForestClassifier
+                n_estimators = trial.suggest_int("n_estimators", 50, 300)
+                max_depth = trial.suggest_int("max_depth", 3, 20)
+                clf = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth)
+            elif model_choice == "XGBoost":
+                from xgboost import XGBClassifier
+                n_estimators = trial.suggest_int("n_estimators", 50, 300)
+                learning_rate = trial.suggest_float("learning_rate", 0.01, 0.3)
+                max_depth = trial.suggest_int("max_depth", 3, 10)
+                clf = XGBClassifier(n_estimators=n_estimators, learning_rate=learning_rate, max_depth=max_depth)
+            elif model_choice == "Logistic Regression":
+                from sklearn.linear_model import LogisticRegression
+                C = trial.suggest_float("C", 0.01, 10.0, log=True)
+                clf = LogisticRegression(C=C, max_iter=1000)
+            else:
+                raise ValueError(f"Unsupported model: {model_choice}")
+
+            score = cross_val_score(clf, X, y, scoring="accuracy", cv=3).mean()
+            return score
+
+        st.info("🔍 Running Optuna study...")
+        study = optuna.create_study(direction="maximize")
+        study.optimize(objective, n_trials=config.get("max_models", 20))
+
+        st.success("✅ Optimization Complete!")
+        st.write("📈 Best Accuracy:", round(study.best_value, 4))
+        st.write("📊 Best Parameters:")
+        st.json(study.best_params)
 
     except ImportError as e:
         if "optuna" in str(e):
@@ -43,7 +76,6 @@ def run_daivid_hpo_trainer():
         st.error(f"❌ DAIVID HPO Trainer failed to run: {type(e).__name__}: {e}")
         st.code(traceback.format_exc())
 
-    
     # Allow user to select scoring metric
     scoring_map = {
         "AUC": (roc_auc_score, "roc_auc"),
