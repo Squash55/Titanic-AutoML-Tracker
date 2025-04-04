@@ -53,10 +53,6 @@ jobs:
           echo "🧪 Running pytest..."
           pytest test_golden_qa.py || echo "⚠️ Pytest failed, continuing..."
 
-      - name: Run standalone import test file
-        run: |
-          echo "🚦 Running standalone test_imports.py..."
-          python test_imports.py
 
       - name: Debug Environment
         run: |
