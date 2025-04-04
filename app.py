@@ -16,6 +16,14 @@ except ImportError:
     def run_shap_waterfall():
         st.error("❌ SHAP Waterfall Panel failed to load.")
         
+# -- Safely import DOE Panel --
+try:
+    from doe_panel import run_doe_panel
+except ImportError:
+    def run_doe_panel(*args, **kwargs):
+        import streamlit as st
+        st.error("❌ DOE Panel failed to load. Make sure doe_panel.py exists and is correctly named.")
+
 # Near the top
 try:
     from auto_eda import run_auto_eda
@@ -101,7 +109,7 @@ except:
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA" 
+    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA",  "DOE Panel" 
 ])
 
 
@@ -211,6 +219,9 @@ elif tab == "Saved Models":
     run_saved_models_panel()
 elif tab == "Auto EDA":
     run_auto_eda()
+elif tab == "DOE Panel":
+    # ⚠️ Replace 'X_train' and 'model' with your actual dataset and model variables
+    run_doe_panel(df=X_train, model=model)
 
 
 
