@@ -53,10 +53,15 @@ jobs:
             timeout 10s python -c "import $module" || echo "⚠️ Import failed or timed out: $module"
           done
 
-      - name: Run pytest for golden_qa.py
+           - name: Run pytest for golden_qa.py
         run: |
           echo "🧪 Running pytest..."
           pytest test_golden_qa.py || echo "⚠️ Pytest failed, continuing..."
+
+      - name: Run standalone import test file
+        run: |
+          echo "🚦 Running standalone test_imports.py..."
+          python test_imports.py
 
       - name: Debug Environment
         run: |
