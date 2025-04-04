@@ -3,6 +3,12 @@ import traceback  # <-- move this right after streamlit
 
 st.set_page_config(page_title="Titanic AutoML App", layout="wide")
 
+# -- Threshold Optimizer Safe Import --
+try:
+    from threshold_optimizer import run_threshold_optimizer
+except ImportError:
+    def run_threshold_optimizer(y_true=None, y_proba=None):
+        st.error("❌ Threshold Optimizer failed to load. Check threshold_optimizer.py is present and error-free.")
 # -- DOE Panel Safe Import --
 try:
     from doe_panel import run_doe_panel
@@ -107,7 +113,7 @@ except:
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA",  "DOE Panel" 
+    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA",  "DOE Panel", "Threshold Optimizer" 
 ])
 
 
@@ -222,6 +228,8 @@ elif tab == "DOE Panel":
         run_doe_panel(df=st.session_state["X_train"], model=st.session_state["model"])
     else:
         st.warning("🚧 Required objects missing. Train a model first to use the DOE panel.")
+elif tab == "Threshold Optimizer":
+    run_threshold_optimizer(y_true=_tpot_cache.get("y_test"), y_proba=_tpot_cache.get("y_pred_proba"))
 
 
 
