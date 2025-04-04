@@ -13,6 +13,11 @@ try:
 except ImportError:
     def run_smart_hpo_recommender():
         st.error("❌ Smart HPO Recommender failed to load.")
+try:
+    from daivid_hpo_engine import run_daivid_hpo_engine
+except ImportError:
+    def run_daivid_hpo_engine():
+        st.error("❌ DAIVID HPO Engine failed to load.")
 
 # -- SHAP Comparison Panel Safe Import --
 try:
@@ -137,7 +142,7 @@ except:
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA",  "DOE Panel", "Threshold Optimizer", "AutoML Comparison", "SHAP Comparison", "Smart HPO Recommender" 
+    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA",  "DOE Panel", "Threshold Optimizer", "AutoML Comparison", "SHAP Comparison", "Smart HPO Recommender", "DAIVID HPO Engine" 
 ])
 
 
@@ -268,6 +273,8 @@ elif tab == "SHAP Comparison":
     run_shap_comparison()
 elif tab == "Smart HPO Recommender":
     run_smart_hpo_recommender()
+elif tab == "DAIVID HPO Engine":
+    run_daivid_hpo_engine()
 
 
 
