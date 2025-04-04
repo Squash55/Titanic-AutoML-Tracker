@@ -1,74 +1,56 @@
 # automl_comparison.py
-
 import streamlit as st
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-from sklearn.ensemble import RandomForestClassifier
-from tpot import TPOTClassifier
-import time
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-from tpot_connector import __dict__ as _tpot_cache
-
-
-@st.cache_data
-def load_titanic_data():
-    df = pd.read_csv("https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv")
-    df = df.drop(columns=["PassengerId", "Name", "Ticket", "Cabin"])
-    df["Sex"] = df["Sex"].map({"male": 0, "female": 1})
-    df["Embarked"] = df["Embarked"].map({"S": 0, "C": 1, "Q": 2})
-    df = df.fillna(df.median(numeric_only=True))
-    df = df.dropna()
-    X = df.drop("Survived", axis=1)
-    y = df["Survived"]
-    return train_test_split(X, y, test_size=0.2, random_state=42)
+from tpot_connector import _tpot_cache
 
 
 def run_automl_comparison():
-    st.subheader("🤖 AutoML Comparison Panel")
+    st.title("📊 AutoML Comparison Dashboard")
+    st.markdown("""
+    This panel compares the performance of all AutoML models you've run.
+    Metrics include accuracy, F1, AUC, feature count, and training time.
+    Use this to identify the best-performing model or spot overfitting.
+    """)
 
-    X_train, X_test, y_train, y_test = load_titanic_data()
-    results = []
+    # Load cached results from TPOT and H2O if available
+    model_results = _tpot_cache.get("model_results", pd.DataFrame())
 
-    # TPOT AutoML
-    if st.button("⚙️ Run TPOT AutoML"):
-        start = time.time()
-        tpot = TPOTClassifier(generations=3, population_size=10, verbosity=0, max_time_mins=2, random_state=42)
-        tpot.fit(X_train, y_train)
-        acc = accuracy_score(y_test, tpot.predict(X_test))
-        end = time.time()
-        results.append(("TPOT", acc, end - start))
-        st.success(f"TPOT accuracy: {acc:.3f}, time: {end - start:.1f}s")
+    if model_results.empty:
+        st.warning("⚠️ No model results found. Run TPOT or H2O AutoML to populate this table.")
+        return
 
-        # Save to shared memory
-        _tpot_cache["latest_tpot_model"] = tpot.fitted_pipeline_
-        _tpot_cache["latest_X_train"] = X_train
-        _tpot_cache["latest_X_test"] = X_test
-        _tpot_cache["latest_y_train"] = y_train
-        _tpot_cache["latest_y_test"] = y_test
+    # Metric selection
+    metric_to_sort = st.selectbox("🔢 Sort models by:", ["Accuracy", "F1", "AUC", "Training Time", "Delta (Overfit)"])
+    ascending_sort = metric_to_sort == "Training Time"  # For time, lower is better
 
-    # Random Forest Baseline
-    if st.button("🌲 Run RandomForest Baseline"):
-        start = time.time()
-        model = RandomForestClassifier(random_state=42)
-        model.fit(X_train, y_train)
-        acc = accuracy_score(y_test, model.predict(X_test))
-        end = time.time()
-        results.append(("RandomForest", acc, end - start))
-        st.success(f"RandomForest accuracy: {acc:.3f}, time: {end - start:.1f}s")
+    # Sort and display
+    sorted_results = model_results.sort_values(by=metric_to_sort, ascending=ascending_sort)
+    st.dataframe(sorted_results)
 
-        # Save to shared memory
-        _tpot_cache["latest_rf_model"] = model
-        _tpot_cache["latest_X_train"] = X_train
-        _tpot_cache["latest_X_test"] = X_test
-        _tpot_cache["latest_y_train"] = y_train
-        _tpot_cache["latest_y_test"] = y_test
+    # Highlight best performer
+    best_model = sorted_results.iloc[0]
+    st.success(f"🏆 Best Model: {best_model['Model Name']} (Top {metric_to_sort}: {best_model[metric_to_sort]:.4f})")
 
-    # Show results table + bar chart
-    if results:
-        df = pd.DataFrame(results, columns=["Model", "Accuracy", "Training Time (s)"])
-        st.markdown("### 📊 Comparison Results")
-        st.dataframe(df)
-        st.bar_chart(df.set_index("Model")[["Accuracy", "Training Time (s)"]])
-    else:
-        st.info("Click a button above to run and compare AutoML tools.")
+    # Bar plots
+    st.markdown("### 📈 Metric Bar Plots")
+    fig, ax = plt.subplots(figsize=(10, 4))
+    sns.barplot(data=sorted_results, x="Model Name", y=metric_to_sort, ax=ax)
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
+    ax.set_title(f"Model Comparison by {metric_to_sort}")
+    st.pyplot(fig)
+
+    # Show overfitting spread
+    st.markdown("### ⚠️ Train vs Test Delta (Overfitting Risk)")
+    fig2, ax2 = plt.subplots(figsize=(10, 4))
+    sns.barplot(data=sorted_results, x="Model Name", y="Delta (Overfit)", ax=ax2)
+    ax2.axhline(0.1, color='red', linestyle='--', label='Risk Threshold')
+    ax2.legend()
+    ax2.set_title("Train-Test Gap per Model")
+    st.pyplot(fig2)
+
+    # SHAP Hook Placeholder
+    st.markdown("### 🧠 SHAP Comparison (Coming Soon)")
+    st.info("Side-by-side SHAP importance plots will appear here once multiple models are available.")
