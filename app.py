@@ -7,6 +7,12 @@ import traceback  # <-- move this right after streamlit
 st.set_page_config(page_title="Titanic AutoML App", layout="wide")
 
 from tpot_connector import _tpot_cache
+# -- Distribution Auditor Safe Import --
+try:
+    from distribution_auditor import run_distribution_auditor
+except ImportError:
+    def run_distribution_auditor():
+        st.error("❌ Distribution Auditor failed to load. Check for typos or missing file.")
 
 try:
     from smart_hpo_recommender import run_smart_hpo_recommender
@@ -143,7 +149,7 @@ except:
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA",  "DOE Panel", "Threshold Optimizer", "AutoML Comparison", "SHAP Comparison", "Smart HPO Recommender", "DAIVID HPO Engine" 
+    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA",  "DOE Panel", "Threshold Optimizer", "AutoML Comparison", "SHAP Comparison", "Smart HPO Recommender", "DAIVID HPO Engine", "Distribution Auditor" 
 ])
 
 
@@ -278,6 +284,8 @@ elif tab == "DAIVID HPO Engine":
     run_daivid_hpo_engine()
 elif tab == "DAIVID HPO Engine":
     run_daivid_hpo_engine()
+elif tab == "Distribution Auditor":
+    run_distribution_auditor()
 
 
 
