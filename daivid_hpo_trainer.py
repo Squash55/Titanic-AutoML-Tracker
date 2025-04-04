@@ -12,6 +12,8 @@ from sklearn.neural_network import MLPClassifier
 
 def run_daivid_hpo_trainer():
     try:
+        import optuna  # 👈 put this INSIDE the try block
+
         st.title("🧪 DAIVID HPO Trainer")
         st.markdown("""
         This module performs hyperparameter optimization using the selected configuration from the Smart HPO panel.
@@ -30,11 +32,17 @@ def run_daivid_hpo_trainer():
 
         # [Future: plug in Optuna, GridSearch, etc.]
         st.success("✅ HPO logic will be inserted here based on selected config.")
-        
+
+    except ImportError as e:
+        if "optuna" in str(e):
+            st.error("❌ Optuna not installed. Please install it with `pip install optuna`.")
+        else:
+            st.error(f"❌ Import error: {type(e).__name__}: {e}")
     except Exception as e:
         import traceback
         st.error(f"❌ DAIVID HPO Trainer failed to run: {type(e).__name__}: {e}")
         st.code(traceback.format_exc())
+
     
     # Allow user to select scoring metric
     scoring_map = {
