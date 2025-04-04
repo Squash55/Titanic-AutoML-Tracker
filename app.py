@@ -24,8 +24,11 @@ except ImportError:
 try:
     from daivid_hpo_trainer import run_daivid_hpo_trainer
 except Exception as e:
+    import traceback
+    st.error(f"❌ DAIVID HPO Trainer failed to import: {type(e).__name__}: {e}")
+    st.code(traceback.format_exc())
     def run_daivid_hpo_trainer():
-        st.error(f"❌ DAIVID HPO Trainer failed to load: {type(e).__name__}: {e}")
+        st.error("❌ DAIVID HPO Trainer is unavailable due to earlier import error.")
 
 # -- DAIVID HPO Engine Safe Import --
 try:
