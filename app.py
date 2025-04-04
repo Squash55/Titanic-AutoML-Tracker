@@ -290,10 +290,6 @@ elif tab == "SHAP Comparison":
     run_shap_comparison()
 elif tab == "Smart HPO Recommender":
     run_smart_hpo_recommender()
-elif tab == "DAIVID HPO Engine":
-    run_daivid_hpo_engine()
-elif tab == "DAIVID HPO Engine":
-    run_daivid_hpo_engine()
 elif tab == "Distribution Auditor":
     run_distribution_auditor()
 elif tab == "Smart HPO Recommender":
