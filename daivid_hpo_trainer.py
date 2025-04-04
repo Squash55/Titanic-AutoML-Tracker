@@ -12,8 +12,6 @@ from sklearn.neural_network import MLPClassifier
 
 def run_daivid_hpo_trainer():
     try:
-        import optuna  # 👈 put this INSIDE the try block
-
         st.title("🧪 DAIVID HPO Trainer")
         st.markdown("""
         This module performs hyperparameter optimization using the selected configuration from the Smart HPO panel.
@@ -27,10 +25,7 @@ def run_daivid_hpo_trainer():
             st.warning("⚠️ Training data not found. Please run AutoML first.")
             return
 
-        st.markdown("### ⚙️ HPO Training in Progress")
-        st.code(config)
-        
-import optuna
+        import optuna
         from sklearn.model_selection import cross_val_score
 
         model_choice = config["model"]
@@ -54,23 +49,16 @@ import optuna
             else:
                 raise ValueError(f"Unsupported model: {model_choice}")
 
-            score = cross_val_score(clf, X, y, scoring="accuracy", cv=3).mean()
-            return score
+            return cross_val_score(clf, X, y, scoring="accuracy", cv=3).mean()
 
         st.info("🔍 Running Optuna study...")
         study = optuna.create_study(direction="maximize")
-        study.optimize(objective, n_trials=config.get("max_models", 20))
+        study.optimize(objective, n_trials=config.get("max_models", 10))
 
-        st.success("✅ Optimization Complete!")
-        st.write("📈 Best Accuracy:", round(study.best_value, 4))
-        st.write("📊 Best Parameters:")
-        st.json(study.best_params)
+        st.success("✅ HPO Completed")
+        st.write("Best Score:", study.best_value)
+        st.write("Best Parameters:", study.best_params)
 
-    except ImportError as e:
-        if "optuna" in str(e):
-            st.error("❌ Optuna not installed. Please install it with `pip install optuna`.")
-        else:
-            st.error(f"❌ Import error: {type(e).__name__}: {e}")
     except Exception as e:
         import traceback
         st.error(f"❌ DAIVID HPO Trainer failed to run: {type(e).__name__}: {e}")
