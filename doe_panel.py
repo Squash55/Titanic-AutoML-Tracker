@@ -6,12 +6,11 @@ import seaborn as sns
 import shap
 from sklearn.preprocessing import LabelEncoder
 
-
 def run_doe_panel(df=None, model=None):
     st.markdown("""
     ## 🧪 Design of Experiments (DOE) Panel
-    This panel performs a screening DOE using the top SHAP-ranked factors.
-    Explore how key drivers affect survival predictions and detect interactions.
+    This panel performs a SHAP-prioritized screening DOE using the top 8 ranked factors.
+    Explore how key drivers affect survival predictions and uncover key interactions.
     """)
 
     if df is None or model is None:
@@ -42,10 +41,11 @@ def run_doe_panel(df=None, model=None):
         st.error(f"SHAP computation failed: {e}")
         top_features = X.columns[:8].tolist()
 
-    st.markdown("### 🔢 SHAP-Prioritized Features")
+    st.markdown("### 🔢 SHAP-Prioritized Factors")
+    st.info("Factors selected by SHAP as the most influential in the model.")
     st.write(top_features)
 
-    selected_factors = st.multiselect("Select DOE factors:", options=X.columns.tolist(), default=top_features)
+    selected_factors = st.multiselect("🎯 Select DOE Factors:", options=X.columns.tolist(), default=top_features)
     if len(selected_factors) < 2:
         st.info("Select at least two factors for interaction exploration.")
         return
@@ -61,17 +61,17 @@ def run_doe_panel(df=None, model=None):
     # Interaction
     st.markdown("### 🔄 Interaction Explorer")
     f1 = st.selectbox("Factor 1:", selected_factors)
-    f2 = st.selectbox("Factor 2:", selected_factors, index=1 if len(selected_factors) > 1 else 0)
+    f2 = st.selectbox("Factor 2:", [f for f in selected_factors if f != f1])
     fig, ax = plt.subplots()
     sns.pointplot(x=f1, y='Survived', hue=f2, data=df, ax=ax)
     ax.set_title(f"Interaction: {f1} × {f2} on Survival")
     st.pyplot(fig)
 
-    # DOE Summary
-    st.markdown("### 📊 Top Combinations Table")
+    # DOE Summary Table
+    st.markdown("### 📊 Top Factor Combinations")
     summary = df.groupby(selected_factors)['Survived'].mean().reset_index().sort_values(by='Survived', ascending=False)
     st.dataframe(summary.head(20))
 
-    # Auto Interpretation placeholder
+    # Auto Interpretation
     st.markdown("### 🧠 Auto Interpretation")
-    st.markdown("This section will evolve to highlight statistically interesting interactions, suggest DOE refinements, and visualize estimated effects.")
+    st.success("Upcoming: This section will highlight statistically interesting interactions, suggest DOE refinements, and visualize marginal effects.")
