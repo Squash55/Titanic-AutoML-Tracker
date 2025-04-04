@@ -286,8 +286,6 @@ elif tab == "Threshold Optimizer":
         st.warning("🟡 TPOT predictions not found. Please run AutoML first.")
 elif tab == "SHAP Comparison":
     run_shap_comparison()
-elif tab == "SHAP Comparison":
-    run_shap_comparison()
 elif tab == "Smart HPO Recommender":
     run_smart_hpo_recommender()
 elif tab == "Distribution Auditor":
