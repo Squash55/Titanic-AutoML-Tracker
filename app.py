@@ -282,7 +282,23 @@ elif tab == "Threshold Optimizer":
     from tpot_connector import _tpot_cache  # 🧠 This must exist earlier in your project
     y_true = _tpot_cache.get("y_test")
     y_proba = _tpot_cache.get("y_pred_proba")
+# -- Zoomed HPO Trainer Safe Import --
+try:
+    from daivid_hpo_trainer import run_daivid_hpo_trainer
+except Exception as e:
+    import streamlit as st
+    def run_daivid_hpo_trainer():
+        st.error(f"❌ DAIVID HPO Trainer failed to load: {type(e).__name__}: {e}")
+# -- Zoomed HPO Explorer Safe Import --
+try:
+    from zoom_hpo_explorer import run_zoom_hpo_explorer
+except Exception as e:
+    import streamlit as st
+    error_message = f"❌ Zoomed HPO Explorer failed to load: {type(e).__name__}: {e}"
+    def run_zoom_hpo_explorer():
+        st.error(error_message)
 
+# if and elif
     if y_true is not None and y_proba is not None:
         run_threshold_optimizer(y_true=y_true, y_proba=y_proba)
     else:
@@ -297,14 +313,6 @@ elif tab == "DAIVID HPO Engine":
     run_daivid_hpo_engine()
 elif tab == "DAIVID HPO Trainer":
     run_daivid_hpo_trainer()
-# -- Zoomed HPO Explorer Safe Import --
-try:
-    from zoom_hpo_explorer import run_zoom_hpo_explorer
-except Exception as e:
-    import streamlit as st
-    error_message = f"❌ Zoomed HPO Explorer failed to load: {type(e).__name__}: {e}"
-    def run_zoom_hpo_explorer():
-        st.error(error_message)
 elif tab == "Zoomed HPO Explorer":
     run_zoom_hpo_explorer()
 
