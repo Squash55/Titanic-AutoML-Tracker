@@ -58,11 +58,10 @@ if show_all:
     st.sidebar.markdown("### 🗺️ DAIVID Roadmap")
     st.sidebar.markdown("Explore all phases and their tools:")
     for phase, tabs in phase_tabs.items():
-        st.sidebar.markdown(f"**{phase}**")
-        for t in tabs:
-            st.sidebar.markdown(f"- {t}")
+        with st.sidebar.expander(f"{phase}", expanded=False):
+            for t in tabs:
+                st.markdown(f"- {t}")
     st.sidebar.markdown("---")
-
     phase = st.sidebar.selectbox("🔢 Choose Phase to Explore", list(phase_tabs.keys()), index=0)
 else:
     phase = st.sidebar.selectbox("🔢 Phase", list(phase_tabs.keys()), index=0)
