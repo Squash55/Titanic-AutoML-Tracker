@@ -1,5 +1,6 @@
 xgboost
 plotly
+featuretools
 numpy
 setuptools
 lightgbm
