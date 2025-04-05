@@ -159,9 +159,10 @@ except:
 # -- Sidebar navigation --
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
-    "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
-    "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA",  "DOE Panel", "Threshold Optimizer", "AutoML Comparison", "SHAP Comparison", "Distribution Auditor", "Smart HPO Recommender", "DAIVID HPO Engine",
- "DAIVID HPO Trainer", "Zoomed HPO Explorer"
+     "Notebook Scout", "Algorithm Selector","Auto EDA", "AutoML Launcher", "Golden Q&A", "SHAP Panel","SHAP Comparison", "SHAP Comparison",
+     "SHAP Waterfall", "Saved Models", "AutoML Comparison", "Ensemble Builder", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "DOE Panel", "Threshold Optimizer", "Distribution Auditor",
+     "Smart HPO Recommender", "DAIVID HPO Engine","DAIVID HPO Trainer", "Zoomed HPO Explorer", 
+     "PDF Report"
 
 ])
 
