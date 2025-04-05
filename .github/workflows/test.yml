@@ -110,7 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 🎉 All checks completed
-        run: echo "Final checks complete. Review failures if any.
+        run: echo "Final checks complete. Review failures if any."
 
       - name: Debug Environment
         run: |
