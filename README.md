@@ -18,3 +18,8 @@ streamlit run app.py
 - AutoGluon, H2O, TPOT launcher tabs
 - Kaggle API leaderboard sync
 - Favorite tagging + feature playground
+![Test Suite](https://github.com/your-user/your-repo/actions/workflows/test.yml/badge.svg)
+tests/
+  ├── test_imports.py ✅
+  ├── test_notebook_scout.py  ← (starter)
+  ├── test_shap.py            ← (starter)
