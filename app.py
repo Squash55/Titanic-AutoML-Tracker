@@ -75,7 +75,7 @@ else:
 
 subtab = st.sidebar.radio("🦩 Select Tab", phase_tabs[phase])
 
-# === TAB ROUTING ===
+# === Route to tab functions based on selection ===
 if subtab == "Notebook Scout":
     run_notebook_scout()
 elif subtab == "Auto EDA":
@@ -83,7 +83,7 @@ elif subtab == "Auto EDA":
 elif subtab == "Auto Feature Engineering":
     run_autofe()
 elif subtab == "LogReg + Interaction Explorer":
-    run_logreg_interactions_explorer()
+    run_algorithm_selector()  # Placeholder
 elif subtab == "Distribution Auditor":
     run_distribution_auditor()
 elif subtab == "Algorithm Selector":
@@ -102,23 +102,13 @@ elif subtab == "SHAP Waterfall":
     run_shap_waterfall()
 elif subtab == "Golden Q&A":
     run_golden_qa()
-elif subtab == "Feature Importance Lab":
-    run_feature_importance_lab()
-elif subtab == "SHAP Summary Lab":
-    run_shap_summary_lab()
-elif subtab == "Explainability Heatmap":
-    run_shap_explainability_heatmap()
-elif subtab == "Correlation Matrix Lab":
-    run_correlation_matrix_lab()
-elif subtab == "Model Diagnostics Lab":
-    run_model_diagnostics_lab()
 elif subtab == "Threshold Optimizer":
     y_true = _tpot_cache.get("y_test")
     y_proba = _tpot_cache.get("y_pred_proba")
     if y_true is not None and y_proba is not None:
         run_threshold_optimizer(y_true=y_true, y_proba=y_proba)
     else:
-        st.warning("🟡 TPOT predictions not found. Please run AutoML first.")
+        st.warning("⚠️ TPOT predictions not found.")
 elif subtab == "DOE Panel":
     run_doe_panel()
 elif subtab == "Experiment Tracker":
@@ -135,10 +125,7 @@ elif subtab == "Saved Models":
     run_saved_models_panel()
 elif subtab == "PDF Report":
     run_pdf_report()
-elif subtab == "DAIVID Roadmap":
-    run_daivid_roadmap()
-else:
-    st.warning("⚠️ Selected tab is not yet implemented.")
 elif subtab == "DAIVID App Maturity Scorecard":
     run_daivid_scorecard()
+
 
