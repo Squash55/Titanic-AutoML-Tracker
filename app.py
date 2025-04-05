@@ -22,9 +22,9 @@ except ImportError:
 
 try:
     from zoom_hpo_explorer import run_zoom_hpo_explorer
-except:
+except Exception as e:
     def run_zoom_hpo_explorer():
-        st.error("❌ Zoomed HPO Explorer failed to load.")
+        st.error(f"❌ Zoomed HPO Explorer failed to load: {type(e).__name__}: {e}")
 
 # -- DAIVID HPO Trainer Safe Import --
 try:
