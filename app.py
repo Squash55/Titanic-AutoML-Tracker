@@ -53,7 +53,7 @@ phase = st.sidebar.selectbox("🔢 Phase", [
 ])
 
 phase_tabs = {
-    "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "Distribution Auditor"],
+    "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "LogReg + Interaction Explorer", "Distribution Auditor"],
     "A: Algorithm Exploration": ["Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"],
     "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A"],
     "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker"],
@@ -114,3 +114,5 @@ elif subtab == "Zoomed HPO Explorer":
     run_zoom_hpo_explorer()
 elif subtab == "PDF Report":
     run_pdf_report()
+elif tab == "LogReg + Interaction Explorer":
+    run_auto_fe_logreg_lab()
