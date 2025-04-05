@@ -1,3 +1,14 @@
+try:
+    from fallback_placeholders import get_golden_questions, get_shap_smart_answers
+except ImportError:
+    def get_golden_questions():
+        return ["Placeholder Q1", "Placeholder Q2"]
+
+    def get_shap_smart_answers():
+        return {
+            "Placeholder Q1": "This is a fallback answer to question 1.",
+            "Placeholder Q2": "This is a fallback answer to question 2."
+        }
 # golden_qa.py
 import streamlit as st
 
