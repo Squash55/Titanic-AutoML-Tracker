@@ -45,6 +45,8 @@ run_shap_summary_lab = safe_import("shap_summary_lab", "run_shap_summary_lab")
 run_shap_explainability_heatmap = safe_import("shap_explainability_heatmap", "run_shap_explainability_heatmap")
 run_correlation_matrix_lab = safe_import("correlation_matrix_lab", "run_correlation_matrix_lab")
 run_model_diagnostics_lab = safe_import("model_diagnostics_lab", "run_model_diagnostics_lab")
+run_daivid_scorecard = safe_import("daivid_scorecard", "run_daivid_scorecard")
+
 
 # === SIDEBAR NAVIGATION ===
 st.sidebar.title("🗽 DAIVID Navigator")
@@ -56,7 +58,7 @@ phase_tabs = {
     "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab"],
     "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab"],
     "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer"],
-    "D: Documentation & Deployment": ["Saved Models", "PDF Report"]
+    "D: Documentation & Deployment": ["Saved Models", "PDF Report", "DAIVID App Maturity Scorecard"]
 }
 
 if show_all:
@@ -137,3 +139,6 @@ elif subtab == "DAIVID Roadmap":
     run_daivid_roadmap()
 else:
     st.warning("⚠️ Selected tab is not yet implemented.")
+elif subtab == "DAIVID App Maturity Scorecard":
+    run_daivid_scorecard()
+
