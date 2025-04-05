@@ -282,6 +282,10 @@ elif tab == "Threshold Optimizer":
     from tpot_connector import _tpot_cache  # 🧠 This must exist earlier in your project
     y_true = _tpot_cache.get("y_test")
     y_proba = _tpot_cache.get("y_pred_proba")
+      if y_true is not None and y_proba is not None:
+        run_threshold_optimizer(y_true=y_true, y_proba=y_proba)
+    else:
+        st.warning("🟡 TPOT predictions not found. Please run AutoML first.")
 # -- Zoomed HPO Trainer Safe Import --
 try:
     from daivid_hpo_trainer import run_daivid_hpo_trainer
@@ -298,11 +302,8 @@ except Exception as e:
     def run_zoom_hpo_explorer():
         st.error(error_message)
 
-# if and elif
-    if y_true is not None and y_proba is not None:
-        run_threshold_optimizer(y_true=y_true, y_proba=y_proba)
-    else:
-        st.warning("🟡 TPOT predictions not found. Please run AutoML first.")
+# elif
+
 elif tab == "SHAP Comparison":
     run_shap_comparison()
 elif tab == "Smart HPO Recommender":
