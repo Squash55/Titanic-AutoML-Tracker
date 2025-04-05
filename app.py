@@ -20,6 +20,12 @@ except ImportError:
     def run_smart_hpo_recommender():
         st.error("❌ Smart HPO Recommender failed to load. Ensure smart_hpo_recommender.py exists and is error-free.")
 
+try:
+    from zoom_hpo_explorer import run_zoom_hpo_explorer
+except:
+    def run_zoom_hpo_explorer():
+        st.error("❌ Zoomed HPO Explorer failed to load.")
+
 # -- DAIVID HPO Trainer Safe Import --
 try:
     from daivid_hpo_trainer import run_daivid_hpo_trainer
@@ -161,7 +167,7 @@ st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
     "AutoML Launcher", "Algorithm Selector", "Golden Q&A", "SHAP Panel",
     "Notebook Scout", "SHAP Waterfall", "PDF Report", "Saved Models", "AutoML Launcher", "Algorithm Selector", "AutoML Comparison", "SHAP Comparison", "Ensemble Builder", "SHAP Comparison", "Experiment Tracker", "Threshold Optimizer", "Saved Models", "Auto EDA",  "DOE Panel", "Threshold Optimizer", "AutoML Comparison", "SHAP Comparison", "Distribution Auditor", "Smart HPO Recommender", "DAIVID HPO Engine",
- "DAIVID HPO Trainer"
+ "DAIVID HPO Trainer", "Zoomed HPO Explorer"
 
 ])
 
@@ -297,6 +303,8 @@ elif tab == "DAIVID HPO Engine":
     run_daivid_hpo_engine()
 elif tab == "DAIVID HPO Trainer":
     run_daivid_hpo_trainer()
+elif tab == "Zoomed HPO Explorer":
+    run_zoom_hpo_explorer()
 
 
 
