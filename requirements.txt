@@ -1,4 +1,5 @@
 xgboost
+plotly
 numpy
 setuptools
 lightgbm
