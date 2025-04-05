@@ -37,30 +37,27 @@ def run_zoom_hpo_explorer():
         optimize_for = st.selectbox("Metric to Optimize", ["Accuracy"])
         run_parallel = st.checkbox("Enable Parallel Mode (Simulated)", value=True)
 
-        def objective(trial):
-            n_estimators = trial.suggest_int("n_estimators", *current_bounds["n_estimators"])
-            max_depth = trial.suggest_int("max_depth", *current_bounds["max_depth"])
-            min_samples_split = trial.suggest_int("min_samples_split", *current_bounds["min_samples_split"])
+      zoom_summaries = []
 
-            clf = RandomForestClassifier(
-                n_estimators=n_estimators,
-                max_depth=max_depth,
-                min_samples_split=min_samples_split,
-                random_state=42
-            )
-            X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
-            clf.fit(X_train, y_train)
-            preds = clf.predict(X_val)
-            return accuracy_score(y_val, preds)
+st.markdown("### 🚀 Running HPO Zoom Phases")
+current_bounds = {
+    "n_estimators": (10, 200),
+    "max_depth": (2, 20),
+    "min_samples_split": (2, 10)
+}
 
-        zoom_summaries = []
+def objective(trial):
+    n_estimators = trial.suggest_int("n_estimators", *current_bounds["n_estimators"])
+    max_depth = trial.suggest_int("max_depth", *current_bounds["max_depth"])
+    min_samples_split = trial.suggest_int("min_samples_split", *current_bounds["min_samples_split"])
 
-        st.markdown("### 🚀 Running HPO Zoom Phases")
-        current_bounds = {
-            "n_estimators": (10, 200),
-            "max_depth": (2, 20),
-            "min_samples_split": (2, 10)
-        }
+    clf = RandomForestClassifier(
+        n_estimators=n_estimators,
+        max_depth=max_depth,
+        min_samples_split=min_samples_split,
+        random_state=42
+    )
+    ...
 
         for zoom in range(zoom_levels):
             st.markdown(f"#### 🔎 Zoom Level {zoom+1}")
