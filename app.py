@@ -20,9 +20,11 @@ except ImportError:
     def run_smart_hpo_recommender():
         st.error("❌ Smart HPO Recommender failed to load. Ensure smart_hpo_recommender.py exists and is error-free.")
 
+# -- Zoomed HPO Explorer Safe Import --
 try:
     from zoom_hpo_explorer import run_zoom_hpo_explorer
 except Exception as e:
+    import streamlit as st
     def run_zoom_hpo_explorer():
         st.error(f"❌ Zoomed HPO Explorer failed to load: {type(e).__name__}: {e}")
 
