@@ -89,7 +89,7 @@ jobs:
           pip install -r requirements.txt || true
           pip install streamlit optuna plotly || true
 
-      - name: ✨ Test Import: ${{ matrix.module }}
+           - name: "✨ Test Import: ${{ matrix.module }}"
         run: |
           echo "🚀 Importing module: ${{ matrix.module }}"
           python -c "import '${{ matrix.module }}'" || echo "❌ Failed: ${{ matrix.module }}"
