@@ -305,7 +305,18 @@ except Exception as e:
         st.error(error_message)
 
 # elif
-
+# Sidebar Tab Routing
+if tab == "AutoML Launcher":
+    run_automl_launcher()
+elif tab == "Algorithm Selector":
+    run_algorithm_selector()
+elif tab == "Threshold Optimizer":
+    y_true = _tpot_cache.get("y_test")
+    y_proba = _tpot_cache.get("y_pred_proba")
+    if y_true is not None and y_proba is not None:
+        run_threshold_optimizer(y_true=y_true, y_proba=y_proba)
+    else:
+        st.warning("🟡 TPOT predictions not found. Please run AutoML first.")
 elif tab == "SHAP Comparison":
     run_shap_comparison()
 elif tab == "Smart HPO Recommender":
