@@ -17,3 +17,4 @@ optuna>=3.0.0
 xhtml2pdf
 pdfkit
 reportlab
+autofeat
