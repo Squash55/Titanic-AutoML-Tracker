@@ -128,3 +128,9 @@ def get_shap_smart_answers():
         "Placeholder Q1": "This is a placeholder answer to question 1.",
         "Placeholder Q2": "This is a placeholder answer to question 2."
     }
+# === FALLBACK Golden Q&A ===
+def get_golden_questions():
+    return ["Placeholder Q1", "Placeholder Q2"]
+
+def get_shap_smart_answers():
+    return {"Placeholder Q1": "Answer 1", "Placeholder Q2": "Answer 2"}
