@@ -23,10 +23,12 @@ except ImportError:
 # -- Zoomed HPO Explorer Safe Import --
 try:
     from zoom_hpo_explorer import run_zoom_hpo_explorer
-except Exception as e:
+except Exception:
     import streamlit as st
+    import traceback
     def run_zoom_hpo_explorer():
-        st.error(f"❌ Zoomed HPO Explorer failed to load: {type(e).__name__}: {e}")
+        st.error("❌ Zoomed HPO Explorer failed to load.")
+        st.code(traceback.format_exc())
 
 # -- DAIVID HPO Trainer Safe Import --
 try:
