@@ -149,7 +149,12 @@ try:
 except ImportError:
     def run_automl_launcher():
         st.error("❌ AutoML Launcher failed to load. Check automl_launcher.py is present.")
-
+try:
+    from autofe import run_autofe
+except:
+    def run_autofe():
+        st.error("❌ Auto Feature Engineering failed to load. Ensure autofe.py exists and defines run_autofe().")
+        
 try:
     from saved_models import run_saved_models_panel
 except:
@@ -159,7 +164,7 @@ except:
 # -- Sidebar navigation --
 st.sidebar.title("📊 Navigation")
 tab = st.sidebar.radio("Choose a Tab:", [
-     "Notebook Scout", "Algorithm Selector", "Saved Models", "Distribution Auditor", "Auto EDA", 
+     "Notebook Scout", "Algorithm Selector", "Saved Models", "Distribution Auditor", "Auto EDA", "Auto Feature Engineering",
     "AutoML Launcher", "Golden Q&A", 
     "SHAP Panel","SHAP Comparison", "SHAP Comparison", "SHAP Waterfall", 
     "Saved Models", "AutoML Comparison", "Ensemble Builder", "Experiment Tracker", "DOE Panel","Threshold Optimizer",
@@ -332,7 +337,8 @@ elif tab == "DAIVID HPO Trainer":
     run_daivid_hpo_trainer()
 elif tab == "Zoomed HPO Explorer":
     run_zoom_hpo_explorer()
-
+elif tab == "Auto Feature Engineering":
+    run_autofe()
 
 
 
