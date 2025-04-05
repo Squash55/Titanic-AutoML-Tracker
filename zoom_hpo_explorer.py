@@ -46,24 +46,25 @@ def run_zoom_hpo_explorer():
             "min_samples_split": (2, 10)
         }
 
-        def objective(trial):
-            n_estimators = trial.suggest_int("n_estimators", *current_bounds["n_estimators"])
-            max_depth = trial.suggest_int("max_depth", *current_bounds["max_depth"])
-            min_samples_split = trial.suggest_int("min_samples_split", *current_bounds["min_samples_split"])
-
-            clf = RandomForestClassifier(
-                n_estimators=n_estimators,
-                max_depth=max_depth,
-                min_samples_split=min_samples_split,
-                random_state=42
-            )
-            X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
-            clf.fit(X_train, y_train)
-            preds = clf.predict(X_val)
-            return accuracy_score(y_val, preds)
-
         for zoom in range(zoom_levels):
             st.markdown(f"#### 🔎 Zoom Level {zoom+1}")
+
+            def objective(trial):
+                n_estimators = trial.suggest_int("n_estimators", *current_bounds["n_estimators"])
+                max_depth = trial.suggest_int("max_depth", *current_bounds["max_depth"])
+                min_samples_split = trial.suggest_int("min_samples_split", *current_bounds["min_samples_split"])
+
+                clf = RandomForestClassifier(
+                    n_estimators=n_estimators,
+                    max_depth=max_depth,
+                    min_samples_split=min_samples_split,
+                    random_state=42
+                )
+                X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+                clf.fit(X_train, y_train)
+                preds = clf.predict(X_val)
+                return accuracy_score(y_val, preds)
+
             study = optuna.create_study(direction="maximize")
             study.optimize(objective, n_trials=trials_per_zoom)
 
