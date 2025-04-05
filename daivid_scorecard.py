@@ -5,13 +5,54 @@ from datetime import datetime
 
 def run_daivid_scorecard():
     st.title("📈 DAIVID App Maturity Scorecard")
+
     st.markdown("""
-    This scorecard tracks how complete, professional, and acquisition-ready your DAIVID app is — without revealing that intent.
-    
-    It’s your secret dashboard for progress, polish, and productization.
+    ### 🧠 What This Is
+
+    The **DAIVID App Maturity Scorecard** tracks the evolution of your data science platform across core domains that drive value, credibility, and readiness for broader impact.
+
+    Each phase is scored based on current capabilities. Use this to guide roadmap priorities, demo strengths to stakeholders, and silently monitor acquisition posture.
+
+    ---
+
+    ### 🧮 Scoring Areas
+
+    | Category                         | Status      | Description |
+    |----------------------------------|-------------|-------------|
+    | **D: Data Exploration**         | ✅ Complete | Auto EDA, Feature Engineering, Visual Audit |
+    | **A: Algorithm Exploration**    | ✅ Strong   | TPOT, Selector, Ensemble Builder |
+    | **I: Interpretability**         | ✅ Mature   | SHAP Panel, Comparison, Q&A |
+    | **V: Validation & Variants**    | ✅ Good     | Threshold Optimizer, DOE |
+    | **I: Iteration & Optimization** | 🚧 Evolving| Zoom HPO, Smart HPO, Trainer |
+    | **D: Docs & Deployment**        | 🚀 Rolling  | PDF Report, Saved Models |
+    | **Score: Platform Readiness**   | 84%         | (Auto-calculated soon) |
+
+    ---
+
+    ### 🪜 Current Growth Priorities
+    - Add AutoML across multiple competitions (📊 expanding scope)
+    - Improve test coverage and nightly snapshot tagging (🔐 reliability)
+    - Finalize SHAP+Q&A interpretability across tabs (🧠 clarity)
+    - Build `AI Assistant Panel` with Copilot suggestions (🪄 intelligence)
+    - Add `Config.yaml` and `Model Score Tracker` (📦 reproducibility)
+
+    ---
+
+    ### 💡 DAIVID Milestones Ahead
+
+    | Milestone                    | ETA       | Notes |
+    |-----------------------------|-----------|-------|
+    | Public-facing landing page  | May 2025  | Stealth mode first |
+    | Slide deck for demo         | May 2025  | With visual brand |
+    | Licensing/dual-mode system  | June 2025 | Free vs. Pro features |
+    | Acquisition-readiness track | Ongoing   | This tab = secret map 🗺️ |
+
+    ---
+    🧠 **DAIVID is more than an app—it's a thought framework, product engine, and market opportunity.**
+
+    👣 Stay focused. Iterate visibly. Signal readiness. Gold will come.
     """)
 
-    st.markdown(f"**🕒 Last Refreshed:** `{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`")
 
     # === Overall Progress ===
     sections = [
