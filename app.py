@@ -40,33 +40,34 @@ run_daivid_hpo_trainer = safe_import("daivid_hpo_trainer", "run_daivid_hpo_train
 run_zoom_hpo_explorer = safe_import("zoom_hpo_explorer", "run_zoom_hpo_explorer")
 run_pdf_report = safe_import("pdf_report", "run_pdf_report")
 run_logreg_interactions_explorer = safe_import("auto_fe_logreg_lab", "run_logreg_interactions_explorer")
+run_feature_importance_lab = safe_import("feature_importance_lab", "run_feature_importance_lab")
 
 # === SIDEBAR NAVIGATION ===
-st.sidebar.title("🧭 DAIVID Navigator")
+st.sidebar.title("🗭 DAIVID Navigator")
 show_all = st.sidebar.checkbox("📚 Show All Tabs", value=True)
 
 phase_tabs = {
     "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "LogReg + Interaction Explorer", "Distribution Auditor"],
     "A: Algorithm Exploration": ["Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"],
-    "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A"],
+    "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A", "Feature Importance Lab"],
     "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker"],
     "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer"],
     "D: Documentation & Deployment": ["Saved Models", "PDF Report"]
 }
 
 if show_all:
-    st.sidebar.markdown("### 🗺️ DAIVID Roadmap")
+    st.sidebar.markdown("### 🗘️ DAIVID Roadmap")
     st.sidebar.markdown("Explore all phases and their tools:")
     for phase, tabs in phase_tabs.items():
         with st.sidebar.expander(f"{phase}", expanded=False):
             for t in tabs:
                 st.markdown(f"- {t}")
     st.sidebar.markdown("---")
-    phase = st.sidebar.selectbox("🔢 Choose Phase to Explore", list(phase_tabs.keys()), index=0)
+    phase = st.sidebar.selectbox("🔷 Choose Phase to Explore", list(phase_tabs.keys()), index=0)
 else:
-    phase = st.sidebar.selectbox("🔢 Phase", list(phase_tabs.keys()), index=0)
+    phase = st.sidebar.selectbox("🔷 Phase", list(phase_tabs.keys()), index=0)
 
-subtab = st.sidebar.radio("🧩 Select Tab", phase_tabs[phase])
+subtab = st.sidebar.radio("🧹 Select Tab", phase_tabs[phase])
 
 # === TAB ROUTING ===
 if subtab == "Notebook Scout":
@@ -95,6 +96,8 @@ elif subtab == "SHAP Waterfall":
     run_shap_waterfall()
 elif subtab == "Golden Q&A":
     run_golden_qa()
+elif subtab == "Feature Importance Lab":
+    run_feature_importance_lab()
 elif subtab == "Threshold Optimizer":
     y_true = _tpot_cache.get("y_test")
     y_proba = _tpot_cache.get("y_pred_proba")
