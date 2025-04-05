@@ -43,6 +43,7 @@ run_logreg_interactions_explorer = safe_import("auto_fe_logreg_lab", "run_logreg
 run_feature_importance_lab = safe_import("feature_importance_lab", "run_feature_importance_lab")
 run_shap_summary_lab = safe_import("shap_summary_lab", "run_shap_summary_lab")
 run_shap_explainability_heatmap = safe_import("shap_explainability_heatmap", "run_shap_explainability_heatmap")
+run_correlation_matrix_lab = safe_import("correlation_matrix_lab", "run_correlation_matrix_lab")
 
 # === SIDEBAR NAVIGATION ===
 st.sidebar.title("🗽 DAIVID Navigator")
@@ -51,7 +52,7 @@ show_all = st.sidebar.checkbox("📚 Show All Tabs", value=True)
 phase_tabs = {
     "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "LogReg + Interaction Explorer", "Distribution Auditor"],
     "A: Algorithm Exploration": ["Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"],
-    "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap"],
+    "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab"],
     "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker"],
     "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer"],
     "D: Documentation & Deployment": ["Saved Models", "PDF Report"]
@@ -104,6 +105,8 @@ elif subtab == "SHAP Summary Lab":
     run_shap_summary_lab()
 elif subtab == "Explainability Heatmap":
     run_shap_explainability_heatmap()
+elif subtab == "Correlation Matrix Lab":
+    run_correlation_matrix_lab()
 elif subtab == "Threshold Optimizer":
     y_true = _tpot_cache.get("y_test")
     y_proba = _tpot_cache.get("y_pred_proba")
