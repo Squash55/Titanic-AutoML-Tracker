@@ -5,6 +5,7 @@ import traceback
 st.set_page_config(page_title="Titanic AutoML App", layout="wide")
 
 from tpot_connector import _tpot_cache
+from golden_qna_shap import run_golden_qna_shap
 
 # === SAFE IMPORT HELPER ===
 def safe_import(module_name, function_name):
@@ -55,7 +56,7 @@ show_all = st.sidebar.checkbox("📚 Show All Tabs", value=True)
 phase_tabs = {
     "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "LogReg + Interaction Explorer", "Distribution Auditor"],
     "A: Algorithm Exploration": ["Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"],
-    "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab"],
+    "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A (SHAP)", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab"],
     "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab"],
     "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer"],
     "D: Documentation & Deployment": ["Saved Models", "PDF Report", "DAIVID App Maturity Scorecard"]
@@ -76,6 +77,8 @@ else:
 subtab = st.sidebar.radio("🦩 Select Tab", phase_tabs[phase])
 
 # === Route to tab functions based on selection ===
+if selected_tab == "Golden Q&A (SHAP)":
+    run_golden_qna_shap()
 if subtab == "Notebook Scout":
     run_notebook_scout()
 elif subtab == "Auto EDA":
