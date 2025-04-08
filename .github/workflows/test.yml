@@ -43,11 +43,18 @@ jobs:
         run: |
           echo "🔊 Checking syntax using py_compile..."
           python -m compileall . || echo "⚠️ Syntax issues found"
+     # ✅ INSERT THIS BANDIT BLOCK BELOW ⬇️
       - name: 🔒 Run Bandit Security Scan
+        continue-on-error: true
         run: |
-          echo "🕵️ Scanning for common security issues..."
+          echo "🕵️ Scanning for common security issues with Bandit..."
           pip install bandit
-          bandit -r . -ll -ii || echo "⚠️ Bandit found security issues"
+          bandit -r . -f sarif -o bandit-results.sarif
+
+      - name: 📤 Upload Bandit Results to Security Tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: bandit-results.sarif
 
       - name: ✨ Import test all top-level modules
         run: |
