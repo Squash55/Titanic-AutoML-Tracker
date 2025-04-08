@@ -135,7 +135,8 @@ elif subtab == "Golden Q&A (SHAP)":
     run_golden_qna_shap()
 elif subtab == "Residual Plot":
     run_residual_plot_panel()
-elif selected_tool == "Synthetic Data Generator":
+elif subtab == "Synthetic Data Generator":
     run_synthetic_data_toggle()
+
 
 
