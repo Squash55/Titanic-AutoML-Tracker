@@ -9,9 +9,10 @@ from tpot_connector import get_latest_model_and_data
 
 def run_golden_qna_shap():
     st.header("🔮 Golden Q&A: SHAP-Powered Explanations")
-# Show model status if loaded from disk
-if "loaded_model" in st.session_state:
-    st.info("✅ A previously saved model is currently active in memory.")
+
+    # ✅ Show model status if loaded from disk
+    if "loaded_model" in st.session_state:
+        st.info("✅ A previously saved model is currently active in memory.")
 
     # Load model and data
     model, X_train, y_train = get_latest_model_and_data()
