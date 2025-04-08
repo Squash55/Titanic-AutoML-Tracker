@@ -6,6 +6,7 @@ import os
 import shap
 import matplotlib.pyplot as plt
 import joblib
+import pandas as pd
 
 try:
     from tpot_connector import (
@@ -13,7 +14,8 @@ try:
         latest_X_train,
         latest_y_train,
         latest_X_test,
-        latest_y_test
+        latest_y_test,
+        _tpot_cache
     )
 except ImportError:
     latest_tpot_model = None
@@ -21,6 +23,7 @@ except ImportError:
     latest_y_train = None
     latest_X_test = None
     latest_y_test = None
+    _tpot_cache = {}
 
 from golden_qa import get_golden_questions, get_shap_smart_answers
 
@@ -60,6 +63,32 @@ def add_shap_summary_plot(pdf, model, X_train):
         os.remove(tmp_img.name)
     except Exception as e:
         pdf.add_section("SHAP Summary Plot", f"Error generating SHAP plot: {e}")
+
+
+def add_model_comparison_plot(pdf):
+    models = _tpot_cache.get("all_models", {})
+    X_test = latest_X_test
+    y_test = latest_y_test
+    accs = {}
+    for name, model in models.items():
+        try:
+            if is_autogluon_model(model):
+                preds = model.predict(X_test)
+                accs[name] = (preds == y_test).mean()
+            else:
+                accs[name] = model.score(X_test, y_test)
+        except:
+            continue
+    if len(accs) >= 2:
+        fig, ax = plt.subplots()
+        ax.bar(accs.keys(), accs.values(), color=["#4682B4" if "TPOT" in k else "orange" for k in accs.keys()])
+        ax.set_ylabel("Accuracy")
+        ax.set_title("Model Accuracy Comparison")
+        tmp_img = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+        fig.savefig(tmp_img.name, bbox_inches="tight")
+        plt.close(fig)
+        pdf.image(tmp_img.name, w=180)
+        os.remove(tmp_img.name)
 
 
 def generate_pdf_report():
@@ -106,6 +135,10 @@ def generate_pdf_report():
 
     if model and X_train is not None:
         add_shap_summary_plot(pdf, model, X_train)
+
+    # AutoGluon vs TPOT Accuracy Chart (if both exist)
+    if latest_X_test is not None and latest_y_test is not None:
+        add_model_comparison_plot(pdf)
 
     return pdf
 
