@@ -1,11 +1,9 @@
-# model_leaderboard_panel.py
+model_leaderboard_panel.py
 
 import streamlit as st
 import pandas as pd
 import shap
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import time
 from datetime import datetime
 from tpot_connector import _tpot_cache
 
@@ -19,6 +17,7 @@ if "saved_models" not in _tpot_cache:
     _tpot_cache["saved_models"] = {}
 if "saved_model_notes" not in _tpot_cache:
     _tpot_cache["saved_model_notes"] = {}
+
 
 def run_model_leaderboard_panel():
     st.title("🏆 Model Leaderboard Tracker")
@@ -37,11 +36,7 @@ def run_model_leaderboard_panel():
         dataset_size = len(X_train) if X_train is not None else "-"
         try:
             if hasattr(model, "predict") and X_test is not None and y_test is not None:
-                if hasattr(model, "leaderboard"):
-                    preds = model.predict(X_test)
-                    acc = (preds == y_test).mean()
-                else:
-                    acc = model.score(X_test, y_test)
+                acc = model.score(X_test, y_test)
             if X_train is not None:
                 try:
                     explainer = shap.Explainer(model.predict, X_train)
@@ -57,12 +52,7 @@ def run_model_leaderboard_panel():
         if name not in _tpot_cache["model_durations"]:
             _tpot_cache["model_durations"][name] = "-"
         if name not in _tpot_cache["model_sources"]:
-            if hasattr(model, "leaderboard"):
-                _tpot_cache["model_sources"][name] = "AutoGluon"
-            elif "TPOT" in str(type(model)):
-                _tpot_cache["model_sources"][name] = "TPOT"
-            else:
-                _tpot_cache["model_sources"][name] = "Loaded"
+            _tpot_cache["model_sources"][name] = "TPOT"
 
         timestamp = _tpot_cache["model_times"].get(name, "-")
         duration = _tpot_cache["model_durations"].get(name, "-")
@@ -139,6 +129,7 @@ def run_model_leaderboard_panel():
                 if st.button("📄 Generate Saved Model Report"):
                     summary = f"Model: {new_name}\n\nNotes: {new_note}\n\nType: {type(model).__name__}"
                     st.download_button("Download Report", summary.encode(), file_name=f"{new_name}_report.txt")
+
         else:
             st.info("No models have been promoted yet.")
 
@@ -188,7 +179,7 @@ def run_model_leaderboard_panel():
             chart_df["SHAP Total"] = chart_df["SHAP Total"].astype(float)
 
             fig, ax = plt.subplots()
-            scatter = ax.scatter(chart_df["Accuracy"], chart_df["SHAP Total"], c="blue")
+            ax.scatter(chart_df["Accuracy"], chart_df["SHAP Total"], c="blue")
             for i, row in chart_df.iterrows():
                 ax.annotate(row["Model Name"], (row["Accuracy"], row["SHAP Total"]), fontsize=8)
             ax.set_xlabel("Accuracy")
