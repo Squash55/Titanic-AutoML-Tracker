@@ -2,56 +2,55 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import KBinsDiscretizer, LabelEncoder
+
 
 def run_catreg_switcher():
-    st.title("🔀 Categorical ↔ Regression Switcher")
+    st.title("🔁 CatReg Switcher")
+    st.markdown("Switch between regression and classification targets seamlessly.")
 
-    if "X" not in st.session_state or "y" not in st.session_state:
-        st.warning("⚠️ No dataset found. Please load or generate data first.")
+    if "y" not in st.session_state:
+        st.warning("⚠️ No target (`y`) found in session. Please run data generation or upload first.")
         return
 
-    df = st.session_state.X.copy()
-    df["Target"] = st.session_state.y
-    selected_column = st.selectbox("Select a column to transform", df.columns)
+    y = st.session_state.y
+    direction = st.radio("Select Transformation Direction", ["Regression ➜ Classification", "Classification ➜ Regression"])
 
-    conversion_type = st.radio("Choose conversion direction:",
-                                ["Categorical → Numeric (Encoding)", "Numeric → Categorical (Binning)"])
+    if direction == "Regression ➔ Classification":
+        st.subheader("📊 Convert Continuous to Categorical")
+        bins = st.slider("Number of Categories", 2, 10, 3)
+        strategy = st.selectbox("Binning Strategy", ["uniform", "quantile", "kmeans"])
 
-    if conversion_type == "Categorical → Numeric (Encoding)":
-        method = st.selectbox("Encoding method", ["Ordinal", "One-Hot"])
+        discretizer = KBinsDiscretizer(n_bins=bins, encode="ordinal", strategy=strategy)
+        y_class = discretizer.fit_transform(np.array(y).reshape(-1, 1)).astype(int).ravel()
 
-        if df[selected_column].dtype == object or df[selected_column].dtype.name == "category":
-            if method == "Ordinal":
-                mapping = {k: v for v, k in enumerate(sorted(df[selected_column].unique()))}
-                st.write("Encoding Map:", mapping)
-                df[selected_column] = df[selected_column].map(mapping)
-            else:
-                df = pd.get_dummies(df, columns=[selected_column], drop_first=True)
+        st.session_state.y_class = y_class
+        st.success("✅ Converted regression target into categorical labels.")
 
-            st.success("✅ Column encoded. Preview below:")
-            st.dataframe(df.head())
+        st.markdown("### 🔢 Category Distribution")
+        st.dataframe(pd.Series(y_class, name="y_class").value_counts().sort_index())
 
+    elif direction == "Classification ➔ Regression":
+        st.subheader("🔁 Convert Categorical to Numeric")
+
+        if not pd.api.types.is_numeric_dtype(y):
+            try:
+                le = LabelEncoder()
+                y_reg = le.fit_transform(y)
+                st.session_state.y_reg = y_reg
+                st.success("✅ Label-encoded classification target into numeric format.")
+
+                st.markdown("### 🔢 Mapped Values")
+                mapping = {label: idx for idx, label in enumerate(le.classes_)}
+                st.json(mapping)
+
+            except Exception as e:
+                st.error(f"❌ Conversion failed: {e}")
         else:
-            st.warning("⚠️ Column must be categorical.")
+            st.info("ℹ️ Target is already numeric. No conversion needed.")
+            st.session_state.y_reg = y
 
-    else:  # Numeric → Categorical
-        bin_method = st.selectbox("Binning method", ["Quantile", "Equal-width"])
-        num_bins = st.slider("Number of bins", 2, 10, 4)
-
-        if np.issubdtype(df[selected_column].dtype, np.number):
-            if bin_method == "Quantile":
-                df[selected_column + "_binned"] = pd.qcut(df[selected_column], q=num_bins, labels=False)
-            else:
-                df[selected_column + "_binned"] = pd.cut(df[selected_column], bins=num_bins, labels=False)
-
-            st.success("✅ Column binned. Preview below:")
-            st.dataframe(df[[selected_column, selected_column + "_binned"]].head())
-
-        else:
-            st.warning("⚠️ Column must be numeric to bin it.")
-
-    # Offer overwrite session option
-    if st.button("🔁 Update session_state.X with transformed data"):
-        df.drop(columns=["Target"], errors="ignore", inplace=True)
-        st.session_state.X = df
-        st.success("✅ session_state.X updated with transformations!")
+    # Show current y summary
+    st.markdown("---")
+    st.markdown("### 📌 Current Target Preview")
+    st.dataframe(pd.Series(st.session_state.y).head(10))
