@@ -7,6 +7,7 @@ st.set_page_config(page_title="Titanic AutoML App", layout="wide")
 from tpot_connector import _tpot_cache
 from golden_qna_shap import run_golden_qna_shap
 from residual_plot_panel import run_residual_plot_panel
+from user_manual import run_user_manual
 
 # === SAFE IMPORT HELPER ===
 def safe_import(module_name, function_name):
