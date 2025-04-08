@@ -1,8 +1,43 @@
 # user_manual.py
 import streamlit as st
 
-def run_user_manual(deep=False, compact=False):
+# === Function to generate downloadable Markdown content ===
+def generate_manual_markdown(include_images=True):
+    sections = []
+
+    sections.append("## 📊 Auto EDA\nExploratory Data Analysis that auto-generates charts and patterns. Useful for spotting outliers, missing values, and variable distributions.")
+    if include_images:
+        sections.append("![Auto EDA Example](https://example.com/eda.png)")  # Replace with actual image paths
+
+    sections.append("## 🧠 Golden Q&A\nAI-powered insights using SHAP and question templates to explain patterns.")
+    if include_images:
+        sections.append("![Golden QA Example](https://example.com/goldenqa.png)")
+
+    return "\n\n".join(sections)
+
+# === MAIN MANUAL RUNNER ===
+def run_user_manual(deep=True, compact=True):
     st.title("📘 DAIVID Analytics User Manual")
+
+    # === 📚 Glossary Sidebar ===
+    with st.sidebar.expander("📚 Glossary", expanded=False):
+        st.markdown("""
+        - **EDA**: Exploratory Data Analysis – the process of visually and statistically understanding a dataset.
+        - **SHAP**: SHapley Additive exPlanations – explains each prediction by computing the contribution of every feature.
+        - **HPO**: Hyperparameter Optimization – tuning settings of algorithms to maximize model performance.
+        - **PDF Report**: A downloadable document summarizing model, insights, and visuals.
+        """)
+
+    # === Sidebar Export Options ===
+    with st.sidebar.expander("📘 Export Options", expanded=False):
+        st.session_state["manual_image_mode"] = st.checkbox("🖼️ Include Visual Aids", value=True)
+        if st.button("📥 Prepare Markdown Download"):
+            st.download_button(
+                label="📄 Download Manual (.md)",
+                data=generate_manual_markdown(include_images=st.session_state["manual_image_mode"]),
+                file_name="DAIVID_Analytics_User_Manual.md",
+                mime="text/markdown"
+            )
 
     spacing = "" if compact else "\n\n"
 
@@ -10,6 +45,7 @@ def run_user_manual(deep=False, compact=False):
         st.markdown(f"### {title}")
         st.markdown(content + spacing)
 
+    # === Manual Content ===
     section("🧭 Overview", """
     DAIVID is your end-to-end decision intelligence platform. This manual provides quick explanations of each module,
     including methods, use cases, and why they matter.
