@@ -1,15 +1,18 @@
-
 # tpot_connector.py
-_tpot_cache = {}
 
-def update_tpot_cache(key, value):
-    _tpot_cache[key] = value
+import pandas as pd
+import joblib
 
+# These can be globals, file-backed, or Streamlit session_state
+_tpot_model = None
+_X_train = None
+_y_train = None
 
-# This module stores and shares the latest TPOT model and data for use in SHAP and Q&A panels.
+def set_latest_model_and_data(model, X_train, y_train):
+    global _tpot_model, _X_train, _y_train
+    _tpot_model = model
+    _X_train = X_train
+    _y_train = y_train
 
-latest_tpot_model = None
-latest_X_train = None
-latest_y_train = None
-latest_X_test = None
-latest_y_test = None
+def get_latest_model_and_data():
+    return _tpot_model, _X_train, _y_train
