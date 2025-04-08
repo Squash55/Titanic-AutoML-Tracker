@@ -43,6 +43,11 @@ jobs:
         run: |
           echo "🔊 Checking syntax using py_compile..."
           python -m compileall . || echo "⚠️ Syntax issues found"
+      - name: 🔒 Run Bandit Security Scan
+        run: |
+          echo "🕵️ Scanning for common security issues..."
+          pip install bandit
+          bandit -r . -ll -ii || echo "⚠️ Bandit found security issues"
 
       - name: ✨ Import test all top-level modules
         run: |
