@@ -19,6 +19,7 @@ def safe_import(module_name, function_name):
         return fallback
 
 # === MODULE IMPORTS VIA SAFE WRAPPER ===
+run_explainable_boosting_visualizer = safe_import("explainable_boosting_visualizer", "run_explainable_boosting_visualizer")
 run_explainable_boosting = safe_import("explainable_boosting_lab", "run_explainable_boosting")
 run_smart_poly_finder = safe_import("smart_poly_finder", "run_smart_poly_finder")
 run_logreg_nonlinear_lab = safe_import("logreg_nonlinear_lab", "run_logreg_nonlinear_lab")
@@ -65,7 +66,7 @@ show_all = st.sidebar.checkbox("📚 Show All Tabs", value=True)
 phase_tabs = {
     "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "LogReg + Interaction Explorer", "Distribution Auditor", "Outlier Suppressor", "Synthetic Data Generator", "Cat↔Reg Switcher", "LogReg Nonlinear Tricks"],
     "A: Algorithm Exploration": ["Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"],
-    "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A (SHAP)", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab", "Explainable Boosting"],
+    "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A (SHAP)", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab", "Explainable Boosting", "Explainable Boosting"],
     "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab", "Residual Plot"],
     "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer", "LogReg Nonlinear Tricks", "Smart Poly Finder"],
     "D: Documentation & Deployment": ["Saved Models", "PDF Report", "DAIVID App Maturity Scorecard"]
@@ -155,6 +156,8 @@ elif subtab == "Smart Poly Finder":
     run_smart_poly_finder()
 elif subtab == "Explainable Boosting":
     run_explainable_boosting()
+elif subtab == "Explainable Boosting":
+    run_explainable_boosting_visualizer()
 
 
 
