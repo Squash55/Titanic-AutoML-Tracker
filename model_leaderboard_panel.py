@@ -143,21 +143,52 @@ def run_model_leaderboard_panel():
 
         else:
             st.info("No models have been promoted yet.")
+        
+st.markdown("### 🔁 Saved vs Current Model Comparison")
 
-        st.markdown("### 🔁 Saved vs Current Model Comparison")
-        if _tpot_cache["saved_models"] and df_filtered is not None:
-            compare_name = st.selectbox("Compare against this current model", df_filtered["Model Name"].tolist(), key="compare_name")
-            current_row = df_filtered[df_filtered["Model Name"] == compare_name].squeeze()
-            saved_row = df[df["Model Name"] == selected].squeeze()
+if _tpot_cache["saved_models"] and df_filtered is not None:
+    compare_name = st.selectbox(
+        "Compare against this current model",
+        df_filtered["Model Name"].tolist(),
+        key="compare_name"
+    )
 
-            if not current_row.empty and not saved_row.empty:
-                comp_df = pd.DataFrame({
-                    "Metric": ["Accuracy", "SHAP Total", "Feature Count"],
-                    "Saved Model": [saved_row["Accuracy"], saved_row["SHAP Total"], saved_row["Feature Count"]],
-                    "Current Model": [current_row["Accuracy"], current_row["SHAP Total"], current_row["Feature Count"]]
-                })
-                st.table(comp_df)
+    current_row = df_filtered[df_filtered["Model Name"] == compare_name].squeeze()
+    saved_row = df[df["Model Name"] == selected].squeeze()
 
+    if not current_row.empty and not saved_row.empty:
+        comp_df = pd.DataFrame({
+            "Metric": [
+                "Accuracy",
+                "SHAP Total",
+                "Feature Count",
+                "Dataset Size",
+                "Trained At",
+                "Duration",
+                "Source"
+            ],
+            "Saved Model": [
+                saved_row.get("Accuracy"),
+                saved_row.get("SHAP Total"),
+                saved_row.get("Feature Count"),
+                saved_row.get("Dataset Size"),
+                saved_row.get("Trained At"),
+                saved_row.get("Duration"),
+                saved_row.get("Source")
+            ],
+            "Current Model": [
+                current_row.get("Accuracy"),
+                current_row.get("SHAP Total"),
+                current_row.get("Feature Count"),
+                current_row.get("Dataset Size"),
+                current_row.get("Trained At"),
+                current_row.get("Duration"),
+                current_row.get("Source")
+            ]
+        })
+        st.table(comp_df)
+
+        
         st.markdown("### 📥 Compare with Uploaded Leaderboard")
         uploaded_file = st.file_uploader("Upload Previous Leaderboard CSV", type=["csv"])
         if uploaded_file:
