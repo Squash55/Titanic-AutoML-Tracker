@@ -43,7 +43,8 @@ jobs:
         run: |
           echo "🔊 Checking syntax using py_compile..."
           python -m compileall . || echo "⚠️ Syntax issues found"
-     # ✅ INSERT THIS BANDIT BLOCK BELOW ⬇️
+
+      # ✅ Run Bandit Security Scan
       - name: 🔒 Run Bandit Security Scan
         continue-on-error: true
         run: |
