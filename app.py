@@ -139,6 +139,7 @@ elif subtab == "PDF Report":
     st.sidebar.markdown("### 📄 PDF Report Options")
     st.session_state["include_ebm_pdf"] = st.sidebar.checkbox("📊 Include EBM Plot", value=True)
     st.session_state["include_shap_perm_delta_pdf"] = st.sidebar.checkbox("📉 Include SHAP vs Permutation Delta Plot", value=True)
+    st.session_state["include_manual_pdf"] = st.sidebar.checkbox("📘 Include User Manual Section", value=True)
     run_pdf_report()
 elif subtab == "DAIVID App Maturity Scorecard":
     run_daivid_scorecard()
@@ -160,5 +161,5 @@ elif subtab == "Explainable Boosting":
     run_explainable_boosting_visualizer()
 elif subtab == "SHAP vs Permutation Delta Viewer":
     run_shap_perm_delta()
-elif subtab == "📘 User Manual":
+elif subtab == "DAIVID Analytics User Manual":
     run_user_manual()
