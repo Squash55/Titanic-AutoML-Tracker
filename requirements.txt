@@ -1,5 +1,5 @@
 xgboost
-autogluon==0.8.2
+autogluon.tabular[all]==0.8.2
 plotly
 featuretools
 numpy
