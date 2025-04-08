@@ -3,8 +3,6 @@ import pandas as pd
 from tpot import TPOTClassifier
 from sklearn.model_selection import train_test_split
 from tpot_connector import _tpot_cache
-from autogluon_runner import train_autogluon_model
-
 
 def run_automl_launcher():
     st.title("🚀 AutoML Launcher (TPOT + AutoGluon)")
