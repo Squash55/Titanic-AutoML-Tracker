@@ -1,5 +1,4 @@
 # pdf_report.py
-
 import streamlit as st
 from fpdf import FPDF
 import tempfile
@@ -26,6 +25,10 @@ except ImportError:
 from golden_qa import get_golden_questions, get_shap_smart_answers
 
 
+def is_autogluon_model(model):
+    return hasattr(model, "leaderboard") and hasattr(model, "predict")
+
+
 class PDFReport(FPDF):
     def header(self):
         self.set_font("Arial", "B", 14)
@@ -48,7 +51,6 @@ def add_shap_summary_plot(pdf, model, X_train):
     try:
         explainer = shap.Explainer(model.predict, X_train)
         shap_values = explainer(X_train)
-
         fig = plt.figure()
         shap.plots.beeswarm(shap_values, show=False)
         tmp_img = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
@@ -71,29 +73,28 @@ def generate_pdf_report():
     X_test = latest_X_test
     y_test = latest_y_test
 
-    # Performance summary
-    if model and X_test is not None and y_test is not None:
-        acc = model.score(X_test, y_test)
-        pipeline_code = str(model)
+    if model:
+        if is_autogluon_model(model):
+            pdf.add_section("AutoGluon Summary", "AutoGluon TabularPredictor model detected.")
+            if X_test is not None and y_test is not None:
+                preds = model.predict(X_test)
+                acc = (preds == y_test).mean()
+                pdf.add_section("Accuracy", f"Accuracy on test set: {acc:.3f}")
 
-        questions = get_golden_questions()
-        answers = get_shap_smart_answers()
-        sample_answers = list(answers.values())
-        top_factors = ", ".join(sample_answers[:2]) if sample_answers else "[Top SHAP factors not available]"
-        summary = (
-            f"The model achieved an accuracy of {acc:.3f}. "
-            f"Top factors influencing predictions include {top_factors}. "
-            "Smart Q&A has been included to assist with diagnostics."
-        )
-        pdf.add_section("Executive Summary", summary)
-        pdf.add_section("Model Accuracy", f"Accuracy on test set: {acc:.3f}")
-        pdf.add_section("Best Pipeline Structure", pipeline_code)
-
-        try:
-            params_text = str(model.get_params())
-            pdf.add_section("Model Parameters", params_text)
-        except:
-            pass
+            leaderboard_df = model.leaderboard(silent=True)
+            leaderboard_text = leaderboard_df.to_string(index=False)
+            pdf.add_section("Leaderboard", leaderboard_text)
+        else:
+            if X_test is not None and y_test is not None:
+                acc = model.score(X_test, y_test)
+                pipeline_code = str(model)
+                pdf.add_section("TPOT Model Accuracy", f"Accuracy on test set: {acc:.3f}")
+                pdf.add_section("Best Pipeline Structure", pipeline_code)
+                try:
+                    params_text = str(model.get_params())
+                    pdf.add_section("Model Parameters", params_text)
+                except:
+                    pass
     else:
         pdf.add_section("Model", "Model not available or not trained yet.")
 
@@ -103,7 +104,6 @@ def generate_pdf_report():
     qa_summary = "\n\n".join([f"Q: {q}\nA: {answers.get(q)}" for q in questions])
     pdf.add_section("Golden Q&A (SHAP Powered)", qa_summary)
 
-    # SHAP Summary
     if model and X_train is not None:
         add_shap_summary_plot(pdf, model, X_train)
 
@@ -112,8 +112,8 @@ def generate_pdf_report():
 
 def run_pdf_report():
     st.subheader("📄 Downloadable PDF Report")
-
     model = st.session_state.get("loaded_model", latest_tpot_model)
+
     if model is None:
         st.warning("⚠️ Train a model in AutoML Launcher first.")
         return
@@ -149,3 +149,14 @@ def run_pdf_report():
 
     if "loaded_model" in st.session_state:
         st.info("✅ Loaded model is currently active in session memory.")
+
+    # Optional leaderboard export for AutoGluon
+    if is_autogluon_model(model):
+        if st.checkbox("📥 Export AutoGluon Leaderboard CSV"):
+            leaderboard_df = model.leaderboard(silent=True)
+            st.download_button(
+                "Download Leaderboard",
+                data=leaderboard_df.to_csv(index=False).encode(),
+                file_name="autogluon_leaderboard.csv",
+                mime="text/csv"
+            )
