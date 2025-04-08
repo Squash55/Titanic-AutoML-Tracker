@@ -4,6 +4,7 @@ import streamlit as st
 import pandas as pd
 import shap
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import time
 from datetime import datetime
 from tpot_connector import _tpot_cache
@@ -90,10 +91,27 @@ def run_model_leaderboard_panel():
             ax.set_title("Model Interpretability vs Accuracy")
             st.pyplot(fig)
 
+        st.markdown("### ⏳ Training Timeline")
+        try:
+            df["Trained At Parsed"] = pd.to_datetime(df["Trained At"], errors="coerce")
+            df_sorted = df.sort_values("Trained At Parsed")
+            fig, ax = plt.subplots()
+            ax.plot(df_sorted["Trained At Parsed"], df_sorted["Accuracy"], marker="o")
+            for i, row in df_sorted.iterrows():
+                ax.text(row["Trained At Parsed"], row["Accuracy"], row["Model Name"], fontsize=8)
+            ax.set_xlabel("Training Time")
+            ax.set_ylabel("Accuracy")
+            ax.set_title("Model Accuracy Over Time")
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H:%M"))
+            fig.autofmt_xdate()
+            st.pyplot(fig)
+        except Exception as e:
+            st.error(f"Timeline plot error: {e}")
+
         if st.button("📥 Export Leaderboard to CSV"):
             st.download_button(
                 "Download CSV",
-                data=df.to_csv(index=False).encode(),
+                data=df.drop(columns=["Trained At Parsed"], errors="ignore").to_csv(index=False).encode(),
                 file_name="model_leaderboard.csv",
                 mime="text/csv"
             )
