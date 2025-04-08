@@ -104,6 +104,26 @@ def run_model_leaderboard_panel():
                 _tpot_cache["saved_models"][best_accuracy["Model Name"]] = model_obj
                 st.success(f"✅ Saved: {best_accuracy['Model Name']}")
 
+        st.markdown("### 💾 Saved Models Viewer")
+        if _tpot_cache["saved_models"]:
+            selected = st.selectbox("Select Saved Model", list(_tpot_cache["saved_models"].keys()))
+            if selected:
+                model = _tpot_cache["saved_models"][selected]
+                st.write(f"📌 Model Name: {selected}")
+                st.write(model)
+
+                if X_train is not None:
+                    try:
+                        explainer = shap.Explainer(model.predict, X_train)
+                        shap_values = explainer(X_train[:1])
+                        st.markdown("#### 🔍 SHAP Waterfall Plot (First Row)")
+                        fig = shap.plots.waterfall(shap_values[0], show=False)
+                        st.pyplot(fig)
+                    except Exception as e:
+                        st.warning(f"SHAP plot error: {e}")
+        else:
+            st.info("No models have been promoted yet.")
+
         st.markdown("### 📥 Compare with Uploaded Leaderboard")
         uploaded_file = st.file_uploader("Upload Previous Leaderboard CSV", type=["csv"])
         if uploaded_file:
