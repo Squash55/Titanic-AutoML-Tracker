@@ -77,8 +77,6 @@ else:
 subtab = st.sidebar.radio("🦩 Select Tab", phase_tabs[phase])
 
 # === Route to tab functions based on selection ===
-if selected_tab == "Golden Q&A (SHAP)":
-    run_golden_qna_shap()
 if subtab == "Notebook Scout":
     run_notebook_scout()
 elif subtab == "Auto EDA":
@@ -130,5 +128,7 @@ elif subtab == "PDF Report":
     run_pdf_report()
 elif subtab == "DAIVID App Maturity Scorecard":
     run_daivid_scorecard()
+elif subtab == "Golden Q&A (SHAP)":
+    run_golden_qna_shap()
 
 
