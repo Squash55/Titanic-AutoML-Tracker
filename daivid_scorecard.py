@@ -108,3 +108,7 @@ def run_daivid_scorecard():
         st.info("📌 You’re halfway there — now polish documentation, licensing, and tab structure.")
     else:
         st.success("🎉 You’re close to acquisition-ready. Consider branding, pitch decks, and strategic outreach.")
+    if st.button("📘 Open DAIVID Analytics User Manual"):
+        st.session_state["launch_tab"] = "DAIVID Analytics User Manual"
+        st.experimental_rerun()
+
