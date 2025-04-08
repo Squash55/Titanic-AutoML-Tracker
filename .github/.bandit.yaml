@@ -1,0 +1,5 @@
+# .bandit.yaml
+skips:
+  - B301  # pickle is used safely in Streamlit with TPOT
+  - B101  # assert used in testing code
+  - B110  # try/except/pass is okay in Streamlit workflows
