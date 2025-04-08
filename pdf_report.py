@@ -26,6 +26,7 @@ except ImportError:
     _tpot_cache = {}
 
 from golden_qa import get_golden_questions, get_shap_smart_answers
+from model_leaderboard_panel import run_model_leaderboard_panel
 
 
 def is_autogluon_model(model):
@@ -50,146 +51,14 @@ class PDFReport(FPDF):
         self.cell(0, 10, f"Page {self.page_no()}", 0, 0, "C")
 
 
-def add_shap_summary_plot(pdf, model, X_train):
-    try:
-        explainer = shap.Explainer(model.predict, X_train)
-        shap_values = explainer(X_train)
-        fig = plt.figure()
-        shap.plots.beeswarm(shap_values, show=False)
-        tmp_img = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-        fig.savefig(tmp_img.name, bbox_inches="tight")
-        plt.close(fig)
-        pdf.image(tmp_img.name, w=180)
-        os.remove(tmp_img.name)
-    except Exception as e:
-        pdf.add_section("SHAP Summary Plot", f"Error generating SHAP plot: {e}")
+# ... [rest of the file unchanged, no need to repeat here]
 
+# === In your sidebar routing logic ===
+# Add this line to your navigation switch block:
+elif subtab == "Model Leaderboard Tracker":
+    run_model_leaderboard_panel()
 
-def add_model_comparison_plot(pdf):
-    models = _tpot_cache.get("all_models", {})
-    X_test = latest_X_test
-    y_test = latest_y_test
-    accs = {}
-    for name, model in models.items():
-        try:
-            if is_autogluon_model(model):
-                preds = model.predict(X_test)
-                accs[name] = (preds == y_test).mean()
-            else:
-                accs[name] = model.score(X_test, y_test)
-        except:
-            continue
-    if len(accs) >= 2:
-        fig, ax = plt.subplots()
-        ax.bar(accs.keys(), accs.values(), color=["#4682B4" if "TPOT" in k else "orange" for k in accs.keys()])
-        ax.set_ylabel("Accuracy")
-        ax.set_title("Model Accuracy Comparison")
-        tmp_img = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-        fig.savefig(tmp_img.name, bbox_inches="tight")
-        plt.close(fig)
-        pdf.image(tmp_img.name, w=180)
-        os.remove(tmp_img.name)
-
-
-def generate_pdf_report():
-    pdf = PDFReport()
-    pdf.add_page()
-
-    # Use loaded model if available
-    model = st.session_state.get("loaded_model", latest_tpot_model)
-    X_train = latest_X_train
-    y_train = latest_y_train
-    X_test = latest_X_test
-    y_test = latest_y_test
-
-    if model:
-        if is_autogluon_model(model):
-            pdf.add_section("AutoGluon Summary", "AutoGluon TabularPredictor model detected.")
-            if X_test is not None and y_test is not None:
-                preds = model.predict(X_test)
-                acc = (preds == y_test).mean()
-                pdf.add_section("Accuracy", f"Accuracy on test set: {acc:.3f}")
-
-            leaderboard_df = model.leaderboard(silent=True)
-            leaderboard_text = leaderboard_df.to_string(index=False)
-            pdf.add_section("Leaderboard", leaderboard_text)
-        else:
-            if X_test is not None and y_test is not None:
-                acc = model.score(X_test, y_test)
-                pipeline_code = str(model)
-                pdf.add_section("TPOT Model Accuracy", f"Accuracy on test set: {acc:.3f}")
-                pdf.add_section("Best Pipeline Structure", pipeline_code)
-                try:
-                    params_text = str(model.get_params())
-                    pdf.add_section("Model Parameters", params_text)
-                except:
-                    pass
-    else:
-        pdf.add_section("Model", "Model not available or not trained yet.")
-
-    # SHAP + Q&A
-    questions = get_golden_questions()
-    answers = get_shap_smart_answers()
-    qa_summary = "\n\n".join([f"Q: {q}\nA: {answers.get(q)}" for q in questions])
-    pdf.add_section("Golden Q&A (SHAP Powered)", qa_summary)
-
-    if model and X_train is not None:
-        add_shap_summary_plot(pdf, model, X_train)
-
-    # AutoGluon vs TPOT Accuracy Chart (if both exist)
-    if latest_X_test is not None and latest_y_test is not None:
-        add_model_comparison_plot(pdf)
-
-    return pdf
-
-
-def run_pdf_report():
-    st.subheader("📄 Downloadable PDF Report")
-    model = st.session_state.get("loaded_model", latest_tpot_model)
-
-    if model is None:
-        st.warning("⚠️ Train a model in AutoML Launcher first.")
-        return
-
-    pdf = generate_pdf_report()
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmpfile:
-        pdf.output(tmpfile.name)
-        with open(tmpfile.name, "rb") as f:
-            st.download_button(
-                label="📥 Download Report",
-                data=f,
-                file_name="AutoML_SHAP_Report.pdf",
-                mime="application/pdf"
-            )
-    os.remove(tmpfile.name)
-
-    st.markdown("---")
-    if st.button("💾 Save Best Model to Disk"):
-        save_path = os.path.join("saved_models", "best_tpot_pipeline.pkl")
-        os.makedirs("saved_models", exist_ok=True)
-        joblib.dump(model, save_path)
-        st.success(f"Model saved to {save_path}")
-
-    if st.button("📂 Load Saved Model"):
-        load_path = os.path.join("saved_models", "best_tpot_pipeline.pkl")
-        if os.path.exists(load_path):
-            loaded_model = joblib.load(load_path)
-            st.session_state["loaded_model"] = loaded_model
-            st.success("Model loaded successfully. It will be available for use in other panels.")
-        else:
-            st.error("Saved model file not found.")
-
-    if "loaded_model" in st.session_state:
-        st.info("✅ Loaded model is currently active in session memory.")
-
-    # Optional leaderboard export for AutoGluon
-    if is_autogluon_model(model):
-        if st.checkbox("📥 Export AutoGluon Leaderboard CSV"):
-            leaderboard_df = model.leaderboard(silent=True)
-            st.download_button(
-                "Download Leaderboard",
-                data=leaderboard_df.to_csv(index=False).encode(),
-                file_name="autogluon_leaderboard.csv",
-                mime="text/csv"
-            )
+# === And make sure to include it in your sidebar config ===
+# Under this section in your app sidebar:
+# "V: Validation & Variants": [ ... add this tab ]
+"V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab", "Model Leaderboard Tracker"],
