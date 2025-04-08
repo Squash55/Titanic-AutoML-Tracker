@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tpot_connector import _tpot_cache
 
-
 def run_shap_comparison():
     st.title("🧠 SHAP Comparison Panel")
     st.markdown("""
@@ -15,10 +14,24 @@ def run_shap_comparison():
     """)
 
     X_train = _tpot_cache.get("X_train")
-    models = _tpot_cache.get("all_models", {})  # Expecting a dict of {name: model}
+    models = _tpot_cache.get("all_models", {}).copy()
+
+    # ✅ Inject loaded model if present
+    if "loaded_model" in st.session_state:
+        models["Loaded Model"] = st.session_state["loaded_model"]
 
     if not X_train or not models:
-        st.warning("⚠️ SHAP Comparison requires multiple trained models and X_train. Run AutoML first.")
+        st.warning("⚠️ SHAP Comparison requires multiple trained models and X_train. Run AutoML or load models.")
+        return
+
+    selected_models = st.multiselect(
+        "🔍 Select Models to Compare",
+        options=list(models.keys()),
+        default=list(models.keys())[:3]  # Up to 3 by default
+    )
+
+    if len(selected_models) < 2:
+        st.info("👆 Select at least two models to compare.")
         return
 
     top_features = set()
@@ -26,7 +39,8 @@ def run_shap_comparison():
     feature_ranks = {}
     feature_agreement = {}
 
-    for name, model in models.items():
+    for name in selected_models:
+        model = models[name]
         try:
             explainer = shap.Explainer(model, X_train)
             shap_values = explainer(X_train)
@@ -41,11 +55,12 @@ def run_shap_comparison():
 
     # 📈 SHAP Summary Plots
     st.markdown("### 📈 Mean Absolute SHAP by Model")
-    for name, shap_series in shap_dfs.items():
-        fig, ax = plt.subplots()
-        shap_series.head(10).plot(kind='bar', ax=ax)
-        ax.set_title(f"{name} - Top SHAP Feature Importances")
-        st.pyplot(fig)
+    for name in selected_models:
+        if name in shap_dfs:
+            fig, ax = plt.subplots()
+            shap_dfs[name].head(10).plot(kind='bar', ax=ax)
+            ax.set_title(f"{name} - Top SHAP Feature Importances")
+            st.pyplot(fig)
 
     # 🧠 Smart Summary Answers
     st.markdown("### 🧠 SHAP Smart Summary")
