@@ -1,5 +1,6 @@
 xgboost
 # autogluon.tabular==0.7.0
+statsmodels
 plotly
 featuretools
 numpy
