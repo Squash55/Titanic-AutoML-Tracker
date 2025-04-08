@@ -62,7 +62,10 @@ def run_pdf_report():
     pdf.add_page()
 
     # Section 1: Model Overview
-    pdf.add_section("Model Summary", f"Model type: TPOT\nNumber of features: {X_test.shape[1]}\nTest sample size: {X_test.shape[0]}")
+    pdf.add_section(
+        "Model Summary",
+        f"Model type: TPOT\nNumber of features: {X_test.shape[1]}\nTest sample size: {X_test.shape[0]}"
+    )
 
     # Section 2: Golden Questions & Answers
     questions = get_golden_questions(X_test)
@@ -71,18 +74,27 @@ def run_pdf_report():
     for q, a in zip(questions, answers):
         pdf.add_section(q, a)
 
-    # Optional: Include EBM plot if selected
+    # Optional: Include Explainable Boosting Plot
     if st.session_state.get("include_ebm_pdf"):
         ebm_plot_path = "ebm_feature_plot.png"
         if os.path.exists(ebm_plot_path):
-            pdf.add_section("Explainable Boosting Insights", "Top features and global explanations below:")
+            pdf.add_section(
+                "Explainable Boosting Insights",
+                "These plots reflect global behavior of top features in an Explainable Boosting Machine.\n"
+                "Each curve represents the marginal effect of a feature on the prediction outcome, helping you understand the direction and shape of relationships."
+            )
             pdf.image(ebm_plot_path, w=180)
 
-    # Optional: Include SHAP vs Permutation Delta if selected
+    # Optional: Include SHAP vs Permutation Delta Plot
     if st.session_state.get("include_shap_perm_delta_pdf"):
         plot_path = st.session_state.get("shap_perm_delta_plot_path")
         if plot_path and os.path.exists(plot_path):
-            pdf.add_section("SHAP vs Permutation Importance Delta", "Discrepancy chart between SHAP and permutation importances:")
+            pdf.add_section(
+                "SHAP vs Permutation Importance Delta",
+                "This chart highlights differences between SHAP and permutation feature importance values.\n"
+                "Large deltas may indicate non-linear interactions, multicollinearity, or SHAP revealing effects missed by permutation testing.\n"
+                "Use this to guide feature investigation and model refinement."
+            )
             pdf.image(plot_path, w=180)
 
     # Save PDF
