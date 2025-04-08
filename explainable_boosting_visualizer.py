@@ -4,61 +4,62 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from interpret.glassbox import ExplainableBoostingClassifier
 from interpret import show
-import shap
-import os
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
+import shap
 
 
 def run_explainable_boosting_visualizer():
-    st.title("🧠 Explainable Boosting Visualizer")
+    st.header("📈 Explainable Boosting Visualizer")
 
     if "X" not in st.session_state or "y" not in st.session_state:
-        st.warning("❌ No dataset found in session. Please upload or generate synthetic data first.")
+        st.warning("❌ No dataset found in session. Please upload or generate synthetic data.")
         return
 
-    X = st.session_state.X.copy()
-    y = st.session_state.y.copy()
+    X = st.session_state.X
+    y = st.session_state.y
 
-    st.info("This tool fits an Explainable Boosting Model (EBM) and displays the most important global features.")
+    # Split for validation and interpretation
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Encode categorical y if classification
-    if y.dtype == 'object' or y.nunique() <= 10:
-        y = LabelEncoder().fit_transform(y)
-        task_type = "classification"
-    else:
-        st.warning("EBM currently supports classification only in this version.")
-        return
-
-    # Train/Test split
-    X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, test_size=0.2, random_state=42)
+    st.markdown("""
+    The Explainable Boosting Machine (EBM) is a glassbox model that combines accuracy with interpretability. 
+    It uses generalized additive models and is particularly good for identifying non-linearities and feature interactions.
+    """)
 
     # Train EBM
     ebm = ExplainableBoostingClassifier(random_state=42)
     ebm.fit(X_train, y_train)
+    st.success("✅ EBM model trained!")
 
-    acc = accuracy_score(y_test, ebm.predict(X_test))
-    st.success(f"✅ EBM model trained. Accuracy on hold-out set: {acc:.3f}")
+    # Show test performance
+    y_pred = ebm.predict(X_test)
+    report = classification_report(y_test, y_pred, output_dict=False)
+    st.text("Classification Report:\n" + report)
 
-    # Plot global explanations
-    st.subheader("🌐 Global Feature Importances")
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ebm_global = ebm.explain_global()
-    top_feats = ebm_global.data()['names'][:10]
-    top_scores = ebm_global.data()['scores'][:10]
-    ax.barh(top_feats[::-1], top_scores[::-1], color='skyblue')
-    ax.set_xlabel("Importance Score")
-    ax.set_title("Top 10 EBM Global Features")
-    st.pyplot(fig)
+    # Show global explanation plot inline
+    st.subheader("🌍 Global Feature Importance")
+    ebm_global = ebm.explain_global(name='EBM')
+    fig = plt.figure(figsize=(10, 5))
+    show(ebm_global)
 
-    # Save plot for PDF report
-    plt.tight_layout()
-    plt.savefig("ebm_feature_plot.png", bbox_inches="tight")
+    # Save image for PDF report (optional toggle)
+    st.session_state.include_ebm_pdf = st.checkbox("Include this chart in the final PDF report", value=True)
+    ebm_fig = ebm_global.visualize(0)
+    fig_path = "ebm_feature_plot.png"
+    ebm_fig.write_image(fig_path, format="png")
+    st.image(fig_path, caption="Top Features from EBM", use_column_width=True)
 
-    # Optional PDF toggle
-    st.session_state.include_ebm_pdf = st.checkbox("📥 Include in PDF Report", value=True)
+    # Optional SHAP overlay
+    st.subheader("🔍 SHAP Overlay (Optional)")
+    try:
+        explainer = shap.Explainer(ebm.predict, X_test)
+        shap_values = explainer(X_test)
+        st.set_option("deprecation.showPyplotGlobalUse", False)
+        shap.summary_plot(shap_values, X_test, show=False)
+        st.pyplot(bbox_inches="tight")
+    except Exception as e:
+        st.warning(f"SHAP visualization not available: {e}")
 
-    # Raw EBM viewer
-    with st.expander("🔍 View Full EBM HTML Summary"):
-        show(ebm_global)
+    # Additional interpretation toggle
+    st.info("EBM models provide insights comparable to decision trees while remaining highly interpretable.")
