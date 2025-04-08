@@ -5,6 +5,7 @@ import tempfile
 import os
 import shap
 import matplotlib.pyplot as plt
+import joblib
 import pandas as pd
 
 try:
@@ -25,6 +26,11 @@ except ImportError:
     _tpot_cache = {}
 
 from golden_qa import get_golden_questions, get_shap_smart_answers
+from model_leaderboard_panel import run_model_leaderboard_panel
+
+
+def is_autogluon_model(model):
+    return hasattr(model, "leaderboard") and hasattr(model, "predict")
 
 
 class PDFReport(FPDF):
@@ -45,45 +51,47 @@ class PDFReport(FPDF):
         self.cell(0, 10, f"Page {self.page_no()}", 0, 0, "C")
 
 
-def generate_pdf_report():
+# === PDF GENERATION LOGIC ===
+def run_pdf_report():
+    st.header("🧾 Generate PDF Report")
+
+    if latest_tpot_model is None or latest_X_test is None:
+        st.warning("⚠️ No TPOT model or test data found.")
+        return
+
+    model = latest_tpot_model
+    X_test = latest_X_test
+    y_test = latest_y_test
+
     pdf = PDFReport()
     pdf.add_page()
 
-    # TPOT performance summary
-    if latest_tpot_model and latest_X_test is not None and latest_y_test is not None:
-        acc = latest_tpot_model.score(latest_X_test, latest_y_test)
-        pipeline_code = str(latest_tpot_model)
-        pdf.add_section("TPOT Model Accuracy", f"Accuracy on test set: {acc:.3f}")
-        pdf.add_section("Best Pipeline Structure", pipeline_code)
-    else:
-        pdf.add_section("TPOT Model", "Model not available or not trained yet.")
+    # Section 1: Model Overview
+    pdf.add_section("Model Summary", f"Model type: TPOT\nNumber of features: {X_test.shape[1]}\nTest sample size: {X_test.shape[0]}")
 
-    # SHAP + Q&A
-    questions = get_golden_questions()
-    answers = get_shap_smart_answers()
-    qa_summary = "\n\n".join([f"Q: {q}\nA: {answers.get(q)}" for q in questions])
-    pdf.add_section("Golden Q&A (SHAP Powered)", qa_summary)
+    # Section 2: Golden Questions & Answers
+    questions = get_golden_questions(X_test)
+    answers = get_shap_smart_answers(model, X_test)
 
-    return pdf
+    for q, a in zip(questions, answers):
+        pdf.add_section(q, a)
+
+    # Optional: Include EBM plot if selected
+    if st.session_state.get("include_ebm_pdf"):
+        ebm_plot_path = "ebm_feature_plot.png"
+        if os.path.exists(ebm_plot_path):
+            pdf.add_section("Explainable Boosting Insights", "Top features and global explanations below:")
+            pdf.image(ebm_plot_path, w=180)
+
+    # Save PDF
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+        pdf.output(tmp_file.name)
+        st.success("✅ PDF Report Ready!")
+        with open(tmp_file.name, "rb") as f:
+            st.download_button(label="📥 Download Report", data=f, file_name="automl_summary_report.pdf")
 
 
-def run_pdf_report():
-    st.subheader("📄 Downloadable PDF Report")
-    st.markdown("🧪 TPOT-only mode active")
-
-    if latest_tpot_model is None:
-        st.warning("⚠️ Train a model in AutoML Launcher first.")
-        return
-
-    pdf = generate_pdf_report()
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmpfile:
-        pdf.output(tmpfile.name)
-        with open(tmpfile.name, "rb") as f:
-            st.download_button(
-                label="📥 Download Report",
-                data=f,
-                file_name="AutoML_SHAP_Report.pdf",
-                mime="application/pdf"
-            )
-    os.remove(tmpfile.name)
+# === ROUTING LOGIC (for app.py) ===
+# Add this to app.py:
+# elif subtab == "PDF Report":
+#     run_pdf_report()
