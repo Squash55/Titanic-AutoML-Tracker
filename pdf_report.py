@@ -26,7 +26,6 @@ except ImportError:
     _tpot_cache = {}
 
 from golden_qa import get_golden_questions, get_shap_smart_answers
-from model_leaderboard_panel import run_model_leaderboard_panel
 
 
 def is_autogluon_model(model):
@@ -51,14 +50,43 @@ class PDFReport(FPDF):
         self.cell(0, 10, f"Page {self.page_no()}", 0, 0, "C")
 
 
-# ... [rest of the file unchanged, no need to repeat here]
+def run_pdf_report():
+    st.subheader("📄 Downloadable PDF Report")
 
-# === In your sidebar routing logic ===
-# Add this line to your navigation switch block:
-elif subtab == "Model Leaderboard Tracker":
-    run_model_leaderboard_panel()
+    model = _tpot_cache.get("latest_tpot_model")
+    X_test = _tpot_cache.get("latest_X_test")
+    y_test = _tpot_cache.get("latest_y_test")
 
-# === And make sure to include it in your sidebar config ===
-# Under this section in your app sidebar:
-# "V: Validation & Variants": [ ... add this tab ]
-"V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab", "Model Leaderboard Tracker"],
+    pdf = PDFReport()
+    pdf.add_page()
+
+    if model and X_test is not None and y_test is not None:
+        if is_autogluon_model(model):
+            preds = model.predict(X_test)
+            acc = (preds == y_test).mean()
+        else:
+            acc = model.score(X_test, y_test)
+        pipeline_str = str(model)
+        pdf.add_section("Model Accuracy", f"Accuracy on test set: {acc:.3f}")
+        pdf.add_section("Model Description", pipeline_str)
+    else:
+        pdf.add_section("Model Info", "Model not found or not yet trained.")
+
+    questions = get_golden_questions()
+    answers = get_shap_smart_answers()
+    if questions:
+        qa_text = "\n\n".join([f"Q: {q}\nA: {answers.get(q, '...')}" for q in questions])
+        pdf.add_section("Golden Q&A", qa_text)
+    else:
+        pdf.add_section("Golden Q&A", "No questions generated yet.")
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmpfile:
+        pdf.output(tmpfile.name)
+        with open(tmpfile.name, "rb") as f:
+            st.download_button(
+                label="📥 Download Full Report",
+                data=f,
+                file_name="automl_report.pdf",
+                mime="application/pdf"
+            )
+    os.remove(tmpfile.name)
