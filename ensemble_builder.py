@@ -1,18 +1,19 @@
-
 # ensemble_builder.py
 
 import streamlit as st
 from sklearn.ensemble import VotingClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import joblib
+import tempfile
 
 from tpot_connector import __dict__ as _tpot_cache
 
 
 def run_ensemble_builder():
-    st.subheader("🧬 Ensemble Builder (TPOT + RandomForest)")
-
-    st.write("✅ Ensemble Builder module is loading")  # Debug confirmation
+    st.title("🧬 Ensemble Builder (TPOT + RandomForest)")
 
     if "latest_tpot_model" not in _tpot_cache and "latest_rf_model" not in _tpot_cache:
         st.warning("⚠️ No models found in memory. Please run TPOT and RandomForest first.")
@@ -35,7 +36,6 @@ def run_ensemble_builder():
         st.warning("⚠️ Missing test data. Please run AutoML first.")
         return
 
-    # Build soft voting ensemble
     ensemble = VotingClassifier(
         estimators=[("tpot", tpot_model), ("rf", rf_model)],
         voting="soft"
@@ -48,17 +48,48 @@ def run_ensemble_builder():
 
     try:
         y_pred = ensemble.predict(X_test)
+        y_proba = ensemble.predict_proba(X_test)[:, 1] if hasattr(ensemble, "predict_proba") else None
         acc = accuracy_score(y_test, y_pred)
+        prec = precision_score(y_test, y_pred, zero_division=0)
+        rec = recall_score(y_test, y_pred, zero_division=0)
+        f1 = f1_score(y_test, y_pred, zero_division=0)
 
-        # Store the ensemble model
         _tpot_cache["latest_ensemble_model"] = ensemble
 
-        st.success(f"✅ Ensemble accuracy on test set: **{acc:.3f}**")
-        st.markdown("### 📊 Sample Predictions (first 10)")
+        st.success(f"✅ Ensemble accuracy: **{acc:.3f}**, F1: **{f1:.3f}**, Precision: **{prec:.3f}**, Recall: **{rec:.3f}**")
+
+        st.markdown("### 📊 Sample Predictions")
         sample = pd.DataFrame({
             "Actual": y_test[:10].values,
-            "Ensemble Prediction": y_pred[:10]
+            "Prediction": y_pred[:10]
         })
         st.dataframe(sample)
+
+        # 📈 Probability Histogram
+        if y_proba is not None:
+            st.markdown("### 📈 Confidence Histogram")
+            fig, ax = plt.subplots()
+            sns.histplot(y_proba, bins=10, kde=True, ax=ax, color='skyblue')
+            ax.set_title("Predicted Probability Distribution")
+            st.pyplot(fig)
+
+        # 💾 Download Button
+        st.markdown("### 💾 Download Ensemble Model")
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl") as tmp:
+            joblib.dump(ensemble, tmp.name)
+            with open(tmp.name, "rb") as f:
+                st.download_button("📥 Download .pkl", data=f, file_name="ensemble_model.pkl")
+
+        # 🧪 Add to leaderboard (optional storage stub)
+        if st.button("📋 Add to Leaderboard"):
+            _tpot_cache["leaderboard"] = _tpot_cache.get("leaderboard", []) + [{
+                "Model": "VotingClassifier (TPOT + RF)",
+                "Accuracy": acc,
+                "F1": f1,
+                "Precision": prec,
+                "Recall": rec
+            }]
+            st.success("✅ Added to internal leaderboard cache.")
+
     except Exception as e:
         st.error(f"❌ Ensemble prediction failed: {type(e).__name__}: {e}")
