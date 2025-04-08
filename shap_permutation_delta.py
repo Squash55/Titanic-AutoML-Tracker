@@ -7,11 +7,11 @@ from sklearn.inspection import permutation_importance
 from tpot_connector import _tpot_cache
 import os
 
-
 def run_shap_perm_delta():
     st.header("📉 SHAP vs Permutation Delta Viewer")
+    
     model = _tpot_cache.get("model")
-    X = latest_X_test
+    X = _tpot_cache.get("X_test")
 
     if model is None or X is None:
         st.error("❌ Model or test data not found. Please train TPOT first.")
@@ -51,7 +51,7 @@ def run_shap_perm_delta():
     # Interpretation
     st.markdown("""
     #### 🤖 Interpretation
-    - Large positive delta: model internally emphasizes this feature more than its real predictive power.
-    - Large negative delta: this feature helps model performance but may be underweighted by internal logic.
-    - Use this chart to detect leakage, multicollinearity, or surprising patterns.
+    - **Large positive delta**: model internally emphasizes this feature *more* than its real predictive power.
+    - **Large negative delta**: feature improves performance but may be underweighted by model logic.
+    - Use this to detect **leakage, multicollinearity**, or surprising model priorities.
     """)
