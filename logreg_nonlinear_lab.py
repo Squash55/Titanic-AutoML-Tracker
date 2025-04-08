@@ -2,55 +2,58 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import FunctionTransformer
-from sklearn.pipeline import Pipeline
-
+import matplotlib.pyplot as plt
 
 def run_logreg_nonlinear_lab():
-    st.header("🔀 LogReg Nonlinear Tricks")
+    st.header("🧠 LogReg Nonlinear Tricks")
 
-    if "X" not in st.session_state or "y" not in st.session_state:
-        st.warning("⚠️ Data not found in session. Please generate or load your data first.")
+    if "X" not in st.session_state:
+        st.warning("❌ No dataset found. Please upload or generate data first.")
         return
 
     X = st.session_state.X.copy()
-    y = st.session_state.y.copy()
+    st.subheader("🔧 Select Feature for Transformation")
+    numeric_columns = X.select_dtypes(include=[np.number]).columns.tolist()
 
-    if not np.issubdtype(y.dtype, np.integer):
-        st.info("ℹ️ Your target `y` does not appear to be binary or categorical. This module is best suited for classification.")
-
-    st.markdown("""
-    Apply nonlinear transformations and interaction terms to enhance your logistic regression models or help tree models discover nonlinearity.
-    """)
-
-    selected_cols = st.multiselect("📌 Select numeric columns to enhance", X.select_dtypes(include=np.number).columns.tolist())
-
-    if not selected_cols:
-        st.info("👈 Select at least one numeric column to proceed.")
+    if not numeric_columns:
+        st.warning("⚠️ No numeric features available for transformation.")
         return
 
-    new_X = X.copy()
-    new_features = []
+    selected_col = st.selectbox("Select numeric column", numeric_columns)
+    transform = st.radio("Choose transformation type", ["Square (x²)", "Cube (x³)", "Log(x)", "1/x", "x * Other"], index=0)
 
-    for col in selected_cols:
-        new_X[f"{col}_squared"] = X[col] ** 2
-        new_X[f"{col}_log"] = np.log1p(X[col])
-        new_X[f"{col}_inv"] = 1 / (X[col] + 1e-6)
-        new_features.extend([f"{col}_squared", f"{col}_log", f"{col}_inv"])
+    if transform == "Square (x²)":
+        new_col = f"{selected_col}_squared"
+        X[new_col] = X[selected_col] ** 2
+        st.success(f"✅ Created: {new_col}")
 
-    # Add interactions
-    if len(selected_cols) >= 2:
-        for i in range(len(selected_cols)):
-            for j in range(i + 1, len(selected_cols)):
-                c1, c2 = selected_cols[i], selected_cols[j]
-                name = f"{c1}_x_{c2}"
-                new_X[name] = X[c1] * X[c2]
-                new_features.append(name)
+    elif transform == "Cube (x³)":
+        new_col = f"{selected_col}_cubed"
+        X[new_col] = X[selected_col] ** 3
+        st.success(f"✅ Created: {new_col}")
 
-    st.success(f"✅ Added {len(new_features)} new nonlinear & interaction features.")
-    st.dataframe(new_X[new_features].head())
+    elif transform == "Log(x)":
+        new_col = f"log_{selected_col}"
+        X[new_col] = np.log1p(X[selected_col])
+        st.success(f"✅ Created: {new_col} (log1p)")
 
-    # Option to update session state
-    if st.checkbox("💾 Replace current X with this enhanced version"):
-        st.session_state.X = new_X
-        st.success("✅ Session state updated with enhanced features.")
+    elif transform == "1/x":
+        new_col = f"inv_{selected_col}"
+        X[new_col] = 1 / (X[selected_col].replace(0, np.nan))
+        st.success(f"✅ Created: {new_col}")
+
+    elif transform == "x * Other":
+        other_col = st.selectbox("Multiply with", [col for col in numeric_columns if col != selected_col])
+        new_col = f"{selected_col}_x_{other_col}"
+        X[new_col] = X[selected_col] * X[other_col]
+        st.success(f"✅ Created: {new_col}")
+
+    st.session_state.X = X
+
+    st.markdown("### 📊 Distribution of New Feature")
+    fig, ax = plt.subplots()
+    X[new_col].hist(ax=ax, bins=30)
+    ax.set_title(f"Histogram of {new_col}")
+    st.pyplot(fig)
+
+    st.dataframe(X[[selected_col, new_col]].head())
