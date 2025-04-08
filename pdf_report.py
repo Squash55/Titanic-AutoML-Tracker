@@ -6,6 +6,7 @@ import tempfile
 import os
 import shap
 import matplotlib.pyplot as plt
+import joblib
 
 try:
     from tpot_connector import (
@@ -124,3 +125,20 @@ def run_pdf_report():
                 mime="application/pdf"
             )
     os.remove(tmpfile.name)
+
+    # Save model option
+    st.markdown("---")
+    if st.button("💾 Save Best Model to Disk"):
+        save_path = os.path.join("saved_models", "best_tpot_pipeline.pkl")
+        os.makedirs("saved_models", exist_ok=True)
+        joblib.dump(latest_tpot_model, save_path)
+        st.success(f"Model saved to {save_path}")
+
+    if st.button("📂 Load Saved Model"):
+        load_path = os.path.join("saved_models", "best_tpot_pipeline.pkl")
+        if os.path.exists(load_path):
+            loaded_model = joblib.load(load_path)
+            st.session_state["loaded_model"] = loaded_model
+            st.success("Model loaded successfully. It will be available for use in other panels.")
+        else:
+            st.error("Saved model file not found.")
