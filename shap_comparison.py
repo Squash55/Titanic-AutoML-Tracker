@@ -5,6 +5,7 @@ import shap
 import matplotlib.pyplot as plt
 import numpy as np
 from tpot_connector import _tpot_cache
+from autogluon_runner import train_autogluon_model
 
 def run_shap_comparison():
     st.title("🧠 SHAP Comparison Panel")
@@ -19,6 +20,16 @@ def run_shap_comparison():
     # ✅ Inject loaded model if present
     if "loaded_model" in st.session_state:
         models["Loaded Model"] = st.session_state["loaded_model"]
+
+    # ✅ Optionally train AutoGluon model on the fly if missing
+    if "AutoGluon" not in models and st.button("🚀 Train AutoGluon Model"):
+        X = _tpot_cache.get("X_train")
+        y = _tpot_cache.get("y_train")
+        if X is not None and y is not None:
+            predictor = train_autogluon_model(X, y)
+            st.success("AutoGluon model trained and cached!")
+        else:
+            st.error("Missing training data. Run AutoML first.")
 
     if not X_train or not models:
         st.warning("⚠️ SHAP Comparison requires multiple trained models and X_train. Run AutoML or load models.")
