@@ -142,3 +142,7 @@ def run_pdf_report():
             st.success("Model loaded successfully. It will be available for use in other panels.")
         else:
             st.error("Saved model file not found.")
+
+    # Notification if model is already loaded
+    if "loaded_model" in st.session_state:
+        st.info("✅ Loaded model is currently active in session memory.")
