@@ -19,6 +19,7 @@ def safe_import(module_name, function_name):
         return fallback
 
 # === MODULE IMPORTS VIA SAFE WRAPPER ===
+run_user_manual = safe_import("user_manual", "run_user_manual")
 run_shap_perm_delta = safe_import("shap_permutation_delta", "run_shap_permutation_delta")
 run_explainable_boosting_visualizer = safe_import("explainable_boosting_visualizer", "run_explainable_boosting_visualizer")
 run_explainable_boosting = safe_import("explainable_boosting_lab", "run_explainable_boosting")
