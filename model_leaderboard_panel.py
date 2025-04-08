@@ -139,9 +139,9 @@ def run_model_leaderboard_panel():
                 if st.button("📄 Generate Saved Model Report"):
                     summary = f"Model: {new_name}\n\nNotes: {new_note}\n\nType: {type(model).__name__}"
                     st.download_button("Download Report", summary.encode(), file_name=f"{new_name}_report.txt")
-
         else:
             st.info("No models have been promoted yet.")
+
         st.markdown("### 🔁 Saved vs Current Model Comparison")
         if _tpot_cache["saved_models"] and df_filtered is not None:
             compare_name = st.selectbox("Compare against this current model", df_filtered["Model Name"].tolist(), key="compare_name")
@@ -179,6 +179,24 @@ def run_model_leaderboard_panel():
                     ]
                 })
                 st.table(comp_df)
+
+        st.markdown("### 📊 SHAP vs Accuracy Scatterplot")
+        try:
+            chart_df = df_filtered.copy()
+            chart_df = chart_df[pd.to_numeric(chart_df["Accuracy"], errors="coerce").notna() & pd.to_numeric(chart_df["SHAP Total"], errors="coerce").notna()]
+            chart_df["Accuracy"] = chart_df["Accuracy"].astype(float)
+            chart_df["SHAP Total"] = chart_df["SHAP Total"].astype(float)
+
+            fig, ax = plt.subplots()
+            scatter = ax.scatter(chart_df["Accuracy"], chart_df["SHAP Total"], c="blue")
+            for i, row in chart_df.iterrows():
+                ax.annotate(row["Model Name"], (row["Accuracy"], row["SHAP Total"]), fontsize=8)
+            ax.set_xlabel("Accuracy")
+            ax.set_ylabel("SHAP Total")
+            ax.set_title("Model Interpretability vs Performance")
+            st.pyplot(fig)
+        except Exception as e:
+            st.warning(f"Could not render scatterplot: {e}")
 
         st.markdown("### 📥 Compare with Uploaded Leaderboard")
         uploaded_file = st.file_uploader("Upload Previous Leaderboard CSV", type=["csv"])
