@@ -10,11 +10,9 @@ from sklearn.preprocessing import PolynomialFeatures
 def run_smart_poly_finder():
     st.header("🧠 Smart Polynomial Finder")
 
-   if "X" not in st.session_state or "y" not in st.session_state:
-      st.error("❌ No data found in session.")
-      st.info("Please [generate synthetic data](#Synthetic-Data-Generator) or upload your dataset to proceed.")
-      return
-
+    if "X" not in st.session_state or "y" not in st.session_state:
+        st.warning("❌ No data found in session. Please upload or generate synthetic data first.")
+        return
 
     X = st.session_state.X.copy()
     y = st.session_state.y.copy()
