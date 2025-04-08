@@ -19,6 +19,7 @@ def safe_import(module_name, function_name):
         return fallback
 
 # === MODULE IMPORTS VIA SAFE WRAPPER ===
+run_logreg_nonlinear_lab = safe_import("logreg_nonlinear_lab", "run_logreg_nonlinear_lab")
 run_logreg_nonlinear_tricks = safe_import("logreg_nonlinear_tricks", "run_logreg_nonlinear_tricks")
 run_catreg_switcher = safe_import("catreg_switcher", "run_catreg_switcher")
 run_synthetic_data_toggle = safe_import("synthetic_data_toggle", "run_synthetic_data_toggle")
@@ -146,6 +147,8 @@ elif subtab == "Cat↔Reg Switcher":
     run_catreg_switcher()
 elif subtab == "LogReg Nonlinear Tricks":
     run_logreg_nonlinear_tricks()
+elif subtab == "LogReg Nonlinear Tricks":
+    run_logreg_nonlinear_lab()
 
 
 
