@@ -51,7 +51,6 @@ def run_model_leaderboard_panel():
         except:
             pass
 
-        # ✅ Auto-store timestamp + duration + source tag if missing
         if name not in _tpot_cache["model_times"]:
             _tpot_cache["model_times"][name] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if name not in _tpot_cache["model_durations"]:
@@ -89,13 +88,32 @@ def run_model_leaderboard_panel():
             best_idx = numeric_df["Accuracy"].astype(float).idxmax()
             df.loc[best_idx, "Model Name"] += " 🥇"
 
-        st.dataframe(df, use_container_width=True)
+        # 🔍 Add filters
+        with st.expander("🔍 Filter Options", expanded=False):
+            filter_source = st.multiselect("Filter by Source", options=df["Source"].unique().tolist(), default=df["Source"].unique().tolist())
+            shap_threshold = st.slider("Minimum SHAP Total", min_value=0.0, max_value=float(df["SHAP Total"].max() or 100.0), value=0.0, step=1.0)
+
+        df_filtered = df[(df["Source"].isin(filter_source)) & (pd.to_numeric(df["SHAP Total"], errors="coerce") >= shap_threshold)]
+        st.dataframe(df_filtered, use_container_width=True)
+
+        st.markdown("### 📊 Accuracy & SHAP Rankings")
+        try:
+            fig, ax = plt.subplots(1, 2, figsize=(14, 6))
+            df_filtered_sorted_acc = df_filtered.sort_values("Accuracy", ascending=False)
+            df_filtered_sorted_shap = df_filtered.sort_values("SHAP Total", ascending=False)
+            ax[0].barh(df_filtered_sorted_acc["Model Name"][::-1], df_filtered_sorted_acc["Accuracy"][::-1])
+            ax[0].set_title("Models Ranked by Accuracy")
+            ax[1].barh(df_filtered_sorted_shap["Model Name"][::-1], df_filtered_sorted_shap["SHAP Total"][::-1], color="orange")
+            ax[1].set_title("Models Ranked by SHAP Total")
+            st.pyplot(fig)
+        except:
+            st.warning("Ranking plots unavailable. Check for missing values.")
 
         st.markdown("### 📈 SHAP vs Accuracy")
-        if df["SHAP Total"].dtype != object and df["Accuracy"].dtype != object:
+        if df_filtered["SHAP Total"].dtype != object and df_filtered["Accuracy"].dtype != object:
             fig, ax = plt.subplots()
-            ax.scatter(df["SHAP Total"], df["Accuracy"], s=100)
-            for i, row in df.iterrows():
+            ax.scatter(df_filtered["SHAP Total"], df_filtered["Accuracy"], s=100)
+            for i, row in df_filtered.iterrows():
                 ax.text(row["SHAP Total"], row["Accuracy"], row["Model Name"], fontsize=9)
             ax.set_xlabel("Total SHAP Value")
             ax.set_ylabel("Accuracy")
@@ -104,8 +122,8 @@ def run_model_leaderboard_panel():
 
         st.markdown("### ⏳ Training Timeline")
         try:
-            df["Trained At Parsed"] = pd.to_datetime(df["Trained At"], errors="coerce")
-            df_sorted = df.sort_values("Trained At Parsed")
+            df_filtered["Trained At Parsed"] = pd.to_datetime(df_filtered["Trained At"], errors="coerce")
+            df_sorted = df_filtered.sort_values("Trained At Parsed")
             fig, ax = plt.subplots()
             ax.plot(df_sorted["Trained At Parsed"], df_sorted["Accuracy"], marker="o")
             for i, row in df_sorted.iterrows():
@@ -122,7 +140,7 @@ def run_model_leaderboard_panel():
         if st.button("📥 Export Leaderboard to CSV"):
             st.download_button(
                 "Download CSV",
-                data=df.drop(columns=["Trained At Parsed"], errors="ignore").to_csv(index=False).encode(),
+                data=df_filtered.drop(columns=["Trained At Parsed"], errors="ignore").to_csv(index=False).encode(),
                 file_name="model_leaderboard.csv",
                 mime="text/csv"
             )
