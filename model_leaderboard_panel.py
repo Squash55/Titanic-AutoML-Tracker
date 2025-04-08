@@ -17,6 +17,9 @@ if "model_sources" not in _tpot_cache:
     _tpot_cache["model_sources"] = {}
 if "saved_models" not in _tpot_cache:
     _tpot_cache["saved_models"] = {}
+if "saved_model_notes" not in _tpot_cache:
+    _tpot_cache["saved_model_notes"] = {}
+
 
 def run_model_leaderboard_panel():
     st.title("🏆 Model Leaderboard Tracker")
@@ -102,6 +105,7 @@ def run_model_leaderboard_panel():
             if st.button("📌 Promote Top Accuracy to Saved Models"):
                 model_obj = models.get(best_accuracy["Model Name"].replace(" 🥇", ""))
                 _tpot_cache["saved_models"][best_accuracy["Model Name"]] = model_obj
+                _tpot_cache["saved_model_notes"][best_accuracy["Model Name"]] = ""
                 st.success(f"✅ Saved: {best_accuracy['Model Name']}")
 
         st.markdown("### 💾 Saved Models Viewer")
@@ -112,6 +116,17 @@ def run_model_leaderboard_panel():
                 st.write(f"📌 Model Name: {selected}")
                 st.write(model)
 
+                new_name = st.text_input("✏️ Rename Model", value=selected)
+                new_note = st.text_area("📝 Notes for this model", value=_tpot_cache["saved_model_notes"].get(selected, ""))
+
+                if st.button("💾 Update Name and Notes"):
+                    _tpot_cache["saved_models"][new_name] = _tpot_cache["saved_models"].pop(selected)
+                    _tpot_cache["saved_model_notes"][new_name] = new_note
+                    if selected in _tpot_cache["saved_model_notes"]:
+                        del _tpot_cache["saved_model_notes"][selected]
+                    st.success("✅ Updated saved model entry")
+                    st.experimental_rerun()
+
                 if X_train is not None:
                     try:
                         explainer = shap.Explainer(model.predict, X_train)
@@ -121,8 +136,27 @@ def run_model_leaderboard_panel():
                         st.pyplot(fig)
                     except Exception as e:
                         st.warning(f"SHAP plot error: {e}")
+
+                if st.button("📄 Generate Saved Model Report"):
+                    summary = f"Model: {new_name}\n\nNotes: {new_note}\n\nType: {type(model).__name__}"
+                    st.download_button("Download Report", summary.encode(), file_name=f"{new_name}_report.txt")
+
         else:
             st.info("No models have been promoted yet.")
+
+        st.markdown("### 🔁 Saved vs Current Model Comparison")
+        if _tpot_cache["saved_models"] and df_filtered is not None:
+            compare_name = st.selectbox("Compare against this current model", df_filtered["Model Name"].tolist(), key="compare_name")
+            current_row = df_filtered[df_filtered["Model Name"] == compare_name].squeeze()
+            saved_row = df[df["Model Name"] == selected].squeeze()
+
+            if not current_row.empty and not saved_row.empty:
+                comp_df = pd.DataFrame({
+                    "Metric": ["Accuracy", "SHAP Total", "Feature Count"],
+                    "Saved Model": [saved_row["Accuracy"], saved_row["SHAP Total"], saved_row["Feature Count"]],
+                    "Current Model": [current_row["Accuracy"], current_row["SHAP Total"], current_row["Feature Count"]]
+                })
+                st.table(comp_df)
 
         st.markdown("### 📥 Compare with Uploaded Leaderboard")
         uploaded_file = st.file_uploader("Upload Previous Leaderboard CSV", type=["csv"])
