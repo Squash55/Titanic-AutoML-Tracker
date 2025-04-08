@@ -8,9 +8,13 @@ import time
 from datetime import datetime
 from tpot_connector import _tpot_cache
 
-# ✅ Ensure model_times cache exists
+# ✅ Ensure model_times and durations caches exist
 if "model_times" not in _tpot_cache:
     _tpot_cache["model_times"] = {}
+if "model_durations" not in _tpot_cache:
+    _tpot_cache["model_durations"] = {}
+if "model_sources" not in _tpot_cache:
+    _tpot_cache["model_sources"] = {}
 
 
 def run_model_leaderboard_panel():
@@ -22,7 +26,6 @@ def run_model_leaderboard_panel():
     X_train = _tpot_cache.get("X_train")
 
     rows = []
-    shap_scores = []
 
     for name, model in models.items():
         acc = "-"
@@ -45,17 +48,31 @@ def run_model_leaderboard_panel():
         except:
             pass
 
-        # ✅ Auto-store timestamp if missing
+        # ✅ Auto-store timestamp + duration + source tag if missing
         if name not in _tpot_cache["model_times"]:
             _tpot_cache["model_times"][name] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if name not in _tpot_cache["model_durations"]:
+            _tpot_cache["model_durations"][name] = "-"
+        if name not in _tpot_cache["model_sources"]:
+            if hasattr(model, "leaderboard"):
+                _tpot_cache["model_sources"][name] = "AutoGluon"
+            elif "TPOT" in str(type(model)):
+                _tpot_cache["model_sources"][name] = "TPOT"
+            else:
+                _tpot_cache["model_sources"][name] = "Loaded"
 
         timestamp = _tpot_cache["model_times"].get(name, "-")
+        duration = _tpot_cache["model_durations"].get(name, "-")
+        source = _tpot_cache["model_sources"].get(name, "-")
+
         rows.append({
             "Model Name": name,
             "Type": type(model).__name__,
             "Accuracy": acc,
             "SHAP Total": shap_total,
-            "Trained At": timestamp
+            "Trained At": timestamp,
+            "Duration": duration,
+            "Source": source
         })
 
     if rows:
