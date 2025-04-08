@@ -10,17 +10,20 @@ from sklearn.metrics import roc_auc_score, accuracy_score, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pickle
-
+from tpot_connector import _tpot_cache
+from automl_launcher import run_automl_launcher
 
 def run_logreg_interactions_explorer():
     st.title("🧪 LogReg + Interaction Explorer")
 
-    if "X" not in st.session_state or "y" not in st.session_state:
-        st.warning("⚠️ No dataset found. Please load or generate synthetic data.")
-        return
+    X = st.session_state.get("X") or _tpot_cache.get("latest_X_train")
+    y = st.session_state.get("y") or _tpot_cache.get("latest_y_train")
 
-    X = st.session_state["X"]
-    y = st.session_state["y"]
+    if X is None or y is None:
+        st.warning("⚠️ No dataset found. Please load data or run AutoML first.")
+        if st.button("🚀 Launch AutoML Now"):
+            run_automl_launcher()
+        return
 
     st.markdown("This tool fits logistic regression models with interaction and polynomial terms, and displays model performance and p-values.")
 
