@@ -31,6 +31,8 @@ def run_model_leaderboard_panel():
     for name, model in models.items():
         acc = "-"
         shap_total = "-"
+        feature_count = len(X_train.columns) if X_train is not None else "-"
+        dataset_size = len(X_train) if X_train is not None else "-"
         try:
             if hasattr(model, "predict") and X_test is not None and y_test is not None:
                 if hasattr(model, "leaderboard"):
@@ -71,6 +73,8 @@ def run_model_leaderboard_panel():
             "Type": type(model).__name__,
             "Accuracy": acc,
             "SHAP Total": shap_total,
+            "Feature Count": feature_count,
+            "Dataset Size": dataset_size,
             "Trained At": timestamp,
             "Duration": duration,
             "Source": source
@@ -78,6 +82,13 @@ def run_model_leaderboard_panel():
 
     if rows:
         df = pd.DataFrame(rows)
+
+        # ⭐ Highlight best model row
+        numeric_df = df[pd.to_numeric(df["Accuracy"], errors="coerce").notna()].copy()
+        if not numeric_df.empty:
+            best_idx = numeric_df["Accuracy"].astype(float).idxmax()
+            df.loc[best_idx, "Model Name"] += " 🥇"
+
         st.dataframe(df, use_container_width=True)
 
         st.markdown("### 📈 SHAP vs Accuracy")
