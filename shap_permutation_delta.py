@@ -4,14 +4,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.inspection import permutation_importance
-from tpot_connector import latest_tpot_model, latest_X_test
+from tpot_connector import _tpot_cache
 import os
 
 
 def run_shap_perm_delta():
     st.header("📉 SHAP vs Permutation Delta Viewer")
-
-    model = latest_tpot_model
+    model = _tpot_cache.get("model")
     X = latest_X_test
 
     if model is None or X is None:
