@@ -6,6 +6,11 @@ st.set_page_config(page_title="Titanic AutoML App", layout="wide")
 
 from tpot_connector import _tpot_cache
 from golden_qna_shap import run_golden_qna_shap
+from residual_plot_panel import run_residual_plot_panel
+
+# Then link it to a tab name:
+if subtab == "Residual Plot":
+    run_residual_plot_panel()
 
 # === SAFE IMPORT HELPER ===
 def safe_import(module_name, function_name):
@@ -46,6 +51,7 @@ run_shap_summary_lab = safe_import("shap_summary_lab", "run_shap_summary_lab")
 run_shap_explainability_heatmap = safe_import("shap_explainability_heatmap", "run_shap_explainability_heatmap")
 run_correlation_matrix_lab = safe_import("correlation_matrix_lab", "run_correlation_matrix_lab")
 run_model_diagnostics_lab = safe_import("model_diagnostics_lab", "run_model_diagnostics_lab")
+run_residual_plot_panel = safe_import("residual_plot_panel", "run_residual_plot_panel")
 run_daivid_scorecard = safe_import("daivid_scorecard", "run_daivid_scorecard")
 
 
@@ -57,7 +63,7 @@ phase_tabs = {
     "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "LogReg + Interaction Explorer", "Distribution Auditor"],
     "A: Algorithm Exploration": ["Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"],
     "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A (SHAP)", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab"],
-    "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab"],
+    "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab", "Residual Plot" ],
     "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer"],
     "D: Documentation & Deployment": ["Saved Models", "PDF Report", "DAIVID App Maturity Scorecard"]
 }
@@ -130,5 +136,7 @@ elif subtab == "DAIVID App Maturity Scorecard":
     run_daivid_scorecard()
 elif subtab == "Golden Q&A (SHAP)":
     run_golden_qna_shap()
+elif subtab == "Residual Plot":
+    run_residual_plot_panel()
 
 
