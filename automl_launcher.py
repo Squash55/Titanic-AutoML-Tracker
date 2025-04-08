@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from tpot_connector import _tpot_cache
 
 def run_automl_launcher():
-    st.title("🚀 AutoML Launcher (TPOT + AutoGluon)")
+    st.title("🚀 AutoML Launcher (TPOT)")
 
     uploaded_file = st.file_uploader("📁 Upload CSV Data", type=["csv"])
     if uploaded_file is not None:
@@ -31,11 +31,6 @@ def run_automl_launcher():
                         best_model = tpot.fitted_pipeline_
                         st.success("✅ TPOT training complete!")
                         st.code(best_model)
-
-                elif automl_choice == "AutoGluon":
-                    with st.spinner("Training AutoGluon Predictor..."):
-                        best_model = train_autogluon_model(X_train, y_train)
-                        st.success("✅ AutoGluon training complete!")
 
                 # ✅ Store in shared memory for all modules
                 _tpot_cache["X_train"] = X_train
