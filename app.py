@@ -135,13 +135,10 @@ elif subtab == "Zoomed HPO Explorer":
     run_zoom_hpo_explorer()
 elif subtab == "Saved Models":
     run_saved_models_panel()
-
-# === PDF REPORT TOGGLES ===
-st.sidebar.markdown("### 📄 PDF Report Options")
-st.session_state["include_ebm_pdf"] = st.sidebar.checkbox("📊 Include EBM Plot", value=True)
-st.session_state["include_shap_perm_delta_pdf"] = st.sidebar.checkbox("📉 Include SHAP vs Permutation Delta Plot", value=True)
-
 elif subtab == "PDF Report":
+    st.sidebar.markdown("### 📄 PDF Report Options")
+    st.session_state["include_ebm_pdf"] = st.sidebar.checkbox("📊 Include EBM Plot", value=True)
+    st.session_state["include_shap_perm_delta_pdf"] = st.sidebar.checkbox("📉 Include SHAP vs Permutation Delta Plot", value=True)
     run_pdf_report()
 elif subtab == "DAIVID App Maturity Scorecard":
     run_daivid_scorecard()
@@ -157,16 +154,9 @@ elif subtab == "Cat↔Reg Switcher":
     run_catreg_switcher()
 elif subtab == "LogReg Nonlinear Tricks":
     run_logreg_nonlinear_tricks()
-elif subtab == "LogReg Nonlinear Tricks":
-    run_logreg_nonlinear_lab()
 elif subtab == "Smart Poly Finder":
     run_smart_poly_finder()
-elif subtab == "Explainable Boosting":
-    run_explainable_boosting()
 elif subtab == "Explainable Boosting":
     run_explainable_boosting_visualizer()
 elif subtab == "SHAP vs Permutation Delta Viewer":
     run_shap_perm_delta()
-
-
-
