@@ -1,78 +1,64 @@
 # explainable_boosting_visualizer.py
 import streamlit as st
 import pandas as pd
-import numpy as np
+import matplotlib.pyplot as plt
 from interpret.glassbox import ExplainableBoostingClassifier
 from interpret import show
+import shap
+import os
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, accuracy_score
-import plotly.graph_objs as go
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score
 
 
 def run_explainable_boosting_visualizer():
-    st.header("📈 Explainable Boosting Visualizer")
-
-    st.markdown("""
-    ### 🔍 What This Tool Does
-    This tool trains an **Explainable Boosting Machine (EBM)** — a highly interpretable model from Microsoft's `interpret` package —
-    and shows how each feature contributes to predictions.
-
-    EBMs are powerful alternatives to black-box models like XGBoost or Random Forests, offering transparency without sacrificing much accuracy.
-    """)
+    st.title("🧠 Explainable Boosting Visualizer")
 
     if "X" not in st.session_state or "y" not in st.session_state:
-        st.warning("❌ No data found. Please generate or upload data first.")
+        st.warning("❌ No dataset found in session. Please upload or generate synthetic data first.")
         return
 
-    X = st.session_state.X
-    y = st.session_state.y
+    X = st.session_state.X.copy()
+    y = st.session_state.y.copy()
 
-    if len(np.unique(y)) > 10:
-        st.warning("🚫 This demo currently supports classification problems only (target should have < 10 unique values). Try using the Cat ↔ Reg Switcher tab.")
+    st.info("This tool fits an Explainable Boosting Model (EBM) and displays the most important global features.")
+
+    # Encode categorical y if classification
+    if y.dtype == 'object' or y.nunique() <= 10:
+        y = LabelEncoder().fit_transform(y)
+        task_type = "classification"
+    else:
+        st.warning("EBM currently supports classification only in this version.")
         return
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+    # Train/Test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, test_size=0.2, random_state=42)
 
-    with st.spinner("🔄 Training Explainable Boosting Model..."):
-        ebm = ExplainableBoostingClassifier(random_state=42)
-        ebm.fit(X_train, y_train)
+    # Train EBM
+    ebm = ExplainableBoostingClassifier(random_state=42)
+    ebm.fit(X_train, y_train)
 
-    y_pred = ebm.predict(X_test)
-    acc = accuracy_score(y_test, y_pred)
-    st.success(f"✅ Accuracy on Test Set: {acc:.3f}")
+    acc = accuracy_score(y_test, ebm.predict(X_test))
+    st.success(f"✅ EBM model trained. Accuracy on hold-out set: {acc:.3f}")
 
-    st.markdown("### 📊 Feature Contributions (Global)")
-    global_exp = ebm.explain_global()
+    # Plot global explanations
+    st.subheader("🌐 Global Feature Importances")
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ebm_global = ebm.explain_global()
+    top_feats = ebm_global.data()['names'][:10]
+    top_scores = ebm_global.data()['scores'][:10]
+    ax.barh(top_feats[::-1], top_scores[::-1], color='skyblue')
+    ax.set_xlabel("Importance Score")
+    ax.set_title("Top 10 EBM Global Features")
+    st.pyplot(fig)
 
-    # Top feature bars
-    top_feats = pd.DataFrame({
-        "Feature": global_exp.feature_names,
-        "Importance": global_exp.feature_importances_
-    }).sort_values("Importance", ascending=False).head(10)
+    # Save plot for PDF report
+    plt.tight_layout()
+    plt.savefig("ebm_feature_plot.png", bbox_inches="tight")
 
-    fig = go.Figure(go.Bar(
-        x=top_feats["Importance"],
-        y=top_feats["Feature"],
-        orientation='h',
-        marker_color='indigo'
-    ))
-    fig.update_layout(title="Top Feature Importances (EBM)", height=400)
-    st.plotly_chart(fig)
+    # Optional PDF toggle
+    st.session_state.include_ebm_pdf = st.checkbox("📥 Include in PDF Report", value=True)
 
-    st.markdown("### 🔍 Inspect Individual Feature Effects")
-    feature = st.selectbox("Select Feature to Inspect", global_exp.feature_names)
-    feature_idx = global_exp.feature_names.index(feature)
-    feature_vals = global_exp.data("scores")[feature_idx]
-    feature_bins = global_exp.data("names")[feature_idx]
-
-    fig2 = go.Figure(go.Scatter(
-        x=feature_bins,
-        y=feature_vals,
-        mode='lines+markers',
-        name=feature
-    ))
-    fig2.update_layout(title=f"Contribution of {feature} to Prediction", xaxis_title=feature, yaxis_title="Score")
-    st.plotly_chart(fig2)
-
-    st.markdown("### 📜 Classification Report")
-    st.text(classification_report(y_test, y_pred))
+    # Raw EBM viewer
+    with st.expander("🔍 View Full EBM HTML Summary"):
+        show(ebm_global)
