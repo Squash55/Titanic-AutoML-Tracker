@@ -8,6 +8,10 @@ import time
 from datetime import datetime
 from tpot_connector import _tpot_cache
 
+# ✅ Ensure model_times cache exists
+if "model_times" not in _tpot_cache:
+    _tpot_cache["model_times"] = {}
+
 
 def run_model_leaderboard_panel():
     st.title("🏆 Model Leaderboard Tracker")
@@ -41,7 +45,11 @@ def run_model_leaderboard_panel():
         except:
             pass
 
-        timestamp = _tpot_cache.get("model_times", {}).get(name, "-")
+        # ✅ Auto-store timestamp if missing
+        if name not in _tpot_cache["model_times"]:
+            _tpot_cache["model_times"][name] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        timestamp = _tpot_cache["model_times"].get(name, "-")
         rows.append({
             "Model Name": name,
             "Type": type(model).__name__,
