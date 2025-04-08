@@ -1,4 +1,4 @@
-model_leaderboard_panel.py
+# model_leaderboard_panel.py
 
 import streamlit as st
 import pandas as pd
@@ -21,6 +21,7 @@ if "saved_model_notes" not in _tpot_cache:
 
 def run_model_leaderboard_panel():
     st.title("🏆 Model Leaderboard Tracker")
+    st.markdown("🧪 TPOT-only mode active")
 
     models = _tpot_cache.get("all_models", {})
     X_test = _tpot_cache.get("X_test")
