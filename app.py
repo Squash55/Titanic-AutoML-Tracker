@@ -8,10 +8,6 @@ from tpot_connector import _tpot_cache
 from golden_qna_shap import run_golden_qna_shap
 from residual_plot_panel import run_residual_plot_panel
 
-# Then link it to a tab name:
-if subtab == "Residual Plot":
-    run_residual_plot_panel()
-
 # === SAFE IMPORT HELPER ===
 def safe_import(module_name, function_name):
     try:
