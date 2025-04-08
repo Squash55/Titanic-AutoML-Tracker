@@ -27,6 +27,7 @@ run_saved_models_panel = safe_import("saved_models", "run_saved_models_panel")
 run_distribution_auditor = safe_import("distribution_auditor", "run_distribution_auditor")
 run_auto_eda = safe_import("auto_eda", "run_auto_eda")
 run_autofe = safe_import("autofe", "run_autofe")
+run_outlier_suppressor = safe_import("outlier_suppressor", "run_outlier_suppressor")
 run_automl_launcher = safe_import("automl_launcher", "run_automl_launcher")
 run_golden_qa = safe_import("golden_qa", "run_golden_qa")
 run_shap_panel = safe_import("shap_interpretability", "run_shap_panel")
@@ -137,6 +138,8 @@ elif subtab == "Residual Plot":
     run_residual_plot_panel()
 elif subtab == "Synthetic Data Generator":
     run_synthetic_data_toggle()
+elif subtab == "Outlier Suppressor":
+    run_outlier_suppressor()
 
 
 
