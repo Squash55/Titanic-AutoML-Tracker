@@ -69,27 +69,6 @@ phase_tabs = {
     "D: Documentation & Deployment": ["Saved Models", "PDF Report", "DAIVID App Maturity Scorecard"]
 }
 
-    st.title("🧪 Synthetic Data Generator")
-
-    use_synthetic = st.toggle("Generate Synthetic Data Instead of Uploading", value=True)
-
-    if use_synthetic:
-        rows = st.slider("Number of Rows", 50, 1000, 100)
-        seed = st.number_input("Random Seed", value=42)
-        X, y = generate_synthetic_regression_data(rows=rows, seed=seed)
-
-        # ✅ Store for downstream modules
-        st.session_state.X = X
-        st.session_state.y = y
-
-        st.success("✅ Synthetic dataset generated!")
-        st.dataframe(pd.concat([X, pd.Series(y, name='Target')], axis=1))
-    else:
-        uploaded = st.file_uploader("Upload your CSV dataset")
-        if uploaded:
-            df = pd.read_csv(uploaded)
-            st.dataframe(df.head())
-
 if show_all:
     st.sidebar.markdown("### 🕘️ DAIVID Roadmap")
     st.sidebar.markdown("Explore all phases and their tools:")
