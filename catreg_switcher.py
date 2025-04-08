@@ -4,9 +4,18 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 def run_catreg_switcher():
     st.header("🔁 Cat ↔ Reg Switcher")
+
+    st.markdown("""
+    ### 🧠 What This Tool Does
+    This switcher helps you **convert a column between categorical and regression formats**, depending on the modeling needs.
+
+    - **Categorical ➜ Regression**: Useful for algorithms that only accept numerical inputs.
+    - **Regression ➜ Categorical**: Handy when you want to group continuous values into bins (e.g., for classification tasks or segment-based analysis).
+
+    The tool supports **manual binning** and **quantile-based binning**, plus lets you **restore the original column** anytime.
+    """)
 
     if "X" not in st.session_state or "y" not in st.session_state:
         st.warning("❌ No data found in session. Please upload or generate synthetic data first.")
