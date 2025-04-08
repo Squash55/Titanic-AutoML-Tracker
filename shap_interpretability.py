@@ -1,4 +1,3 @@
-
 # shap_interpretability.py
 
 import streamlit as st
@@ -15,18 +14,18 @@ except ImportError:
 def run_shap_panel():
     st.subheader("🔍 SHAP Interpretability Panel")
 
-    if latest_tpot_model is None or latest_X_train is None:
-        st.warning("⚠️ No trained model found. Please run TPOT in the AutoML Launcher tab first.")
+    # Use session-loaded model if available
+    model = st.session_state.get("loaded_model", latest_tpot_model)
+
+    if model is None or latest_X_train is None:
+        st.warning("⚠️ No trained model or training data found. Please run AutoML or load a model.")
         return
 
     try:
-        st.info("Generating SHAP summary plot for the latest TPOT model (sampled 100 rows)...")
+        st.info("Generating SHAP summary plot (sampled 100 rows)...")
 
-        # Sample the training data for faster SHAP computation
         X_sample = latest_X_train.sample(n=min(100, len(latest_X_train)), random_state=42)
-
-        # Use model directly — SHAP will auto-select best explainer
-        explainer = shap.Explainer(latest_tpot_model, X_sample)
+        explainer = shap.Explainer(model, X_sample)
         shap_values = explainer(X_sample)
 
         st.markdown("### 📈 SHAP Summary Plot")
@@ -42,6 +41,9 @@ def run_shap_panel():
         st.markdown(f"**Top driver:** `{feature_names[0]}`")
         st.markdown(f"**Secondary factors:** `{feature_names[1]}`, `{feature_names[2]}`")
 
-        st.success("✅ SHAP analysis completed successfully.")
+        if "loaded_model" in st.session_state:
+            st.success("✅ SHAP analysis used a model loaded from disk.")
+        else:
+            st.success("✅ SHAP analysis used the latest TPOT model.")
     except Exception as e:
         st.error(f"❌ SHAP analysis failed. {type(e).__name__}: {e}")
