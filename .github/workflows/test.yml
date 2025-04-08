@@ -124,6 +124,7 @@ jobs:
           pip list
 
       - name: 🧪 Run module import integrity test
-        run: python src/test_imports.py
+        run: python test_imports.py
+
 
 
