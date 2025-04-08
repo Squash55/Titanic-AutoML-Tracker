@@ -19,6 +19,7 @@ def safe_import(module_name, function_name):
         return fallback
 
 # === MODULE IMPORTS VIA SAFE WRAPPER ===
+run_smart_poly_finder = safe_import("smart_poly_finder", "run_smart_poly_finder")
 run_logreg_nonlinear_lab = safe_import("logreg_nonlinear_lab", "run_logreg_nonlinear_lab")
 run_logreg_nonlinear_tricks = safe_import("logreg_nonlinear_tricks", "run_logreg_nonlinear_tricks")
 run_catreg_switcher = safe_import("catreg_switcher", "run_catreg_switcher")
@@ -65,7 +66,7 @@ phase_tabs = {
     "A: Algorithm Exploration": ["Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"],
     "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A (SHAP)", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab"],
     "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab", "Residual Plot"],
-    "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer", "LogReg Nonlinear Tricks"],
+    "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer", "LogReg Nonlinear Tricks", "Smart Poly Finder"],
     "D: Documentation & Deployment": ["Saved Models", "PDF Report", "DAIVID App Maturity Scorecard"]
 }
 
@@ -149,6 +150,8 @@ elif subtab == "LogReg Nonlinear Tricks":
     run_logreg_nonlinear_tricks()
 elif subtab == "LogReg Nonlinear Tricks":
     run_logreg_nonlinear_lab()
+elif subtab == "Smart Poly Finder":
+    run_smart_poly_finder()
 
 
 
