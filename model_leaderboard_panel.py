@@ -96,46 +96,48 @@ def run_model_leaderboard_panel():
         df_filtered = df[(df["Source"].isin(filter_source)) & (pd.to_numeric(df["SHAP Total"], errors="coerce") >= shap_threshold)]
         st.dataframe(df_filtered, use_container_width=True)
 
-        st.markdown("### 📊 Accuracy & SHAP Rankings")
-        try:
-            fig, ax = plt.subplots(1, 2, figsize=(14, 6))
-            df_filtered_sorted_acc = df_filtered.sort_values("Accuracy", ascending=False)
-            df_filtered_sorted_shap = df_filtered.sort_values("SHAP Total", ascending=False)
-            ax[0].barh(df_filtered_sorted_acc["Model Name"][::-1], df_filtered_sorted_acc["Accuracy"][::-1])
-            ax[0].set_title("Models Ranked by Accuracy")
-            ax[1].barh(df_filtered_sorted_shap["Model Name"][::-1], df_filtered_sorted_shap["SHAP Total"][::-1], color="orange")
-            ax[1].set_title("Models Ranked by SHAP Total")
-            st.pyplot(fig)
-        except:
-            st.warning("Ranking plots unavailable. Check for missing values.")
+        st.markdown("### 📌 Rule-Based Summary")
+        if not df_filtered.empty:
+            best_accuracy = df_filtered.loc[df_filtered["Accuracy"].astype(float).idxmax()]
+            st.success(f"Top Accuracy: {best_accuracy['Model Name']} ({best_accuracy['Accuracy']:.3f})")
+            best_shap = df_filtered.loc[df_filtered["SHAP Total"].astype(float).idxmax()]
+            st.info(f"Most Interpretable: {best_shap['Model Name']} (SHAP: {best_shap['SHAP Total']:.1f})")
 
-        st.markdown("### 📈 SHAP vs Accuracy")
-        if df_filtered["SHAP Total"].dtype != object and df_filtered["Accuracy"].dtype != object:
-            fig, ax = plt.subplots()
-            ax.scatter(df_filtered["SHAP Total"], df_filtered["Accuracy"], s=100)
-            for i, row in df_filtered.iterrows():
-                ax.text(row["SHAP Total"], row["Accuracy"], row["Model Name"], fontsize=9)
-            ax.set_xlabel("Total SHAP Value")
-            ax.set_ylabel("Accuracy")
-            ax.set_title("Model Interpretability vs Accuracy")
-            st.pyplot(fig)
+        st.markdown("### 🤖 GPT Insight Summary")
+        if st.button("🧠 Generate AI Summary"):
+            import openai
+            try:
+                openai.api_key = st.secrets["OPENAI_API_KEY"]
+                prompt = f"""
+                Given the following table of models with accuracy and SHAP total values, summarize the key findings.
 
-        st.markdown("### ⏳ Training Timeline")
-        try:
-            df_filtered["Trained At Parsed"] = pd.to_datetime(df_filtered["Trained At"], errors="coerce")
-            df_sorted = df_filtered.sort_values("Trained At Parsed")
-            fig, ax = plt.subplots()
-            ax.plot(df_sorted["Trained At Parsed"], df_sorted["Accuracy"], marker="o")
-            for i, row in df_sorted.iterrows():
-                ax.text(row["Trained At Parsed"], row["Accuracy"], row["Model Name"], fontsize=8)
-            ax.set_xlabel("Training Time")
-            ax.set_ylabel("Accuracy")
-            ax.set_title("Model Accuracy Over Time")
-            ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H:%M"))
-            fig.autofmt_xdate()
-            st.pyplot(fig)
-        except Exception as e:
-            st.error(f"Timeline plot error: {e}")
+                {df_filtered[['Model Name', 'Accuracy', 'SHAP Total', 'Source']].to_string(index=False)}
+
+                Provide insights on which model is the best overall and which are most interpretable.
+                """
+                response = openai.ChatCompletion.create(
+                    model="gpt-4",
+                    messages=[{"role": "user", "content": prompt}]
+                )
+                summary = response.choices[0].message.content
+                st.markdown(f"> {summary}")
+            except Exception as e:
+                st.error(f"AI summary failed: {e}")
+
+        st.markdown("### 📥 Compare with Uploaded Leaderboard")
+        uploaded_file = st.file_uploader("Upload Previous Leaderboard CSV", type=["csv"])
+        if uploaded_file:
+            try:
+                old_df = pd.read_csv(uploaded_file)
+                st.dataframe(old_df, use_container_width=True)
+                st.markdown("#### 🔄 Change Detection")
+                diff_cols = [col for col in ["Model Name", "Accuracy"] if col in old_df.columns and col in df.columns]
+                if diff_cols:
+                    merged = pd.merge(old_df, df, on="Model Name", suffixes=("_Old", "_New"))
+                    merged["Accuracy Change"] = pd.to_numeric(merged["Accuracy_New"], errors="coerce") - pd.to_numeric(merged["Accuracy_Old"], errors="coerce")
+                    st.dataframe(merged[["Model Name", "Accuracy_Old", "Accuracy_New", "Accuracy Change"]])
+            except Exception as e:
+                st.error(f"Upload comparison failed: {e}")
 
         if st.button("📥 Export Leaderboard to CSV"):
             st.download_button(
