@@ -20,3 +20,6 @@ xhtml2pdf
 pdfkit
 reportlab
 autofeat
+psutil
+requests
+openml
