@@ -6,9 +6,11 @@ import numpy as np
 import statsmodels.api as sm
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, accuracy_score, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pickle
+
 
 def run_logreg_interactions_explorer():
     st.title("🧪 LogReg + Interaction Explorer")
@@ -52,14 +54,26 @@ def run_logreg_interactions_explorer():
         lr_model.fit(X_poly, y)
         y_proba = lr_model.predict_proba(X_poly)[:, 1]
         auc = roc_auc_score(y, y_proba)
+        y_pred = lr_model.predict(X_poly)
+
         st.success(f"✅ Logistic Regression AUC (with poly terms): **{auc:.3f}**")
 
-        # Plot predicted probabilities
-        st.subheader("📈 Prediction Distribution")
+        st.subheader("📈 Prediction Probability Histogram")
         fig, ax = plt.subplots()
         sns.histplot(y_proba, kde=True, bins=20, ax=ax, color="teal")
         ax.set_title("Predicted Probability Distribution (Train Set)")
         st.pyplot(fig)
+
+        # Visualize confusion matrix
+        cm = confusion_matrix(y, y_pred)
+        st.subheader("🔍 Confusion Matrix")
+        st.text(cm)
+
+        # Save model as .pkl
+        if st.button("💾 Export Model (.pkl)"):
+            with open("logreg_poly_model.pkl", "wb") as f:
+                pickle.dump(lr_model, f)
+            st.success("✅ Model exported to logreg_poly_model.pkl")
 
     except Exception as e:
         st.error(f"❌ LogReg model failed: {type(e).__name__}: {e}")
