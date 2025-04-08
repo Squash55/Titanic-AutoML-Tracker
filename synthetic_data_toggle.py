@@ -38,3 +38,8 @@ def run_synthetic_data_toggle():
             st.session_state.y = df[df.columns[-1]]
             st.success("✅ Uploaded dataset stored in session_state!")
             st.dataframe(df.head())
+
+    # Auto route to Cat ↔ Reg converter if user wants
+    if st.checkbox("🔁 Open Cat ↔ Reg Switcher"):
+        from catreg_switcher import run_catreg_switcher
+        run_catreg_switcher()
