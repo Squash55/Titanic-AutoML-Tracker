@@ -135,6 +135,12 @@ elif subtab == "Zoomed HPO Explorer":
     run_zoom_hpo_explorer()
 elif subtab == "Saved Models":
     run_saved_models_panel()
+
+# === PDF REPORT TOGGLES ===
+st.sidebar.markdown("### 📄 PDF Report Options")
+st.session_state["include_ebm_pdf"] = st.sidebar.checkbox("📊 Include EBM Plot", value=True)
+st.session_state["include_shap_perm_delta_pdf"] = st.sidebar.checkbox("📉 Include SHAP vs Permutation Delta Plot", value=True)
+
 elif subtab == "PDF Report":
     run_pdf_report()
 elif subtab == "DAIVID App Maturity Scorecard":
