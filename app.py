@@ -23,6 +23,7 @@ def safe_import(module_name, function_name):
         return fallback
 
 # === MODULE IMPORTS VIA SAFE WRAPPER ===
+run_synthetic_data_toggle = safe_import("synthetic_data_toggle", "run_synthetic_data_toggle")
 run_daivid_roadmap = safe_import("daivid_roadmap", "run_daivid_roadmap")
 run_notebook_scout = safe_import("notebook_scout", "run_notebook_scout")
 run_algorithm_selector = safe_import("algorithm_selector", "run_algorithm_selector")
@@ -60,13 +61,34 @@ st.sidebar.title("🗽 DAIVID Navigator")
 show_all = st.sidebar.checkbox("📚 Show All Tabs", value=True)
 
 phase_tabs = {
-    "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "LogReg + Interaction Explorer", "Distribution Auditor"],
+    "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "LogReg + Interaction Explorer", "Distribution Auditor", "Synthetic Data Generator"],
     "A: Algorithm Exploration": ["Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"],
     "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A (SHAP)", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab"],
     "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab", "Residual Plot" ],
     "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer"],
     "D: Documentation & Deployment": ["Saved Models", "PDF Report", "DAIVID App Maturity Scorecard"]
 }
+
+    st.title("🧪 Synthetic Data Generator")
+
+    use_synthetic = st.toggle("Generate Synthetic Data Instead of Uploading", value=True)
+
+    if use_synthetic:
+        rows = st.slider("Number of Rows", 50, 1000, 100)
+        seed = st.number_input("Random Seed", value=42)
+        X, y = generate_synthetic_regression_data(rows=rows, seed=seed)
+
+        # ✅ Store for downstream modules
+        st.session_state.X = X
+        st.session_state.y = y
+
+        st.success("✅ Synthetic dataset generated!")
+        st.dataframe(pd.concat([X, pd.Series(y, name='Target')], axis=1))
+    else:
+        uploaded = st.file_uploader("Upload your CSV dataset")
+        if uploaded:
+            df = pd.read_csv(uploaded)
+            st.dataframe(df.head())
 
 if show_all:
     st.sidebar.markdown("### 🕘️ DAIVID Roadmap")
@@ -138,5 +160,7 @@ elif subtab == "Golden Q&A (SHAP)":
     run_golden_qna_shap()
 elif subtab == "Residual Plot":
     run_residual_plot_panel()
+elif selected_tool == "Synthetic Data Generator":
+    run_synthetic_data_toggle()
 
 
