@@ -64,12 +64,18 @@ def generate_pdf_report():
     pdf = PDFReport()
     pdf.add_page()
 
-    # TPOT performance summary
-    if latest_tpot_model and latest_X_test is not None and latest_y_test is not None:
-        acc = latest_tpot_model.score(latest_X_test, latest_y_test)
-        pipeline_code = str(latest_tpot_model)
+    # Use loaded model if available
+    model = st.session_state.get("loaded_model", latest_tpot_model)
+    X_train = latest_X_train
+    y_train = latest_y_train
+    X_test = latest_X_test
+    y_test = latest_y_test
 
-        # Executive Summary
+    # Performance summary
+    if model and X_test is not None and y_test is not None:
+        acc = model.score(X_test, y_test)
+        pipeline_code = str(model)
+
         questions = get_golden_questions()
         answers = get_shap_smart_answers()
         sample_answers = list(answers.values())
@@ -80,18 +86,16 @@ def generate_pdf_report():
             "Smart Q&A has been included to assist with diagnostics."
         )
         pdf.add_section("Executive Summary", summary)
-
-        pdf.add_section("TPOT Model Accuracy", f"Accuracy on test set: {acc:.3f}")
+        pdf.add_section("Model Accuracy", f"Accuracy on test set: {acc:.3f}")
         pdf.add_section("Best Pipeline Structure", pipeline_code)
 
-        # Optional: model parameters
         try:
-            params_text = str(latest_tpot_model.get_params())
-            pdf.add_section("TPOT Model Parameters", params_text)
+            params_text = str(model.get_params())
+            pdf.add_section("Model Parameters", params_text)
         except:
             pass
     else:
-        pdf.add_section("TPOT Model", "Model not available or not trained yet.")
+        pdf.add_section("Model", "Model not available or not trained yet.")
 
     # SHAP + Q&A
     questions = get_golden_questions()
@@ -99,9 +103,9 @@ def generate_pdf_report():
     qa_summary = "\n\n".join([f"Q: {q}\nA: {answers.get(q)}" for q in questions])
     pdf.add_section("Golden Q&A (SHAP Powered)", qa_summary)
 
-    # Global SHAP Summary
-    if latest_tpot_model and latest_X_train is not None:
-        add_shap_summary_plot(pdf, latest_tpot_model, latest_X_train)
+    # SHAP Summary
+    if model and X_train is not None:
+        add_shap_summary_plot(pdf, model, X_train)
 
     return pdf
 
@@ -109,7 +113,8 @@ def generate_pdf_report():
 def run_pdf_report():
     st.subheader("📄 Downloadable PDF Report")
 
-    if latest_tpot_model is None:
+    model = st.session_state.get("loaded_model", latest_tpot_model)
+    if model is None:
         st.warning("⚠️ Train a model in AutoML Launcher first.")
         return
 
@@ -126,12 +131,11 @@ def run_pdf_report():
             )
     os.remove(tmpfile.name)
 
-    # Save model option
     st.markdown("---")
     if st.button("💾 Save Best Model to Disk"):
         save_path = os.path.join("saved_models", "best_tpot_pipeline.pkl")
         os.makedirs("saved_models", exist_ok=True)
-        joblib.dump(latest_tpot_model, save_path)
+        joblib.dump(model, save_path)
         st.success(f"Model saved to {save_path}")
 
     if st.button("📂 Load Saved Model"):
@@ -143,6 +147,5 @@ def run_pdf_report():
         else:
             st.error("Saved model file not found.")
 
-    # Notification if model is already loaded
     if "loaded_model" in st.session_state:
         st.info("✅ Loaded model is currently active in session memory.")
