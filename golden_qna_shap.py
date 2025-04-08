@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tpot_connector import get_latest_model_and_data
 
-
 def run_golden_qna_shap():
     st.header("🔮 Golden Q&A: SHAP-Powered Explanations")
 
@@ -14,11 +13,15 @@ def run_golden_qna_shap():
     if "loaded_model" in st.session_state:
         st.info("✅ A previously saved model is currently active in memory.")
 
-    # Load model and data
-    model, X_train, y_train = get_latest_model_and_data()
-
+    # Use loaded model if available
+    model = st.session_state.get("loaded_model", None)
     if model is None:
-        st.warning("No model found. Please run AutoML first.")
+        model, X_train, y_train = get_latest_model_and_data()
+    else:
+        _, X_train, y_train = get_latest_model_and_data()  # still get data from connector
+
+    if model is None or X_train is None:
+        st.warning("No model or data found. Please run AutoML first.")
         return
 
     # SHAP explainer setup
@@ -61,7 +64,6 @@ def run_golden_qna_shap():
     # Display data row for reference
     with st.expander("📄 Show Input Row Data"):
         st.dataframe(row_data.T, use_container_width=True)
-
 
 # For standalone testing
 if __name__ == '__main__':
