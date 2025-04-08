@@ -63,7 +63,7 @@ show_all = st.sidebar.checkbox("📚 Show All Tabs", value=True)
 phase_tabs = {
     "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "LogReg + Interaction Explorer", "Distribution Auditor", "Outlier Suppressor", "Synthetic Data Generator", "Cat↔Reg Switcher", "LogReg Nonlinear Tricks"],
     "A: Algorithm Exploration": ["Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"],
-    "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A (SHAP)", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab"],
+    "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A (SHAP)", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab", "LogReg Nonlinear Tricks"],
     "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab", "Residual Plot" ],
     "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer"],
     "D: Documentation & Deployment": ["Saved Models", "PDF Report", "DAIVID App Maturity Scorecard"]
