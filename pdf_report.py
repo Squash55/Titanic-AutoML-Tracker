@@ -29,10 +29,6 @@ from golden_qa import get_golden_questions, get_shap_smart_answers
 from model_leaderboard_panel import run_model_leaderboard_panel
 
 
-def is_autogluon_model(model):
-    return hasattr(model, "leaderboard") and hasattr(model, "predict")
-
-
 class PDFReport(FPDF):
     def header(self):
         self.set_font("Arial", "B", 14)
@@ -51,7 +47,6 @@ class PDFReport(FPDF):
         self.cell(0, 10, f"Page {self.page_no()}", 0, 0, "C")
 
 
-# === PDF GENERATION LOGIC ===
 def run_pdf_report():
     st.header("🧾 Generate PDF Report")
 
@@ -83,15 +78,16 @@ def run_pdf_report():
             pdf.add_section("Explainable Boosting Insights", "Top features and global explanations below:")
             pdf.image(ebm_plot_path, w=180)
 
+    # Optional: Include SHAP vs Permutation Delta if selected
+    if st.session_state.get("include_shap_perm_delta_pdf"):
+        plot_path = st.session_state.get("shap_perm_delta_plot_path")
+        if plot_path and os.path.exists(plot_path):
+            pdf.add_section("SHAP vs Permutation Importance Delta", "Discrepancy chart between SHAP and permutation importances:")
+            pdf.image(plot_path, w=180)
+
     # Save PDF
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
         pdf.output(tmp_file.name)
         st.success("✅ PDF Report Ready!")
         with open(tmp_file.name, "rb") as f:
             st.download_button(label="📥 Download Report", data=f, file_name="automl_summary_report.pdf")
-
-
-# === ROUTING LOGIC (for app.py) ===
-# Add this to app.py:
-# elif subtab == "PDF Report":
-#     run_pdf_report()
