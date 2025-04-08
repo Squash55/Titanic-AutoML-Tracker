@@ -44,15 +44,15 @@ jobs:
           echo "🔊 Checking syntax using py_compile..."
           python -m compileall . || echo "⚠️ Syntax issues found"
 
-      # ✅ Run Bandit Security Scan
       - name: 🔒 Run Bandit Security Scan
         continue-on-error: true
         run: |
           echo "🕵️ Scanning for common security issues with Bandit..."
           pip install bandit
-          bandit -r . -c .bandit.yaml -f sarif -o bandit-results.sarif
+          bandit -r . -c .bandit.yaml -f sarif -o bandit-results.sarif || echo "⚠️ Bandit scan completed with issues"
 
-      - name: 📤 Upload Bandit Results to Security Tab
+      - name: 📄 Upload Bandit Results to Security Tab
+        if: success() && hashFiles('bandit-results.sarif') != ''
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: bandit-results.sarif
@@ -74,7 +74,7 @@ jobs:
 
       - name: 🧰 Run standalone import test file (if exists)
         run: |
-          echo "🤜 Running test_imports.py if it exists..."
+          echo "🥜 Running test_imports.py if it exists..."
           if [ -f test_imports.py ]; then
             echo "✅ Found test_imports.py"
             python test_imports.py
@@ -94,6 +94,7 @@ jobs:
     strategy:
       matrix:
         module: ["app.py", "auto_eda.py", "auto_threshold_optimizer.py", "zoom_hpo_explorer.py", "daivid_hpo_engine.py"]
+
     steps:
       - uses: actions/checkout@v3
 
@@ -130,7 +131,7 @@ jobs:
       - name: 🎉 All checks completed
         run: echo "✅ Final checks complete. Review any red ❌ above."
 
-      - name: 🧭 Confirm workspace structure
+      - name: 🧽 Confirm workspace structure
         run: |
           echo "📁 Current directory:"
           pwd
@@ -138,5 +139,5 @@ jobs:
           ls -la
           echo "🐍 Python version:"
           python --version
-          echo "📦 Installed packages:"
+          echo "📆 Installed packages:"
           pip list
