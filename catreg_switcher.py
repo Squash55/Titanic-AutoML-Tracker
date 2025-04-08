@@ -51,7 +51,7 @@ def run_catreg_switcher():
 
         # Histogram preview
         fig, ax = plt.subplots(figsize=(6, 3))
-        df["Transformed"].value_counts().sort_index().plot(kind="bar", ax=ax)
+        df[column_to_convert].value_counts().sort_index().plot(kind="bar", ax=ax)
         ax.set_title("Distribution of Binned Classes")
         st.pyplot(fig)
 
