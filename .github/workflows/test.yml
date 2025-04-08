@@ -53,7 +53,7 @@ jobs:
           bandit -r . -c .bandit.yaml -f sarif -o bandit-results.sarif
 
       - name: 📤 Upload Bandit Results to Security Tab
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: bandit-results.sarif
 
