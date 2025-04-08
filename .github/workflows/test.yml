@@ -61,8 +61,13 @@ jobs:
 
       - name: 🧰 Run standalone import test file (if exists)
         run: |
-          echo "🤜 Running test_imports.py..."
-          if [ -f test_imports.py ]; then python test_imports.py; fi
+          echo "🤜 Running test_imports.py if it exists..."
+          if [ -f test_imports.py ]; then
+            echo "✅ Found test_imports.py"
+            python test_imports.py
+          else
+            echo "❌ test_imports.py not found."
+          fi
 
       - name: 📁 Debug Environment
         run: |
@@ -110,9 +115,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 🎉 All checks completed
-        run: echo "Final checks complete. Review failures if any."
+        run: echo "✅ Final checks complete. Review any red ❌ above."
 
-      - name: Debug Environment
+      - name: 🧭 Confirm workspace structure
         run: |
           echo "📁 Current directory:"
           pwd
@@ -122,9 +127,3 @@ jobs:
           python --version
           echo "📦 Installed packages:"
           pip list
-
-      - name: 🧪 Run module import integrity test
-        run: python test_imports.py
-
-
-
