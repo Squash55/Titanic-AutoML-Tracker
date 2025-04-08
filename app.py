@@ -19,6 +19,7 @@ def safe_import(module_name, function_name):
         return fallback
 
 # === MODULE IMPORTS VIA SAFE WRAPPER ===
+run_logreg_nonlinear_tricks = safe_import("logreg_nonlinear_tricks", "run_logreg_nonlinear_tricks")
 run_catreg_switcher = safe_import("catreg_switcher", "run_catreg_switcher")
 run_synthetic_data_toggle = safe_import("synthetic_data_toggle", "run_synthetic_data_toggle")
 run_daivid_roadmap = safe_import("daivid_roadmap", "run_daivid_roadmap")
@@ -59,7 +60,7 @@ st.sidebar.title("🗽 DAIVID Navigator")
 show_all = st.sidebar.checkbox("📚 Show All Tabs", value=True)
 
 phase_tabs = {
-    "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "LogReg + Interaction Explorer", "Distribution Auditor", "Outlier Suppressor", "Synthetic Data Generator", "Cat↔Reg Switcher"],
+    "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "LogReg + Interaction Explorer", "Distribution Auditor", "Outlier Suppressor", "Synthetic Data Generator", "Cat↔Reg Switcher", "LogReg Nonlinear Tricks"],
     "A: Algorithm Exploration": ["Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"],
     "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A (SHAP)", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab"],
     "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab", "Residual Plot" ],
@@ -143,6 +144,8 @@ elif subtab == "Outlier Suppressor":
     run_outlier_suppressor()
 elif subtab == "Cat↔Reg Switcher":
     run_catreg_switcher()
+elif subtab == "LogReg Nonlinear Tricks":
+    run_logreg_nonlinear_tricks()
 
 
 
