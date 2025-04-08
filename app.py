@@ -160,3 +160,5 @@ elif subtab == "Explainable Boosting":
     run_explainable_boosting_visualizer()
 elif subtab == "SHAP vs Permutation Delta Viewer":
     run_shap_perm_delta()
+elif subtab == "📘 User Manual":
+    run_user_manual()
