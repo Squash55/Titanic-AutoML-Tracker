@@ -9,14 +9,14 @@ import time
 from datetime import datetime
 from tpot_connector import _tpot_cache
 
-# ✅ Ensure model_times and durations caches exist
 if "model_times" not in _tpot_cache:
     _tpot_cache["model_times"] = {}
 if "model_durations" not in _tpot_cache:
     _tpot_cache["model_durations"] = {}
 if "model_sources" not in _tpot_cache:
     _tpot_cache["model_sources"] = {}
-
+if "saved_models" not in _tpot_cache:
+    _tpot_cache["saved_models"] = {}
 
 def run_model_leaderboard_panel():
     st.title("🏆 Model Leaderboard Tracker")
@@ -40,7 +40,6 @@ def run_model_leaderboard_panel():
                     acc = (preds == y_test).mean()
                 else:
                     acc = model.score(X_test, y_test)
-
             if X_train is not None:
                 try:
                     explainer = shap.Explainer(model.predict, X_train)
@@ -81,14 +80,11 @@ def run_model_leaderboard_panel():
 
     if rows:
         df = pd.DataFrame(rows)
-
-        # ⭐ Highlight best model row
         numeric_df = df[pd.to_numeric(df["Accuracy"], errors="coerce").notna()].copy()
         if not numeric_df.empty:
             best_idx = numeric_df["Accuracy"].astype(float).idxmax()
             df.loc[best_idx, "Model Name"] += " 🥇"
 
-        # 🔍 Add filters
         with st.expander("🔍 Filter Options", expanded=False):
             filter_source = st.multiselect("Filter by Source", options=df["Source"].unique().tolist(), default=df["Source"].unique().tolist())
             shap_threshold = st.slider("Minimum SHAP Total", min_value=0.0, max_value=float(df["SHAP Total"].max() or 100.0), value=0.0, step=1.0)
@@ -103,26 +99,10 @@ def run_model_leaderboard_panel():
             best_shap = df_filtered.loc[df_filtered["SHAP Total"].astype(float).idxmax()]
             st.info(f"Most Interpretable: {best_shap['Model Name']} (SHAP: {best_shap['SHAP Total']:.1f})")
 
-        st.markdown("### 🤖 GPT Insight Summary")
-        if st.button("🧠 Generate AI Summary"):
-            import openai
-            try:
-                openai.api_key = st.secrets["OPENAI_API_KEY"]
-                prompt = f"""
-                Given the following table of models with accuracy and SHAP total values, summarize the key findings.
-
-                {df_filtered[['Model Name', 'Accuracy', 'SHAP Total', 'Source']].to_string(index=False)}
-
-                Provide insights on which model is the best overall and which are most interpretable.
-                """
-                response = openai.ChatCompletion.create(
-                    model="gpt-4",
-                    messages=[{"role": "user", "content": prompt}]
-                )
-                summary = response.choices[0].message.content
-                st.markdown(f"> {summary}")
-            except Exception as e:
-                st.error(f"AI summary failed: {e}")
+            if st.button("📌 Promote Top Accuracy to Saved Models"):
+                model_obj = models.get(best_accuracy["Model Name"].replace(" 🥇", ""))
+                _tpot_cache["saved_models"][best_accuracy["Model Name"]] = model_obj
+                st.success(f"✅ Saved: {best_accuracy['Model Name']}")
 
         st.markdown("### 📥 Compare with Uploaded Leaderboard")
         uploaded_file = st.file_uploader("Upload Previous Leaderboard CSV", type=["csv"])
@@ -130,19 +110,18 @@ def run_model_leaderboard_panel():
             try:
                 old_df = pd.read_csv(uploaded_file)
                 st.dataframe(old_df, use_container_width=True)
-                st.markdown("#### 🔄 Change Detection")
-                diff_cols = [col for col in ["Model Name", "Accuracy"] if col in old_df.columns and col in df.columns]
-                if diff_cols:
-                    merged = pd.merge(old_df, df, on="Model Name", suffixes=("_Old", "_New"))
-                    merged["Accuracy Change"] = pd.to_numeric(merged["Accuracy_New"], errors="coerce") - pd.to_numeric(merged["Accuracy_Old"], errors="coerce")
-                    st.dataframe(merged[["Model Name", "Accuracy_Old", "Accuracy_New", "Accuracy Change"]])
+                st.markdown("#### 🔄 Change Detection with Highlighting")
+                merged = pd.merge(old_df, df, on="Model Name", suffixes=("_Old", "_New"))
+                merged["Accuracy Change"] = pd.to_numeric(merged["Accuracy_New"], errors="coerce") - pd.to_numeric(merged["Accuracy_Old"], errors="coerce")
+                styled = merged[["Model Name", "Accuracy_Old", "Accuracy_New", "Accuracy Change"]].style.background_gradient("RdYlGn", subset=["Accuracy Change"])
+                st.dataframe(styled)
             except Exception as e:
                 st.error(f"Upload comparison failed: {e}")
 
         if st.button("📥 Export Leaderboard to CSV"):
             st.download_button(
                 "Download CSV",
-                data=df_filtered.drop(columns=["Trained At Parsed"], errors="ignore").to_csv(index=False).encode(),
+                data=df_filtered.to_csv(index=False).encode(),
                 file_name="model_leaderboard.csv",
                 mime="text/csv"
             )
