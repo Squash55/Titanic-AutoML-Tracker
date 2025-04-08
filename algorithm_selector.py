@@ -22,6 +22,30 @@ def load_titanic_data():
     y = df["Survived"]
     return train_test_split(X, y, test_size=0.2, random_state=42)
 
+# algorithm_selector.py
+
+import streamlit as st
+
+def run_algorithm_selector():
+    st.title("🧠 Algorithm Selector")
+    st.markdown("This panel is a placeholder to explore and configure different algorithms.")
+
+    task_type = st.radio("Select Task Type", ["Classification", "Regression"])
+
+    if task_type == "Classification":
+        st.markdown("📋 Choose from classification models:")
+        st.checkbox("Logistic Regression")
+        st.checkbox("Random Forest Classifier")
+        st.checkbox("Support Vector Classifier")
+        st.checkbox("Gradient Boosting Classifier")
+    else:
+        st.markdown("📋 Choose from regression models:")
+        st.checkbox("Linear Regression")
+        st.checkbox("Random Forest Regressor")
+        st.checkbox("SVR")
+        st.checkbox("Gradient Boosting Regressor")
+
+    st.info("This is just a mockup. Actual model training is done in the AutoML tab.")
 
 def run_automl_launcher():
     st.subheader("🚢 Titanic AutoML Launcher (TPOT Demo)")
