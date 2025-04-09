@@ -72,20 +72,10 @@ run_model_diagnostics_lab = safe_import("model_diagnostics_lab", "run_model_diag
 run_residual_plot_panel = safe_import("residual_plot_panel", "run_residual_plot_panel")
 run_daivid_scorecard = safe_import("daivid_scorecard", "run_daivid_scorecard")
 
-
 # === SIDEBAR NAVIGATION ===
 st.sidebar.title("🗽 DAIVID Navigator")
-st.sidebar.caption(f"📍 Phase: `{phase}` | Tab: `{subtab}`")
 show_all = st.sidebar.checkbox("📚 Show All Tabs", value=True)
 
-phase_tabs = {
-    "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "LogReg + Interaction Explorer", "Distribution Auditor", "Outlier Suppressor", "Synthetic Data Generator", "Cat↔Reg Switcher", "LogReg Nonlinear Tricks"],
-    "A: Algorithm Exploration": ["Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"],
-    "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A (SHAP)", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab", "Explainable Boosting", "Explainable Boosting", "SHAP vs Permutation Delta Viewer", "Feature Impact Tester" ],
-    "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab", "Residual Plot", "Feature Drift Detector", "Target Drift Diagnostic", "AI-Generated Validation Scenarios", "Synthetic Perturbation Tester"],
-    "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer", "LogReg Nonlinear Tricks", "Smart Poly Finder", "Sensitivity Explorer"],
-    "D: Documentation & Deployment": ["Saved Models", "PDF Report", "DAIVID App Maturity Scorecard"]
-}
 # === Phase Descriptions ===
 phase_descriptions = {
     "D: Data Exploration": "🧪 Explore and preprocess your dataset. Detect outliers, understand distributions, and prep features.",
@@ -96,6 +86,17 @@ phase_descriptions = {
     "D: Documentation & Deployment": "📦 Save models, generate reports, and track platform maturity for deployment."
 }
 
+# === Phase Tabs ===
+phase_tabs = {
+    "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "LogReg + Interaction Explorer", "Distribution Auditor", "Outlier Suppressor", "Synthetic Data Generator", "Cat↔Reg Switcher", "LogReg Nonlinear Tricks"],
+    "A: Algorithm Exploration": ["Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"],
+    "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A (SHAP)", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab", "Explainable Boosting", "Explainable Boosting", "SHAP vs Permutation Delta Viewer", "Feature Impact Tester"],
+    "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab", "Residual Plot", "Feature Drift Detector", "Target Drift Diagnostic", "AI-Generated Validation Scenarios", "Synthetic Perturbation Tester"],
+    "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer", "LogReg Nonlinear Tricks", "Smart Poly Finder", "Sensitivity Explorer"],
+    "D: Documentation & Deployment": ["Saved Models", "PDF Report", "DAIVID App Maturity Scorecard"]
+}
+
+# === Sidebar Phase and Tab Selection ===
 if show_all:
     st.sidebar.markdown("### 🕘️ DAIVID Roadmap")
     st.sidebar.markdown("Explore all phases and their tools:")
@@ -108,10 +109,14 @@ if show_all:
 else:
     phase = st.sidebar.selectbox("🔷 Phase", list(phase_tabs.keys()), index=0)
 
-# ✅ Show phase description below the selector (once)
+# ✅ Show description AFTER phase is selected
 st.sidebar.info(phase_descriptions.get(phase, ""))
 
+# ✅ Tab selection AFTER phase
 subtab = st.sidebar.radio("🦩 Select Tab", phase_tabs[phase])
+
+# ✅ Now safe to show contextual caption
+st.sidebar.caption(f"📍 Phase: `{phase}` | Tab: `{subtab}`")
 
 # === Route to tab functions based on selection ===
 if subtab == "Notebook Scout":
