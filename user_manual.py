@@ -88,10 +88,11 @@ def run_user_manual(deep=True, compact=True):
     - **Model Diagnostics Lab**: Residual plots and error analysis tools.
     - **Residual Plot**: Visualizes predicted vs actual to spot issues.
     - **Feature Drift Detector**: Compares training vs new data to identify features with changed distributions. Uses:
-      - KS Test for numeric features (sensitive to shape shifts),
-      - Chi² Test for categorical features (detects category imbalance).
-      - Useful for alerting model owners when assumptions no longer hold.
+    - KS Test for numeric features (sensitive to shape shifts),
+    - Chi² Test for categorical features (detects category imbalance).
+    - Useful for alerting model owners when assumptions no longer hold.
     """)
+
 
     section("I: Iteration & Optimization", f"""
     - **Smart HPO Recommender**: Suggests hyperparameter ranges to explore.
