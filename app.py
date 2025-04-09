@@ -75,6 +75,7 @@ run_daivid_scorecard = safe_import("daivid_scorecard", "run_daivid_scorecard")
 
 # === SIDEBAR NAVIGATION ===
 st.sidebar.title("🗽 DAIVID Navigator")
+st.sidebar.caption(f"📍 Phase: `{phase}` | Tab: `{subtab}`")
 show_all = st.sidebar.checkbox("📚 Show All Tabs", value=True)
 
 phase_tabs = {
@@ -84,6 +85,15 @@ phase_tabs = {
     "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab", "Residual Plot", "Feature Drift Detector", "Target Drift Diagnostic", "AI-Generated Validation Scenarios", "Synthetic Perturbation Tester"],
     "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer", "LogReg Nonlinear Tricks", "Smart Poly Finder", "Sensitivity Explorer"],
     "D: Documentation & Deployment": ["Saved Models", "PDF Report", "DAIVID App Maturity Scorecard"]
+}
+# === Phase Descriptions ===
+phase_descriptions = {
+    "D: Data Exploration": "🧪 Explore and preprocess your dataset. Detect outliers, understand distributions, and prep features.",
+    "A: Algorithm Exploration": "🤖 Select models, run AutoML, and build ensembles to optimize predictive power.",
+    "I: Interpretability & Insights": "🧠 Explain your models using SHAP, feature importance, and golden Q&A.",
+    "V: Validation & Variants": "🧬 Validate robustness with diagnostics, drift checks, perturbations, and DOE panels.",
+    "I: Iteration & Optimization": "🔁 Tune hyperparameters, explore nonlinearities, and refine models iteratively.",
+    "D: Documentation & Deployment": "📦 Save models, generate reports, and track platform maturity for deployment."
 }
 
 if show_all:
