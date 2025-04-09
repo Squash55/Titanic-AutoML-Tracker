@@ -87,6 +87,7 @@ def run_user_manual(deep=True, compact=True):
     - **DOE Panel**: Factorial Design of Experiments for sensitivity analysis.
     - **Model Diagnostics Lab**: Residual plots and error analysis tools.
     - **Residual Plot**: Visualizes predicted vs actual to spot issues.
+    - **Synthetic Perturbation Tester**: Applies artificial noise, missingness, or extreme values to test data. It checks how model predictions degrade when specific features are disrupted. Useful for robustness and adversarial stress testing.
     - **Feature Drift Detector**: Compares training vs new data to identify features with changed distributions. Uses:
     - KS Test for numeric features (sensitive to shape shifts),
     - Chi² Test for categorical features (detects category imbalance).
