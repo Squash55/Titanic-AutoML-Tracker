@@ -107,6 +107,16 @@ def run_user_manual(deep=True, compact=True):
     - **Saved Models**: Download and re-load trained models.
     - **Scorecard**: Self-assessment tracker for DAIVID maturity milestones.
     """)
-
+    st.markdown("### 📐 Sensitivity Explorer (What-if Panel)")
+    st.markdown("""
+    This panel allows you to simulate hypothetical scenarios by adjusting input feature values.
+    
+    - Use the **sliders and selectors** to create what-if inputs.
+    - Toggle **Edge Case Mode** to test Min, Max, Random, or Missing values.
+    - Get real-time predictions and probability scores based on your input.
+    - Great for understanding how small changes affect outcomes.
+    
+    You can also include the current sensitivity configuration in the **PDF Report**.
+    """)
     st.markdown("---")
     st.success("This user manual auto-updates. For custom branding, print-ready versions, or Markdown export, enable download in the PDF tab.")
