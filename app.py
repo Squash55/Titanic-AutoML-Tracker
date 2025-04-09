@@ -24,6 +24,7 @@ def safe_import(module_name, function_name):
         return fallback
 
 # === MODULE IMPORTS VIA SAFE WRAPPER ===
+run_feature_impact_tester = safe_import("feature_impact_tester", "run_feature_impact_tester")
 run_synthetic_perturbation_tester = safe_import("synthetic_perturbation_tester", "run_synthetic_perturbation_tester")
 run_sensitivity_explorer = safe_import("sensitivity_explorer", "run_sensitivity_explorer")
 run_model_diagnostics_lab = safe_import("model_diagnostics_lab", "run_model_diagnostics_lab")
@@ -79,7 +80,7 @@ show_all = st.sidebar.checkbox("📚 Show All Tabs", value=True)
 phase_tabs = {
     "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "LogReg + Interaction Explorer", "Distribution Auditor", "Outlier Suppressor", "Synthetic Data Generator", "Cat↔Reg Switcher", "LogReg Nonlinear Tricks"],
     "A: Algorithm Exploration": ["Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"],
-    "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A (SHAP)", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab", "Explainable Boosting", "Explainable Boosting", "SHAP vs Permutation Delta Viewer"],
+    "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A (SHAP)", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab", "Explainable Boosting", "Explainable Boosting", "SHAP vs Permutation Delta Viewer", "Feature Impact Tester" ],
     "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab", "Residual Plot", "Feature Drift Detector", "Target Drift Diagnostic", "AI-Generated Validation Scenarios", "Synthetic Perturbation Tester"],
     "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer", "LogReg Nonlinear Tricks", "Smart Poly Finder", "Sensitivity Explorer"],
     "D: Documentation & Deployment": ["Saved Models", "PDF Report", "DAIVID App Maturity Scorecard"]
@@ -187,4 +188,6 @@ elif subtab == "Sensitivity Explorer":
     run_sensitivity_explorer()
 elif subtab == "Synthetic Perturbation Tester":
     run_synthetic_perturbation_tester()
+elif subtab == "Feature Impact Tester":
+    run_feature_impact_tester()
 
