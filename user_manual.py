@@ -1,4 +1,5 @@
 # user_manual.py
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -137,6 +138,28 @@ def append_to_manual():
     if st.session_state.get("manual_image_mode"):
         st.image("screenshots/doe_panel_demo.png", caption="DOE Visual Explorer", use_column_width=True)
 
+    st.markdown("### 📈 Residual Plot")
+    st.markdown("""
+    Visual diagnostic comparing predicted vs actual outcomes.
+
+    - Helps detect systematic bias
+    - Useful for regression or probability-based classification models
+    - Shows under- and over-prediction zones
+    """)
+    if st.session_state.get("manual_image_mode"):
+        st.image("screenshots/residual_plot_demo.png", caption="Residual Plot Sample", use_column_width=True)
+
+    st.markdown("### 🌊 Feature Drift Detector")
+    st.markdown("""
+    Identifies changes in feature distributions over time.
+
+    - KS test for numeric drift, Chi² for categorical
+    - Compare current data with training data
+    - Highlight features that need retraining attention
+    """)
+    if st.session_state.get("manual_image_mode"):
+        st.image("screenshots/feature_drift_demo.png", caption="Feature Drift Summary", use_column_width=True)
+
 def run_user_manual():
     st.title("📘 DAIVID Analytics User Manual")
 
@@ -154,10 +177,16 @@ def run_user_manual():
         pdf.set_font("Arial", size=12)
         pdf.multi_cell(0, 10, "DAIVID Analytics User Manual")
         pdf.ln()
-        pdf.multi_cell(0, 10, "Sensitivity Explorer: What-if Analysis tool with real-time prediction feedback.")
-        pdf.multi_cell(0, 10, "AutoML: Automatically builds and selects the best ML pipeline using TPOT.")
-        pdf.multi_cell(0, 10, "SHAP Comparison: Visualize feature importance variation across models.")
-        pdf.multi_cell(0, 10, "DOE Panel: Structured input testing with factor effect visualization.")
+        sections = [
+            "Sensitivity Explorer: What-if Analysis tool with real-time prediction feedback.",
+            "AutoML: Automatically builds and selects the best ML pipeline using TPOT.",
+            "SHAP Comparison: Visualize feature importance variation across models.",
+            "DOE Panel: Structured input testing with factor effect visualization.",
+            "Residual Plot: Helps detect bias in predictions.",
+            "Feature Drift Detector: Monitors distribution shifts to maintain model performance."
+        ]
+        for section in sections:
+            pdf.multi_cell(0, 10, section)
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
             pdf.output(tmp_file.name)
@@ -168,18 +197,21 @@ def run_user_manual():
         md_content = """# DAIVID Analytics User Manual
 
 ## 📐 Sensitivity Explorer
-This panel allows you to simulate hypothetical scenarios by adjusting input feature values.
-- Use sliders and selectors to create what-if inputs.
-- Toggle Edge Case Mode to test edge values.
-- Get real-time predictions and probabilities.
+Simulate what-if scenarios using custom feature inputs.
 
 ## 🤖 AutoML Launcher
-Runs TPOT to automatically find optimal ML pipelines.
+Run TPOT to find optimized pipelines.
 
 ## 🔍 SHAP Comparison
-Compare SHAP scores across models to assess consistency.
+Compare model interpretability across algorithms.
 
 ## 🧪 DOE Panel
-Visualize factor impacts through main effects and interactions.
+Use structured experiments to explore model behavior.
+
+## 📈 Residual Plot
+Visualize prediction errors and trends.
+
+## 🌊 Feature Drift Detector
+Monitor for changes in input distributions over time.
 """
         st.download_button("📥 Download Markdown Manual", md_content, file_name="DAIVID_User_Manual.md")
