@@ -1,66 +1,48 @@
-# target_drift_diagnostic.py
+# ai_validation_scenarios.py
 
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from scipy.stats import chi2_contingency, ks_2samp
+import random
 from tpot_connector import _tpot_cache
 
-def run_target_drift_diagnostic():
-    st.title("🎯 Target Drift Diagnostic")
+def generate_synthetic_scenarios(X, num_cases=5):
+    scenarios = []
+    for _ in range(num_cases):
+        scenario = {}
+        for col in X.columns:
+            if pd.api.types.is_numeric_dtype(X[col]):
+                scenario[col] = round(random.uniform(X[col].min(), X[col].max()), 2)
+            else:
+                scenario[col] = random.choice(X[col].dropna().unique())
+        scenarios.append(scenario)
+    return pd.DataFrame(scenarios)
 
-    y_train = _tpot_cache.get("latest_y_train")
-    y_new = st.session_state.get("y")
+def run_ai_validation_scenarios():
+    st.title("🧪 AI-Generated Validation Scenarios")
 
-    if y_train is None or y_new is None:
-        st.warning("⚠️ Missing target variable for train or new data. Please run AutoML and ensure both are loaded.")
+    model = _tpot_cache.get("latest_tpot_model")
+    X_train = _tpot_cache.get("latest_X_train")
+
+    if model is None or X_train is None:
+        st.warning("⚠️ TPOT model or training data not found. Please run AutoML first.")
         return
 
-    # Detect type: classification (discrete) vs regression (continuous)
-    is_classification = y_train.nunique() <= 10
-
-    st.markdown(f"Detected problem type: **{'Classification' if is_classification else 'Regression'}**")
-
-    if is_classification:
-        train_counts = y_train.value_counts().sort_index()
-        new_counts = y_new.value_counts().reindex(train_counts.index, fill_value=0)
-
-        df = pd.DataFrame({"Train": train_counts, "New": new_counts})
-        chi2, p, _, _ = chi2_contingency(df.T)
-
-        st.dataframe(df)
-        st.metric("Chi-square P-Value", f"{p:.4f}")
-        if p < 0.05:
-            st.error("⚠️ Likely target drift detected!")
-        else:
-            st.success("✅ No significant target drift detected.")
-
-        fig, ax = plt.subplots()
-        df.plot.bar(ax=ax)
-        ax.set_title("Target Class Distribution Comparison")
-        st.pyplot(fig)
-
-    else:
-        stat, p = ks_2samp(y_train, y_new)
-
-        st.metric("KS-Test P-Value", f"{p:.4f}")
-        if p < 0.05:
-            st.error("⚠️ Likely target drift detected!")
-        else:
-            st.success("✅ No significant target drift detected.")
-
-        fig, ax = plt.subplots()
-        sns.kdeplot(y_train, label="Train", fill=True, alpha=0.4)
-        sns.kdeplot(y_new, label="New", fill=True, alpha=0.4)
-        ax.set_title("Target Distribution (Regression)")
-        ax.legend()
-        st.pyplot(fig)
-
-    st.markdown("---")
     st.markdown("""
-    ### 🧠 Interpretation
-    - A significant change in the distribution of the target variable indicates that the **problem definition may be shifting**.
-    - This can occur due to changes in business rules, label definitions, or external conditions.
-    - Use this panel to decide whether to retrain or revalidate your model.
+    This module generates synthetic edge cases to test your model on uncommon or extreme scenarios.
+    Useful for robustness checks, adversarial testing, and hypothesis generation.
     """)
+
+    num_cases = st.slider("How many test cases to generate?", 3, 10, 5)
+    X_synthetic = generate_synthetic_scenarios(X_train, num_cases=num_cases)
+
+    st.markdown("### 🧪 Generated Scenarios")
+    st.dataframe(X_synthetic)
+
+    if st.button("⚙️ Predict on These Scenarios"):
+        try:
+            preds = model.predict(X_synthetic)
+            X_synthetic["Prediction"] = preds
+            st.success("✅ Model predictions computed.")
+            st.dataframe(X_synthetic)
+        except Exception as e:
+            st.error(f"❌ Prediction failed: {type(e).__name__}: {e}")
