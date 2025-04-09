@@ -24,6 +24,7 @@ def safe_import(module_name, function_name):
         return fallback
 
 # === MODULE IMPORTS VIA SAFE WRAPPER ===
+run_model_diagnostics_lab = safe_import("model_diagnostics_lab", "run_model_diagnostics_lab")
 run_ai_validation_scenarios = safe_import("ai_validation_scenarios", "run_ai_validation_scenarios")
 run_target_drift_diagnostic = safe_import("target_drift_diagnostic", "run_target_drift_diagnostic")
 run_feature_drift_detector = safe_import("feature_drift_detector", "run_feature_drift_detector")
@@ -178,3 +179,5 @@ elif subtab == "Target Drift Diagnostic":
     run_target_drift_diagnostic()
 elif subtab == "AI-Generated Validation Scenarios":
     run_ai_validation_scenarios()
+elif subtab == "Model Diagnostics Lab":
+    run_model_diagnostics_lab()
