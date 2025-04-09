@@ -58,6 +58,10 @@ def run_sensitivity_explorer():
     st.markdown("### 🔍 Simulated Input")
     st.dataframe(input_df)
 
+    # Save user input to session for PDF export
+    for k, v in user_input.items():
+        st.session_state[f"sens_input_{k}"] = v
+
     try:
         prediction = model.predict(input_df)[0]
         st.success(f"🧠 Model Prediction: **{prediction}**")
