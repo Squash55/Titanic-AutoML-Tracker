@@ -77,3 +77,7 @@ def run_sensitivity_explorer():
     - Try adjusting only one feature at a time to isolate sensitivity.
     - Toggle **Edge Case Mode** to simulate real-world anomalies or stress tests.
     """)
+
+    # ✅ Add session tracker for better navigation and PDF integration
+    st.session_state["last_used_tab"] = "Sensitivity Explorer"
+    st.session_state["include_sensitivity_pdf"] = st.sidebar.checkbox("🧪 Include Sensitivity Explorer Section", value=True)
