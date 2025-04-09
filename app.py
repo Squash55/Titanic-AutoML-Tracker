@@ -24,6 +24,7 @@ def safe_import(module_name, function_name):
         return fallback
 
 # === MODULE IMPORTS VIA SAFE WRAPPER ===
+run_sensitivity_explorer = safe_import("sensitivity_explorer", "run_sensitivity_explorer")
 run_model_diagnostics_lab = safe_import("model_diagnostics_lab", "run_model_diagnostics_lab")
 run_ai_validation_scenarios = safe_import("ai_validation_scenarios", "run_ai_validation_scenarios")
 run_target_drift_diagnostic = safe_import("target_drift_diagnostic", "run_target_drift_diagnostic")
@@ -79,7 +80,7 @@ phase_tabs = {
     "A: Algorithm Exploration": ["Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"],
     "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A (SHAP)", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab", "Explainable Boosting", "Explainable Boosting", "SHAP vs Permutation Delta Viewer"],
     "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab", "Residual Plot", "Feature Drift Detector", "Target Drift Diagnostic", "AI-Generated Validation Scenarios"],
-    "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer", "LogReg Nonlinear Tricks", "Smart Poly Finder"],
+    "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer", "LogReg Nonlinear Tricks", "Smart Poly Finder", "Sensitivity Explorer"],
     "D: Documentation & Deployment": ["Saved Models", "PDF Report", "DAIVID App Maturity Scorecard"]
 }
 
@@ -181,3 +182,5 @@ elif subtab == "AI-Generated Validation Scenarios":
     run_ai_validation_scenarios()
 elif subtab == "Model Diagnostics Lab":
     run_model_diagnostics_lab()
+elif subtab == "Sensitivity Explorer":
+    run_sensitivity_explorer()
