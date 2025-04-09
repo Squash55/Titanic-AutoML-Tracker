@@ -4,8 +4,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from tpot_connector import _tpot_cache
-
-
+def run_user_manual(deep=True, compact=True):
+    
+# full contents of your manual go here
 def run_sensitivity_explorer():
     st.title("📐 Sensitivity Explorer (What-if Panel)")
 
