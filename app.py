@@ -184,3 +184,4 @@ elif subtab == "Model Diagnostics Lab":
     run_model_diagnostics_lab()
 elif subtab == "Sensitivity Explorer":
     run_sensitivity_explorer()
+
