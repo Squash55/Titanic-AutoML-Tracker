@@ -96,6 +96,40 @@ def run_pdf_report():
                 "Use this to guide feature investigation and model refinement."
             )
             pdf.image(plot_path, w=180)
+    # === Sensitivity Explorer Section ===
+    if st.session_state.get("include_sensitivity_pdf", False):
+        try:
+            from sensitivity_explorer import run_sensitivity_explorer
+            st.markdown("## 📐 Sensitivity Explorer")
+            st.markdown("This section captures a snapshot of your custom what-if input and the resulting prediction.")
+    
+            model = _tpot_cache.get("latest_tpot_model")
+            X_train = _tpot_cache.get("latest_X_train")
+    
+            if model is not None and X_train is not None:
+                st.write("⬇️ Sample prediction from last configured simulation (if available):")
+    
+                # Reconstruct the most recent input
+                user_input = {}
+                for col in X_train.columns:
+                    user_input[col] = st.session_state.get(f"sens_input_{col}", "—")
+    
+                input_df = pd.DataFrame([user_input])
+                st.dataframe(input_df)
+    
+                try:
+                    pred = model.predict(input_df)[0]
+                    st.write(f"**Prediction:** {pred}")
+                    if hasattr(model, "predict_proba"):
+                        proba = model.predict_proba(input_df)[0]
+                        proba_df = pd.DataFrame({"Class": model.classes_, "Probability": proba})
+                        st.dataframe(proba_df)
+                except Exception as e:
+                    st.warning(f"Prediction failed in report: {e}")
+            else:
+                st.info("No AutoML model or training data available for Sensitivity Explorer report.")
+        except Exception as e:
+            st.error(f"Sensitivity Explorer section failed: {e}")
 
     # Save PDF
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
