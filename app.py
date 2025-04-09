@@ -153,6 +153,8 @@ elif subtab == "PDF Report":
     st.session_state["include_ebm_pdf"] = st.sidebar.checkbox("📊 Include EBM Plot", value=True)
     st.session_state["include_shap_perm_delta_pdf"] = st.sidebar.checkbox("📉 Include SHAP vs Permutation Delta Plot", value=True)
     st.session_state["include_manual_pdf"] = st.sidebar.checkbox("📘 Include User Manual Section", value=True)
+    st.session_state["include_feature_impact_pdf"] = st.sidebar.checkbox(
+        "🧪 Include Feature Impact Tester Section", value=True)
     run_pdf_report()
 elif subtab == "DAIVID App Maturity Scorecard":
     run_daivid_scorecard()
