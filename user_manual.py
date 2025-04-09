@@ -1,8 +1,8 @@
 # user_manual.py
-
 import streamlit as st
 import pandas as pd
 import numpy as np
+import tempfile
 from tpot_connector import _tpot_cache
 
 def run_sensitivity_explorer():
@@ -57,7 +57,6 @@ def run_sensitivity_explorer():
     st.markdown("### 🔍 Simulated Input")
     st.dataframe(input_df)
 
-    # Save user input to session for PDF export
     for k, v in user_input.items():
         st.session_state[f"sens_input_{k}"] = v
 
@@ -81,7 +80,6 @@ def run_sensitivity_explorer():
     - Toggle **Edge Case Mode** to simulate real-world anomalies or stress tests.
     """)
 
-    # ✅ Add session tracker for better navigation and PDF integration
     st.session_state["last_used_tab"] = "Sensitivity Explorer"
     st.session_state["include_sensitivity_pdf"] = st.sidebar.checkbox("🧪 Include Sensitivity Explorer Section", value=True)
 
@@ -97,7 +95,91 @@ def append_to_manual():
 
     You can also include the current sensitivity configuration in the **PDF Report**.
     """)
+    if st.session_state.get("manual_image_mode"):
+        st.image("screenshots/sensitivity_explorer_demo.png", caption="Sensitivity Explorer Screenshot", use_column_width=True)
+
+    st.markdown("### 🤖 AutoML Launcher")
+    st.markdown("""
+    Runs an AutoML pipeline using TPOT.
+
+    - Automatically searches for the best preprocessing + model combo
+    - Customizable generations, population size, scoring metric
+    - Trains multiple models and selects the best pipeline
+
+    Recommended as the first modeling step after EDA.
+    """)
+    if st.session_state.get("manual_image_mode"):
+        st.image("screenshots/automl_launcher_demo.png", caption="AutoML Launcher in action", use_column_width=True)
+
+    st.markdown("### 🔍 SHAP Comparison")
+    st.markdown("""
+    Compare SHAP feature importance across multiple models.
+
+    - Helps identify consistent vs unstable feature contributions
+    - Useful when comparing RandomForest, XGBoost, and others
+    - Makes it easy to pick the most interpretable or robust model
+
+    Especially useful when choosing models for deployment.
+    """)
+    if st.session_state.get("manual_image_mode"):
+        st.image("screenshots/shap_comparison_demo.png", caption="SHAP Comparison Visual", use_column_width=True)
+
+    st.markdown("### 🧪 DOE Panel")
+    st.markdown("""
+    Use Design of Experiments (DOE) to run structured input sweeps.
+
+    - Visualize main effects and interaction effects
+    - Ideal for identifying key variables and non-linear interactions
+    - Based on classic factorial DOE methods
+
+    Boosts trust and understanding of your model’s behavior under controlled tests.
+    """)
+    if st.session_state.get("manual_image_mode"):
+        st.image("screenshots/doe_panel_demo.png", caption="DOE Visual Explorer", use_column_width=True)
 
 def run_user_manual():
     st.title("📘 DAIVID Analytics User Manual")
+
+    with st.sidebar.expander("📘 Export Options", expanded=False):
+        include_images = st.checkbox("🖼️ Include Visual Aids", value=True, key="manual_image_mode")
+        export_pdf = st.button("📄 Generate PDF")
+        export_md = st.button("📝 Export Markdown")
+
     append_to_manual()
+
+    if export_pdf:
+        from fpdf import FPDF
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+        pdf.multi_cell(0, 10, "DAIVID Analytics User Manual")
+        pdf.ln()
+        pdf.multi_cell(0, 10, "Sensitivity Explorer: What-if Analysis tool with real-time prediction feedback.")
+        pdf.multi_cell(0, 10, "AutoML: Automatically builds and selects the best ML pipeline using TPOT.")
+        pdf.multi_cell(0, 10, "SHAP Comparison: Visualize feature importance variation across models.")
+        pdf.multi_cell(0, 10, "DOE Panel: Structured input testing with factor effect visualization.")
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+            pdf.output(tmp_file.name)
+            with open(tmp_file.name, "rb") as f:
+                st.download_button("📥 Download PDF Manual", f, file_name="DAIVID_User_Manual.pdf")
+
+    if export_md:
+        md_content = """# DAIVID Analytics User Manual
+
+## 📐 Sensitivity Explorer
+This panel allows you to simulate hypothetical scenarios by adjusting input feature values.
+- Use sliders and selectors to create what-if inputs.
+- Toggle Edge Case Mode to test edge values.
+- Get real-time predictions and probabilities.
+
+## 🤖 AutoML Launcher
+Runs TPOT to automatically find optimal ML pipelines.
+
+## 🔍 SHAP Comparison
+Compare SHAP scores across models to assess consistency.
+
+## 🧪 DOE Panel
+Visualize factor impacts through main effects and interactions.
+"""
+        st.download_button("📥 Download Markdown Manual", md_content, file_name="DAIVID_User_Manual.md")
