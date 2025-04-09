@@ -17,19 +17,21 @@ def run_target_drift_diagnostic():
         st.warning("⚠️ Missing target variable for train or new data. Please run AutoML and ensure both are loaded.")
         return
 
-    # Detect type: classification (discrete) vs regression (continuous)
+    # Detect classification vs regression
     is_classification = y_train.nunique() <= 10
-
     st.markdown(f"Detected problem type: **{'Classification' if is_classification else 'Regression'}**")
 
     if is_classification:
-        train_counts = y_train.value_counts().sort_index()
-        new_counts = y_new.value_counts().reindex(train_counts.index, fill_value=0)
+        all_labels = sorted(set(y_train.unique()) | set(y_new.unique()))
+        train_counts = y_train.value_counts().reindex(all_labels, fill_value=0)
+        new_counts = y_new.value_counts().reindex(all_labels, fill_value=0)
 
         df = pd.DataFrame({"Train": train_counts, "New": new_counts})
         chi2, p, _, _ = chi2_contingency(df.T)
 
+        st.markdown("### 📊 Target Distribution (Classification)")
         st.dataframe(df)
+
         st.metric("Chi-square P-Value", f"{p:.4f}")
         if p < 0.05:
             st.error("⚠️ Likely target drift detected!")
@@ -41,9 +43,14 @@ def run_target_drift_diagnostic():
         ax.set_title("Target Class Distribution Comparison")
         st.pyplot(fig)
 
+        # Download button
+        csv = df.to_csv(index=True).encode("utf-8")
+        st.download_button("📥 Download Comparison CSV", data=csv, file_name="target_drift_comparison.csv", mime="text/csv")
+
     else:
         stat, p = ks_2samp(y_train, y_new)
 
+        st.markdown("### 📊 Target Distribution (Regression)")
         st.metric("KS-Test P-Value", f"{p:.4f}")
         if p < 0.05:
             st.error("⚠️ Likely target drift detected!")
@@ -51,9 +58,9 @@ def run_target_drift_diagnostic():
             st.success("✅ No significant target drift detected.")
 
         fig, ax = plt.subplots()
-        sns.kdeplot(y_train, label="Train", fill=True, alpha=0.4)
-        sns.kdeplot(y_new, label="New", fill=True, alpha=0.4)
-        ax.set_title("Target Distribution (Regression)")
+        sns.kdeplot(y_train, label="Train", fill=True, alpha=0.4, common_norm=False)
+        sns.kdeplot(y_new, label="New", fill=True, alpha=0.4, common_norm=False)
+        ax.set_title("Target Distribution Comparison (Regression)")
         ax.legend()
         st.pyplot(fig)
 
