@@ -20,7 +20,7 @@ def safe_import(module_name, function_name):
         return fallback
 
 # === MODULE IMPORTS VIA SAFE WRAPPER ===
-run_target_drift_diagnostic = safe_import("target_drift_diagnostic", "run_target_drift_diagnostic")
+run_ai_validation_scenarios = safe_import("ai_validation_scenarios", "run_ai_validation_scenarios")
 run_target_drift_diagnostic = safe_import("target_drift_diagnostic", "run_target_drift_diagnostic")
 run_feature_drift_detector = safe_import("feature_drift_detector", "run_feature_drift_detector")
 run_user_manual = safe_import("user_manual", "run_user_manual")
