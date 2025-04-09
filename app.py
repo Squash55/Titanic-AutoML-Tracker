@@ -99,14 +99,17 @@ phase_descriptions = {
 if show_all:
     st.sidebar.markdown("### 🕘️ DAIVID Roadmap")
     st.sidebar.markdown("Explore all phases and their tools:")
-    for phase, tabs in phase_tabs.items():
-        with st.sidebar.expander(f"{phase}", expanded=False):
+    for phase_name, tabs in phase_tabs.items():
+        with st.sidebar.expander(f"{phase_name}", expanded=False):
             for t in tabs:
                 st.markdown(f"- {t}")
     st.sidebar.markdown("---")
     phase = st.sidebar.selectbox("🔷 Choose Phase to Explore", list(phase_tabs.keys()), index=0)
 else:
     phase = st.sidebar.selectbox("🔷 Phase", list(phase_tabs.keys()), index=0)
+
+# ✅ Show phase description below the selector (once)
+st.sidebar.info(phase_descriptions.get(phase, ""))
 
 subtab = st.sidebar.radio("🦩 Select Tab", phase_tabs[phase])
 
