@@ -115,9 +115,6 @@ st.sidebar.info(phase_descriptions.get(phase, ""))
 # ✅ Tab selection AFTER phase
 subtab = st.sidebar.radio("🦩 Select Tab", phase_tabs[phase])
 
-# ✅ Now safe to show contextual caption
-st.sidebar.caption(f"📍 Phase: `{phase}` | Tab: `{subtab}`")
-
 # === Route to tab functions based on selection ===
 if subtab == "Notebook Scout":
     run_notebook_scout()
