@@ -21,16 +21,38 @@ def run_sensitivity_explorer():
     We'll show the model's prediction and probability (if available).
     """)
 
+    edge_case_mode = st.checkbox("🧪 Edge Case Mode", value=False)
     user_input = {}
+
     for col in X_train.columns:
         if pd.api.types.is_numeric_dtype(X_train[col]):
             min_val = float(X_train[col].min())
             max_val = float(X_train[col].max())
             mean_val = float(X_train[col].mean())
-            user_input[col] = st.slider(col, min_val, max_val, mean_val)
+
+            if edge_case_mode:
+                extreme_option = st.radio(
+                    f"{col} (Extreme Mode)",
+                    ["Normal", "Min", "Max", "Random"],
+                    horizontal=True
+                )
+                if extreme_option == "Min":
+                    val = min_val
+                elif extreme_option == "Max":
+                    val = max_val
+                elif extreme_option == "Random":
+                    val = float(np.random.uniform(min_val, max_val))
+                else:
+                    val = mean_val
+                user_input[col] = val
+            else:
+                user_input[col] = st.slider(col, min_val, max_val, mean_val)
         else:
             options = list(X_train[col].dropna().unique())
-            user_input[col] = st.selectbox(col, options)
+            if edge_case_mode:
+                options.append("🚫 Missing")
+            selected = st.selectbox(col, options)
+            user_input[col] = None if selected == "🚫 Missing" else selected
 
     input_df = pd.DataFrame([user_input])
     st.markdown("### 🔍 Simulated Input")
@@ -53,5 +75,5 @@ def run_sensitivity_explorer():
     ### 🧠 Interpretation
     - Use this panel to test edge cases and understand prediction drivers.
     - Try adjusting only one feature at a time to isolate sensitivity.
-    - You can screenshot or log interesting scenarios for deeper analysis.
+    - Toggle **Edge Case Mode** to simulate real-world anomalies or stress tests.
     """)
