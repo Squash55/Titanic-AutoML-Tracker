@@ -3,9 +3,6 @@ import streamlit as st
 from fpdf import FPDF
 import tempfile
 import os
-import shap
-import matplotlib.pyplot as plt
-import joblib
 import pandas as pd
 
 try:
@@ -26,7 +23,6 @@ except ImportError:
     _tpot_cache = {}
 
 from golden_qa import get_golden_questions, get_shap_smart_answers
-from model_leaderboard_panel import run_model_leaderboard_panel
 
 
 class PDFReport(FPDF):
@@ -47,6 +43,50 @@ class PDFReport(FPDF):
         self.cell(0, 10, f"Page {self.page_no()}", 0, 0, "C")
 
 
+def render_sensitivity_explorer_section(pdf):
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(0, 10, "📐 Sensitivity Explorer Results", ln=True)
+
+    pdf.set_font("Arial", '', 12)
+    pdf.multi_cell(0, 8, "This section simulates what-if predictions based on user-defined inputs, including edge cases.")
+
+    input_data = {
+        k.replace("sens_input_", ""): v
+        for k, v in st.session_state.items()
+        if k.startswith("sens_input_")
+    }
+
+    if input_data:
+        pdf.ln(4)
+        pdf.set_font("Arial", 'B', 12)
+        pdf.cell(0, 10, "Simulated Inputs:", ln=True)
+        pdf.set_font("Arial", '', 11)
+        for feature, value in input_data.items():
+            pdf.cell(0, 8, f"• {feature}: {value}", ln=True)
+
+        try:
+            model = _tpot_cache.get("latest_tpot_model")
+            input_df = pd.DataFrame([input_data])
+            if model is not None:
+                pred = model.predict(input_df)[0]
+                pdf.ln(4)
+                pdf.set_font("Arial", "B", 12)
+                pdf.cell(0, 10, f"Prediction: {pred}", ln=True)
+
+                if hasattr(model, "predict_proba"):
+                    proba = model.predict_proba(input_df)[0]
+                    pdf.set_font("Arial", "B", 12)
+                    pdf.cell(0, 10, "Prediction Probabilities:", ln=True)
+                    pdf.set_font("Arial", "", 11)
+                    for cls, p in zip(model.classes_, proba):
+                        pdf.cell(0, 8, f"• {cls}: {p:.3f}", ln=True)
+        except Exception as e:
+            pdf.cell(0, 8, f"Prediction failed: {e}", ln=True)
+    else:
+        pdf.cell(0, 8, "⚠️ No sensitivity inputs were configured or saved.", ln=True)
+
+
 def run_pdf_report():
     st.header("🧾 Generate PDF Report")
 
@@ -56,7 +96,6 @@ def run_pdf_report():
 
     model = latest_tpot_model
     X_test = latest_X_test
-    y_test = latest_y_test
 
     pdf = PDFReport()
     pdf.add_page()
@@ -74,66 +113,37 @@ def run_pdf_report():
     for q, a in zip(questions, answers):
         pdf.add_section(q, a)
 
-    # Optional: Include Explainable Boosting Plot
+    # Optional: Include EBM Plot
     if st.session_state.get("include_ebm_pdf"):
         ebm_plot_path = "ebm_feature_plot.png"
         if os.path.exists(ebm_plot_path):
             pdf.add_section(
                 "Explainable Boosting Insights",
-                "These plots reflect global behavior of top features in an Explainable Boosting Machine.\n"
-                "Each curve represents the marginal effect of a feature on the prediction outcome, helping you understand the direction and shape of relationships."
+                "Global behavior of top EBM features. Curves show marginal effects."
             )
             pdf.image(ebm_plot_path, w=180)
 
-    # Optional: Include SHAP vs Permutation Delta Plot
+    # Optional: SHAP vs Permutation Delta Plot
     if st.session_state.get("include_shap_perm_delta_pdf"):
         plot_path = st.session_state.get("shap_perm_delta_plot_path")
         if plot_path and os.path.exists(plot_path):
             pdf.add_section(
                 "SHAP vs Permutation Importance Delta",
-                "This chart highlights differences between SHAP and permutation feature importance values.\n"
-                "Large deltas may indicate non-linear interactions, multicollinearity, or SHAP revealing effects missed by permutation testing.\n"
-                "Use this to guide feature investigation and model refinement."
+                "Highlights nonlinearities, collinearity, or signal differences. Large delta = investigate."
             )
             pdf.image(plot_path, w=180)
-    # === Sensitivity Explorer Section ===
-    if st.session_state.get("include_sensitivity_pdf", False):
-        try:
-            from sensitivity_explorer import run_sensitivity_explorer
-            st.markdown("## 📐 Sensitivity Explorer")
-            st.markdown("This section captures a snapshot of your custom what-if input and the resulting prediction.")
-    
-            model = _tpot_cache.get("latest_tpot_model")
-            X_train = _tpot_cache.get("latest_X_train")
-    
-            if model is not None and X_train is not None:
-                st.write("⬇️ Sample prediction from last configured simulation (if available):")
-    
-                # Reconstruct the most recent input
-                user_input = {}
-                for col in X_train.columns:
-                    user_input[col] = st.session_state.get(f"sens_input_{col}", "—")
-    
-                input_df = pd.DataFrame([user_input])
-                st.dataframe(input_df)
-    
-                try:
-                    pred = model.predict(input_df)[0]
-                    st.write(f"**Prediction:** {pred}")
-                    if hasattr(model, "predict_proba"):
-                        proba = model.predict_proba(input_df)[0]
-                        proba_df = pd.DataFrame({"Class": model.classes_, "Probability": proba})
-                        st.dataframe(proba_df)
-                except Exception as e:
-                    st.warning(f"Prediction failed in report: {e}")
-            else:
-                st.info("No AutoML model or training data available for Sensitivity Explorer report.")
-        except Exception as e:
-            st.error(f"Sensitivity Explorer section failed: {e}")
 
-    # Save PDF
+    # Optional: Sensitivity Explorer Section
+    if st.session_state.get("include_sensitivity_pdf"):
+        render_sensitivity_explorer_section(pdf)
+
+    # Optional: User Manual Section
+    if st.session_state.get("include_manual_pdf"):
+        pdf.add_section("User Manual Reference", "Refer to the in-app User Manual tab for detailed guidance.")
+
+    # Save and Offer Download
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
         pdf.output(tmp_file.name)
         st.success("✅ PDF Report Ready!")
         with open(tmp_file.name, "rb") as f:
-            st.download_button(label="📥 Download Report", data=f, file_name="automl_summary_report.pdf")
+            st.download_button("📥 Download Report", data=f, file_name="automl_summary_report.pdf")
