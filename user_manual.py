@@ -1,12 +1,10 @@
-# sensitivity_explorer.py
+# user_manual.py
 
 import streamlit as st
 import pandas as pd
 import numpy as np
 from tpot_connector import _tpot_cache
-def run_user_manual(deep=True, compact=True):
-    
-# full contents of your manual go here
+
 def run_sensitivity_explorer():
     st.title("📐 Sensitivity Explorer (What-if Panel)")
 
@@ -87,8 +85,6 @@ def run_sensitivity_explorer():
     st.session_state["last_used_tab"] = "Sensitivity Explorer"
     st.session_state["include_sensitivity_pdf"] = st.sidebar.checkbox("🧪 Include Sensitivity Explorer Section", value=True)
 
-
-# === Documentation Insertion for user_manual.py ===
 def append_to_manual():
     st.markdown("### 📐 Sensitivity Explorer (What-if Panel)")
     st.markdown("""
@@ -101,3 +97,7 @@ def append_to_manual():
 
     You can also include the current sensitivity configuration in the **PDF Report**.
     """)
+
+def run_user_manual():
+    st.title("📘 DAIVID Analytics User Manual")
+    append_to_manual()
