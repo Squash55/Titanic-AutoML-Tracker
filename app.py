@@ -20,6 +20,7 @@ def safe_import(module_name, function_name):
         return fallback
 
 # === MODULE IMPORTS VIA SAFE WRAPPER ===
+run_feature_drift_detector = safe_import("feature_drift_detector", "run_feature_drift_detector")
 run_user_manual = safe_import("user_manual", "run_user_manual")
 run_shap_perm_delta = safe_import("shap_permutation_delta", "run_shap_permutation_delta")
 run_explainable_boosting_visualizer = safe_import("explainable_boosting_visualizer", "run_explainable_boosting_visualizer")
@@ -70,7 +71,7 @@ phase_tabs = {
     "D: Data Exploration": ["Notebook Scout", "Auto EDA", "Auto Feature Engineering", "LogReg + Interaction Explorer", "Distribution Auditor", "Outlier Suppressor", "Synthetic Data Generator", "Cat↔Reg Switcher", "LogReg Nonlinear Tricks"],
     "A: Algorithm Exploration": ["Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"],
     "I: Interpretability & Insights": ["SHAP Panel", "SHAP Comparison", "SHAP Waterfall", "Golden Q&A (SHAP)", "Golden Q&A", "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab", "Explainable Boosting", "Explainable Boosting", "SHAP vs Permutation Delta Viewer"],
-    "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab", "Residual Plot"],
+    "V: Validation & Variants": ["Threshold Optimizer", "DOE Panel", "Experiment Tracker", "Model Diagnostics Lab", "Residual Plot", "Feature Drift Detector"],
     "I: Iteration & Optimization": ["Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer", "LogReg Nonlinear Tricks", "Smart Poly Finder"],
     "D: Documentation & Deployment": ["Saved Models", "PDF Report", "DAIVID App Maturity Scorecard"]
 }
@@ -165,3 +166,5 @@ elif subtab == "SHAP vs Permutation Delta Viewer":
     run_shap_perm_delta()
 elif subtab == "DAIVID Analytics User Manual":
     run_user_manual()
+elif subtab == "Feature Drift Detector":
+    run_feature_drift_detector()
