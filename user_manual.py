@@ -1,122 +1,102 @@
-# user_manual.py
+# sensitivity_explorer.py
+
 import streamlit as st
+import pandas as pd
+import numpy as np
+from tpot_connector import _tpot_cache
 
-# === Function to generate downloadable Markdown content ===
-def generate_manual_markdown(include_images=True):
-    sections = []
 
-    sections.append("## 📊 Auto EDA\nExploratory Data Analysis that auto-generates charts and patterns. Useful for spotting outliers, missing values, and variable distributions.")
-    if include_images:
-        sections.append("![Auto EDA Example](https://example.com/eda.png)")  # Replace with actual image paths
+def run_sensitivity_explorer():
+    st.title("📐 Sensitivity Explorer (What-if Panel)")
 
-    sections.append("## 🧠 Golden Q&A\nAI-powered insights using SHAP and question templates to explain patterns.")
-    if include_images:
-        sections.append("![Golden QA Example](https://example.com/goldenqa.png)")
+    model = _tpot_cache.get("latest_tpot_model")
+    X_train = _tpot_cache.get("latest_X_train")
 
-    return "\n\n".join(sections)
+    if model is None or X_train is None:
+        st.warning("⚠️ No model or training data found. Please run AutoML first.")
+        return
 
-# === MAIN MANUAL RUNNER ===
-def run_user_manual(deep=True, compact=True):
-    st.title("📘 DAIVID Analytics User Manual")
-
-    # === 📚 Glossary Sidebar ===
-    with st.sidebar.expander("📚 Glossary", expanded=False):
-        st.markdown("""
-        - **EDA**: Exploratory Data Analysis – the process of visually and statistically understanding a dataset.
-        - **SHAP**: SHapley Additive exPlanations – explains each prediction by computing the contribution of every feature.
-        - **HPO**: Hyperparameter Optimization – tuning settings of algorithms to maximize model performance.
-        - **PDF Report**: A downloadable document summarizing model, insights, and visuals.
-        """)
-
-    # === Sidebar Export Options ===
-    with st.sidebar.expander("📘 Export Options", expanded=False):
-        st.session_state["manual_image_mode"] = st.checkbox("🖼️ Include Visual Aids", value=True)
-        if st.button("📥 Prepare Markdown Download"):
-            st.download_button(
-                label="📄 Download Manual (.md)",
-                data=generate_manual_markdown(include_images=st.session_state["manual_image_mode"]),
-                file_name="DAIVID_Analytics_User_Manual.md",
-                mime="text/markdown"
-            )
-
-    spacing = "" if compact else "\n\n"
-
-    def section(title, content):
-        st.markdown(f"### {title}")
-        st.markdown(content + spacing)
-
-    # === Manual Content ===
-    section("🧭 Overview", """
-    DAIVID is your end-to-end decision intelligence platform. This manual provides quick explanations of each module,
-    including methods, use cases, and why they matter.
+    st.markdown("""
+    Adjust each feature below to simulate hypothetical inputs.
+    We'll show the model's prediction and probability (if available).
     """)
 
-    section("D: Data Exploration", f"""
-    - **Notebook Scout**: Scans top Kaggle notebooks to extract trends and techniques.
-    - **Auto EDA**: Automatically generates visual summaries for numeric and categorical features.
-    - **Auto Feature Engineering**: Applies transformations (binning, encoding, interactions) automatically.
-    - **LogReg + Interaction Explorer**: For linear models, this reveals hidden interaction terms.
-    - **Distribution Auditor**: Detects shifts and anomalies in variable distributions.
+    edge_case_mode = st.checkbox("🧪 Edge Case Mode", value=False)
+    user_input = {}
+
+    for col in X_train.columns:
+        if pd.api.types.is_numeric_dtype(X_train[col]):
+            min_val = float(X_train[col].min())
+            max_val = float(X_train[col].max())
+            mean_val = float(X_train[col].mean())
+
+            if edge_case_mode:
+                extreme_option = st.radio(
+                    f"{col} (Extreme Mode)",
+                    ["Normal", "Min", "Max", "Random"],
+                    horizontal=True
+                )
+                if extreme_option == "Min":
+                    val = min_val
+                elif extreme_option == "Max":
+                    val = max_val
+                elif extreme_option == "Random":
+                    val = float(np.random.uniform(min_val, max_val))
+                else:
+                    val = mean_val
+                user_input[col] = val
+            else:
+                user_input[col] = st.slider(col, min_val, max_val, mean_val)
+        else:
+            options = list(X_train[col].dropna().unique())
+            if edge_case_mode:
+                options.append("🚫 Missing")
+            selected = st.selectbox(col, options)
+            user_input[col] = None if selected == "🚫 Missing" else selected
+
+    input_df = pd.DataFrame([user_input])
+    st.markdown("### 🔍 Simulated Input")
+    st.dataframe(input_df)
+
+    # Save user input to session for PDF export
+    for k, v in user_input.items():
+        st.session_state[f"sens_input_{k}"] = v
+
+    try:
+        prediction = model.predict(input_df)[0]
+        st.success(f"🧠 Model Prediction: **{prediction}**")
+
+        if hasattr(model, "predict_proba"):
+            proba = model.predict_proba(input_df)[0]
+            st.markdown("### 📈 Prediction Probabilities")
+            proba_df = pd.DataFrame({"Class": model.classes_, "Probability": proba})
+            st.dataframe(proba_df)
+    except Exception as e:
+        st.error(f"❌ Prediction failed: {type(e).__name__}: {e}")
+
+    st.markdown("---")
+    st.markdown("""
+    ### 🧠 Interpretation
+    - Use this panel to test edge cases and understand prediction drivers.
+    - Try adjusting only one feature at a time to isolate sensitivity.
+    - Toggle **Edge Case Mode** to simulate real-world anomalies or stress tests.
     """)
 
-    section("A: Algorithm Exploration", f"""
-    - **Algorithm Selector**: Interactive guide to help select model types.
-    - **AutoML Launcher**: Kicks off TPOT-based pipelines.
-    - **AutoML Comparison**: Ranks and compares results across AutoML runs.
-    - **Ensemble Builder**: Combines multiple models to boost performance.
-    """)
-
-    section("I: Interpretability", f"""
-    - **SHAP Panel**: Explains model predictions globally and locally using SHAP values.
-    - **SHAP Comparison**: Shows how SHAP importances differ across models.
-    - **Golden Q&A (SHAP)**: Generates high-quality questions and smart answers using SHAP logic.
-    - **Feature Importance Lab**: Aggregated visual feature rankings.
-    - **Explainability Heatmap**: Categorical SHAP heatmaps by group.
-    - **SHAP vs Permutation Delta Viewer**: Contrasts SHAP importances with traditional permutation-based scores.
-    """)
-
-    if deep:
-        section("Deep Dive – Interpretability Methods", f"""
-        - **SHAP (SHapley Additive Explanations)** uses game theory to distribute contribution scores across features.
-        - **Permutation Importance** randomly shuffles feature values to see the drop in model performance.
-        - **Delta Viewer** highlights where model logic diverges from performance-driven importance.
-        """)
-
-    section("V: Validation & Variants", f"""
-    - **Threshold Optimizer**: Sweeps thresholds to optimize F1, precision, recall.
-    - **DOE Panel**: Factorial Design of Experiments for sensitivity analysis.
-    - **Model Diagnostics Lab**: Residual plots and error analysis tools.
-    - **Residual Plot**: Visualizes predicted vs actual to spot issues.
-    - **Synthetic Perturbation Tester**: Applies artificial noise, missingness, or extreme values to test data. It checks how model predictions degrade when specific features are disrupted. Useful for robustness and adversarial stress testing.
-    - **Feature Drift Detector**: Compares training vs new data to identify features with changed distributions. Uses:
-    - KS Test for numeric features (sensitive to shape shifts),
-    - Chi² Test for categorical features (detects category imbalance).
-    - Useful for alerting model owners when assumptions no longer hold.
-    """)
+    # ✅ Add session tracker for better navigation and PDF integration
+    st.session_state["last_used_tab"] = "Sensitivity Explorer"
+    st.session_state["include_sensitivity_pdf"] = st.sidebar.checkbox("🧪 Include Sensitivity Explorer Section", value=True)
 
 
-    section("I: Iteration & Optimization", f"""
-    - **Smart HPO Recommender**: Suggests hyperparameter ranges to explore.
-    - **DAIVID HPO Engine / Trainer / Explorer**: Full control of iterative HPO.
-    - **Smart Poly Finder**: Fits multiple polynomial degrees, returns fit vs overfit risk.
-    - **LogReg Nonlinear Tricks**: Adds interaction/polynomial features to linear models.
-    """)
-
-    section("D: Docs & Deployment", f"""
-    - **PDF Report**: Includes all charts, smart insights, golden Q&A, and SHAP plots.
-    - **Saved Models**: Download and re-load trained models.
-    - **Scorecard**: Self-assessment tracker for DAIVID maturity milestones.
-    """)
+# === Documentation Insertion for user_manual.py ===
+def append_to_manual():
     st.markdown("### 📐 Sensitivity Explorer (What-if Panel)")
     st.markdown("""
     This panel allows you to simulate hypothetical scenarios by adjusting input feature values.
-    
+
     - Use the **sliders and selectors** to create what-if inputs.
     - Toggle **Edge Case Mode** to test Min, Max, Random, or Missing values.
     - Get real-time predictions and probability scores based on your input.
     - Great for understanding how small changes affect outcomes.
-    
+
     You can also include the current sensitivity configuration in the **PDF Report**.
     """)
-    st.markdown("---")
-    st.success("This user manual auto-updates. For custom branding, print-ready versions, or Markdown export, enable download in the PDF tab.")
