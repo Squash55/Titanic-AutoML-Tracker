@@ -16,7 +16,11 @@ def safe_import(module_name, function_name):
         return getattr(module, function_name)
     except Exception as e:
         def fallback(*args, **kwargs):
-            st.error(f"❌ {function_name.replace('run_', '').replace('_', ' ').title()} failed to load: {type(e).__name__}: {e}")
+            st.error(
+                f"❌ `{function_name}` failed to load due to: **{type(e).__name__}**\n\n"
+                f"**Reason:** `{e}`\n\n"
+                f"📦 Check if `{module_name}.py` exists and defines `{function_name}()` properly."
+            )
         return fallback
 
 # === MODULE IMPORTS VIA SAFE WRAPPER ===
