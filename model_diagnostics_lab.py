@@ -5,8 +5,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix, classification_report, ConfusionMatrixDisplay
-
 from tpot_connector import _tpot_cache
+st.write("🛠️ Loaded Model Diagnostics Lab module.")
 
 def run_model_diagnostics_lab():
     st.title("🔬 Model Diagnostics Lab")
