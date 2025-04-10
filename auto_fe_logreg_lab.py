@@ -13,8 +13,9 @@ import pickle
 from tpot_connector import _tpot_cache
 from automl_launcher import run_automl_launcher
 
-def run_logreg_interactions_explorer():
-    st.title("🧪 LogReg + Interaction Explorer")
+def run():
+    st.title("Auto Feature Engineering LogReg Lab")
+    st.write("This is the Auto Feature Engineering LogReg Lab module.")
 
     X = st.session_state.get("X") or _tpot_cache.get("latest_X_train")
     y = st.session_state.get("y") or _tpot_cache.get("latest_y_train")
