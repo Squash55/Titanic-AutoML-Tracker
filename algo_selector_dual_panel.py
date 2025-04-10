@@ -1,4 +1,3 @@
-
 import streamlit as st
 import inspect
 from sklearn.linear_model import LinearRegression, LogisticRegression, Ridge, Lasso
@@ -18,7 +17,7 @@ def get_hyperparams(model_class):
         if k != 'self' and v.default is not inspect.Parameter.empty
     }
 
-def show_algo_selector():
+def run():
     st.title("🧠 Algorithm Selector + HPO Panel")
     st.markdown("Select a task type, then pick a model and tune its hyperparameters.")
 
