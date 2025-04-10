@@ -28,6 +28,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest flake8 black mypy
+      
+      - name: 🔍 Confirm all tab files exist (check-only)
+        run: |
+          echo "📦 Checking tab files without generating..."
+          python generate_missing_tabs.py --check-only
 
       - name: ✅ Check all tab modules contain run() function
         run: |
