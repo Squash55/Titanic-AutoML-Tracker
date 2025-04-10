@@ -14,7 +14,7 @@ TITANIC_MODULE_GROUPS = {
     ],
     "🟣 Advanced: Validation & Drift": [
         "Threshold Optimizer", "Residual Plot", "Model Diagnostics Lab",
-        "Feature Drift Detector", "Target Drift Diagnostic", "AI-Generated Validation Scenarios"
+        "Feature Drift Detector", "Target Drift Diagnostic", "AI-Generated Validation Scenarios", "AutoML & AI Validation"
     ],
     "🟣 Advanced: Stress Testing": [
         "Sensitivity Explorer", "Synthetic Perturbation Tester", "DOE Panel"
@@ -28,6 +28,7 @@ TITANIC_MODULE_GROUPS = {
 }
 
 DAIVID_TABS = {
+    "AutoML & AI Validation": "automl_ai_validation",
     "AI-Generated Validation Scenarios": "ai_validation_scenarios",
     "Algorithm Selector": "algorithm_selector",
     "auto_eda": "auto_eda.py",
