@@ -42,3 +42,7 @@ def run_automl_launcher():
                 _tpot_cache["all_models"][automl_choice] = best_model
     else:
         st.info("👆 Upload a CSV file to get started.")
+
+
+def run():
+    run_automl_launcher()
