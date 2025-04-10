@@ -37,7 +37,7 @@ jobs:
       - name: ✅ Check all tab modules contain run() function
         run: |
           echo "🔎 Verifying all modules have run()..."
-          python validate_modules.py
+          python workflows/validate_modules.py
 
       - name: 🔍 Run Black (Code Formatter Check)
         run: |
