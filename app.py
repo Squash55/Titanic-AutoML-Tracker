@@ -57,9 +57,9 @@ TAB_ICONS = {
 }
 
 # -- Streamlit UI --
-st.set_page_config(page_title="DAIVID Titanic App", layout="wide")
-st.sidebar.title("🧭 DAIVID Titanic Navigator")
-st.sidebar.caption("Kaggle AutoML – Modular Edition")
+st.set_page_config(page_title="DAIVID Analytics App", layout="wide")
+st.sidebar.title("🧭 DAIVID Analytics Navigator")
+st.sidebar.caption("Dynamic AI for Insight, Validation, Interpretation & Discovery")
 
 show_flat = st.sidebar.checkbox("🔀 Show All Modules (Flat List)", value=False)
 
