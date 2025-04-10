@@ -28,6 +28,7 @@ TITANIC_MODULE_GROUPS = {
 }
 
 DAIVID_TABS = {
+    "AI-Generated Validation Scenarios": "ai_validation_scenarios",
     "auto_eda": "auto_eda.py",
     "auto_fe_logreg_lab": "auto_fe_logreg_lab.py",
     "auto_feature_engineering": "autofe.py",
