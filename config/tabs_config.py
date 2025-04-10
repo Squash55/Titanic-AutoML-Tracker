@@ -1,5 +1,5 @@
 # config/tabs_config.py
-import os  # Add this import to fix the error
+import os  # Ensure os is imported to handle file checks
 
 TITANIC_MODULE_GROUPS = {
     "🟢 Core (Data Prep)": [
@@ -36,4 +36,28 @@ DAIVID_TABS = {
                 .replace(")", "")
                 .replace("+", "_plus")
                 .replace("-", "_")
-    for group in TIT
+    for group in TITANIC_MODULE_GROUPS.values()
+    for name in group
+}
+
+# Add the run() function to each tab file if not already created
+for module_name in DAIVID_TABS.values():
+    tab_file = f"tabs/{module_name}.py"
+    
+    # If the file doesn't exist, create it
+    if not os.path.exists(tab_file):
+        with open(tab_file, "w", encoding="utf-8") as f:
+            f.write(f"""\"\"\"
+Auto-generated tab: {module_name}
+\"\"\"
+
+import streamlit as st
+
+@st.cache_data
+def run():
+    st.title("{module_name}")
+    st.info("This is the auto-generated tab for {module_name}. Add your custom content here.")
+""")
+        print(f"✅ Created: {tab_file}")
+    else:
+        print(f"⚠️ File {tab_file} already exists.")
