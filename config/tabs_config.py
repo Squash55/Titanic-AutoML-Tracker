@@ -7,7 +7,7 @@ TITANIC_MODULE_GROUPS = {
         "Outlier Suppressor", "Cat↔Reg Switcher", "LogReg Nonlinear Tricks", "LogReg + Interaction Explorer"
     ],
     "🟡 Mid (Modeling)": [
-        "Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"
+        "Algorithm Selector", "automl Launcher", "AutoML Comparison", "Ensemble Builder"
     ],
     "🟣 Advanced: Interpretability": [
         "SHAP Panel", "Golden Q&A (SHAP)", "SHAP Comparison", "SHAP Waterfall",
