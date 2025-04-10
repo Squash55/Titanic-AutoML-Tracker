@@ -79,7 +79,7 @@ def run_sensitivity_explorer():
     - Use this panel to test edge cases and understand prediction drivers.
     - Try adjusting only one feature at a time to isolate sensitivity.
     - Toggle **Edge Case Mode** to simulate real-world anomalies or stress tests.
-    
+
     **Pro Tips:**
     - Use this as a sandbox before real deployment — edge inputs often expose model fragility.
     - Combine with SHAP force plots to confirm feature influence changes match expectations.
@@ -93,7 +93,7 @@ def run_user_manual():
 
     with st.expander("\U0001F680 How to Use This App", expanded=True):
         st.markdown("""
-        Welcome to **DAIVID** – your AI co-pilot for predictive modeling!
+        Welcome to **DAIVID Analytics** – your AI co-pilot for predictive modeling!
 
         1. Start with **Auto EDA** to explore your dataset
         2. Launch **AutoML** to automatically build a model
@@ -103,6 +103,38 @@ def run_user_manual():
 
     st.markdown("---")
     st.header("\U0001F4D6 Module Reference Guide")
+
+    st.subheader("🟢 Core (Starter Tools)")
+    st.markdown("""
+    - **Notebook Scout**: Scan top Kaggle notebooks for trends
+    - **Auto EDA**: Auto visual analysis of your dataset
+    - **Auto Feature Engineering**: Auto-transformations and encodings
+    - **Distribution Auditor**: Understand feature distributions
+    """)
+
+    st.subheader("🟡 Mid-Level (Modeling & Metrics)")
+    st.markdown("""
+    - **AutoML Launcher**: Runs TPOT to find best pipelines
+    - **SHAP Panel**: Visualizes model explanations with SHAP
+    - **Golden Q&A (SHAP)**: Smart insights from SHAP values
+    - **Threshold Optimizer**: Adjust decision thresholds
+    """)
+
+    st.subheader("🔵 Advanced (Diagnostics & Drift)")
+    st.markdown("""
+    - **Residual Plot**: Analyze prediction errors
+    - **SHAP Comparison**: Compare feature importance across models
+    - **Feature Drift Detector**: Compare training and new distributions
+    - **Model Diagnostics Lab**: Advanced evaluation tools
+    """)
+
+    st.subheader("🟣 Pro (Stress Testing & Strategy)")
+    st.markdown("""
+    - **Sensitivity Explorer**: Simulate inputs and observe predictions
+    - **Synthetic Perturbation Tester**: Add noise and observe robustness
+    - **DOE Panel**: Test main and interaction effects
+    - **Smart HPO Recommender**: Tune model hyperparameters
+    """)
 
     with st.expander("\U0001F4D0 Sensitivity Explorer (What-if Panel)"):
         st.markdown("""
@@ -119,4 +151,5 @@ def run_user_manual():
         if st.session_state.get("manual_image_mode"):
             st.image("screenshots/sensitivity_explorer_demo.png", caption="Sensitivity Explorer Screenshot", use_column_width=True)
 
-    # Additional modules will be inserted below in sequence
+    st.markdown("---")
+    st.caption("DAIVID Analytics v1.0 | For more, visit: [GitHub Repo](https://github.com/your-repo) | [Documentation](https://docs.daivid.ai)")
