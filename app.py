@@ -20,8 +20,9 @@ TAB_ICONS = {
     "AI-Generated Validation Scenarios": "🧠", "Sensitivity Explorer": "🌡️", "Synthetic Perturbation Tester": "🧪",
     "DOE Panel": "🧪", "Smart HPO Recommender": "🔍", "DAIVID HPO Engine": "⚙️", "DAIVID HPO Trainer": "🎓",
     "Zoomed HPO Explorer": "🔎", "Saved Models": "💾", "PDF Report": "📄", "DAIVID Analytics Scorecard": "🏆",
-    "User Manual": "📘"
+    "User Manual": "📘", "AutoML & AI Validation": "⚙️"  # Add this line
 }
+
 
 # -- Streamlit UI --
 st.set_page_config(page_title="DAIVID Analytics App", layout="wide")
