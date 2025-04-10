@@ -75,18 +75,18 @@ analysis_levels = {
     "🟡 Mid (Modeling)": [
         "Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"
     ],
-    "🔵 Interpretability": [
+    "🟣 Advanced: Interpretability": [
         "SHAP Panel", "Golden Q&A (SHAP)", "SHAP Comparison", "SHAP Waterfall",
         "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab"
     ],
-    "🟣 Validation & Drift": [
+    "🟣 Advanced: Validation & Drift": [
         "Threshold Optimizer", "Residual Plot", "Model Diagnostics Lab",
         "Feature Drift Detector", "Target Drift Diagnostic", "AI-Generated Validation Scenarios"
     ],
-    "🧪 Stress Testing": [
+    "🟣 Advanced: Stress Testing": [
         "Sensitivity Explorer", "Synthetic Perturbation Tester", "DOE Panel"
     ],
-    "🔁 Optimization": [
+    "🟣 Advanced: Optimization": [
         "Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer"
     ],
     "📦 Deployment & Docs": ["Saved Models", "PDF Report", "DAIVID Analytics Scorecard", "User Manual"]
