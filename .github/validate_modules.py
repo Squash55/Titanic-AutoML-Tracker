@@ -57,8 +57,10 @@ def check_run_function(path):
         syntax_errors.append(f"{path} → ❌ SyntaxError: {e}")
         return False
 
+# Assuming all Python files are in the 'tabs' directory
+tabs_directory = "tabs"  # Correct the path to your 'tabs' folder
 for display_name, module_name in DAIVID_TABS.items():
-    file_path = f"{module_name}.py"
+    file_path = os.path.join(tabs_directory, f"{module_name}.py")  # Update this to check the 'tabs' directory
     if not os.path.exists(file_path):
         missing_files.append(file_path)
     else:
