@@ -1,6 +1,6 @@
 import streamlit as st
 import importlib
-from config.tabs_config import TITANIC_MODULE_GROUPS, DAIVID_TABS  # ⬅ moved to config file
+from config.tabs_config import TITANIC_MODULE_GROUPS, DAIVID_TABS
 
 # -- Safe session state init --
 if "app_state" not in st.session_state:
