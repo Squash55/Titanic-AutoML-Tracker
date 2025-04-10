@@ -1,9 +1,8 @@
 import os
 import sys
-from app import DAIVID_TABS
+from config.tabs_config import DAIVID_TABS  # ✅ Now safe for GitHub Actions
 
 CHECK_ONLY = "--check-only" in sys.argv
-
 missing_files = []
 
 def create_stub(module_name: str, tab_title: str):
@@ -31,11 +30,11 @@ def run():
         f.write(content)
     print(f"✅ Created: {filename}")
 
-# Loop through all mapped modules
+# Create or validate tab files
 for tab_title, module_name in DAIVID_TABS.items():
     create_stub(module_name, tab_title)
 
-# --- Final Status ---
+# Final check results
 if CHECK_ONLY:
     if missing_files:
         print("❌ Missing tab files:")
