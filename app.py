@@ -1,10 +1,9 @@
 import streamlit as st
 import importlib
 
-# -- Smart session state --
+# -- Safe session state init --
 if "app_state" not in st.session_state:
     st.session_state.app_state = {
-        "current_competition": "Titanic",
         "active_tab": "AutoML Launcher"
     }
 
@@ -37,9 +36,8 @@ TITANIC_MODULE_GROUPS = {
 }
 
 # -- Flat mapping for dynamic import --
-DAIVID_TABS = {name: module for group in TITANIC_MODULE_GROUPS.values() for name in group for module in [
-    name.lower().replace(" ", "_").replace("↔", "").replace("(", "").replace(")", "").replace("+", "_plus").replace("-", "_")
-]}
+DAIVID_TABS = {name: name.lower().replace(" ", "_").replace("↔", "").replace("(", "").replace(")", "").replace("+", "_plus").replace("-", "_")
+                for group in TITANIC_MODULE_GROUPS.values() for name in group}
 
 # -- Icons for sidebar display --
 TAB_ICONS = {
@@ -65,20 +63,23 @@ show_flat = st.sidebar.checkbox("🔀 Show All Modules (Flat List)", value=False
 
 if show_flat:
     all_tabs = list(DAIVID_TABS.keys())
-    icons = [f"{TAB_ICONS.get(tab, '📌')} {tab}" for tab in all_tabs]
-    selection = st.sidebar.radio("Select Module:", icons, index=all_tabs.index(st.session_state.app_state["active_tab"]))
-    selected_tab = all_tabs[icons.index(selection)]
+    display_names = [f"{TAB_ICONS.get(tab, '📌')} {tab}" for tab in all_tabs]
+    default_index = display_names.index(f"{TAB_ICONS.get(st.session_state.app_state['active_tab'], '📌')} {st.session_state.app_state['active_tab']}")
+    selection = st.sidebar.radio("Select Module:", display_names, index=default_index)
+    selected_tab = all_tabs[display_names.index(selection)]
 else:
-    selected_tab = None
-    for group, tabs in TITANIC_MODULE_GROUPS.items():
-        with st.sidebar.expander(group, expanded=True):
-            icons = [f"{TAB_ICONS.get(tab, '📌')} {tab}" for tab in tabs]
-            selected = st.radio("", icons, key=group, label_visibility="collapsed")
-            tab_name = tabs[icons.index(selected)]
-            if selected:
-                selected_tab = tab_name
-                st.session_state.app_state["active_tab"] = tab_name
-                break
+    display_names = []
+    name_to_tab = {}
+    for group, tab_list in TITANIC_MODULE_GROUPS.items():
+        for tab in tab_list:
+            label = f"{TAB_ICONS.get(tab, '📌')} [{group.split(' ')[1]}] {tab}"
+            display_names.append(label)
+            name_to_tab[label] = tab
+    default_label = next((k for k, v in name_to_tab.items() if v == st.session_state.app_state['active_tab']), list(name_to_tab.keys())[0])
+    selection = st.sidebar.radio("📚 Select Module:", display_names, index=display_names.index(default_label))
+    selected_tab = name_to_tab[selection]
+
+st.session_state.app_state["active_tab"] = selected_tab
 
 # -- Dynamic Import + Run --
 try:
