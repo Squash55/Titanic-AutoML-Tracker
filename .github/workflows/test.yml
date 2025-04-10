@@ -29,6 +29,11 @@ jobs:
           pip install -r requirements.txt
           pip install pytest flake8 black mypy
 
+      - name: ✅ Check all tab modules contain run() function
+        run: |
+          echo "🔎 Verifying all modules have run()..."
+          python validate_modules.py
+
       - name: 🔍 Run Black (Code Formatter Check)
         run: |
           echo "🌟 Checking formatting with black..."
@@ -78,7 +83,7 @@ jobs:
           if [ -f test_imports.py ]; then
             echo "✅ Found test_imports.py"
             python test_imports.py
-          else
+          else:
             echo "❌ test_imports.py not found."
           fi
 
