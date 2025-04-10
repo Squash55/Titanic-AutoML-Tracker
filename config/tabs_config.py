@@ -28,7 +28,7 @@ TITANIC_MODULE_GROUPS = {
 }
 
 DAIVID_TABS = {
-    "AutoML & AI Validation": "automl_ai_validation",
+    "AutoML & AI Validation": "automl_with_validation",
     "AI-Generated Validation Scenarios": "ai_validation_scenarios",
     "Algorithm Selector": "algorithm_selector",
     "auto_eda": "auto_eda.py",
