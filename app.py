@@ -1,43 +1,12 @@
 import streamlit as st
 import importlib
+from config.tabs_config import TITANIC_MODULE_GROUPS, DAIVID_TABS  # ⬅ moved to config file
 
 # -- Safe session state init --
 if "app_state" not in st.session_state:
     st.session_state.app_state = {
         "active_tab": "AutoML Launcher"
     }
-
-# -- Grouped Modules by Category --
-TITANIC_MODULE_GROUPS = {
-    "🟢 Core (Data Prep)": [
-        "Notebook Scout", "Auto EDA", "Auto Feature Engineering", "Distribution Auditor",
-        "Outlier Suppressor", "Cat↔Reg Switcher", "LogReg Nonlinear Tricks", "LogReg + Interaction Explorer"
-    ],
-    "🟡 Mid (Modeling)": [
-        "Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"
-    ],
-    "🟣 Advanced: Interpretability": [
-        "SHAP Panel", "Golden Q&A (SHAP)", "SHAP Comparison", "SHAP Waterfall",
-        "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab"
-    ],
-    "🟣 Advanced: Validation & Drift": [
-        "Threshold Optimizer", "Residual Plot", "Model Diagnostics Lab",
-        "Feature Drift Detector", "Target Drift Diagnostic", "AI-Generated Validation Scenarios"
-    ],
-    "🟣 Advanced: Stress Testing": [
-        "Sensitivity Explorer", "Synthetic Perturbation Tester", "DOE Panel"
-    ],
-    "🟣 Advanced: Optimization": [
-        "Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer"
-    ],
-    "📦 Deployment & Docs": [
-        "Saved Models", "PDF Report", "DAIVID Analytics Scorecard", "User Manual"
-    ]
-}
-
-# -- Flat mapping for dynamic import --
-DAIVID_TABS = {name: name.lower().replace(" ", "_").replace("↔", "").replace("(", "").replace(")", "").replace("+", "_plus").replace("-", "_")
-                for group in TITANIC_MODULE_GROUPS.values() for name in group}
 
 # -- Icons for sidebar display --
 TAB_ICONS = {
