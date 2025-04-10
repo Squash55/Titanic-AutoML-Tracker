@@ -1,5 +1,3 @@
-# ai_validation_scenarios.py
-
 import streamlit as st
 import pandas as pd
 import random
@@ -17,7 +15,7 @@ def generate_synthetic_scenarios(X, num_cases=5):
         scenarios.append(scenario)
     return pd.DataFrame(scenarios)
 
-def run_ai_validation_scenarios():
+def run():
     st.title("🧪 AI-Generated Validation Scenarios")
 
     model = _tpot_cache.get("latest_tpot_model")
@@ -27,7 +25,7 @@ def run_ai_validation_scenarios():
         st.warning("⚠️ TPOT model or training data not found. Please run AutoML first.")
         return
 
-    st.markdown("""
+    st.markdown(""" 
     This module generates synthetic edge cases to test your model on uncommon or extreme scenarios.
     Useful for robustness checks, adversarial testing, and hypothesis generation.
     """)
