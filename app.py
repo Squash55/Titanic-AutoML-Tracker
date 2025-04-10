@@ -67,6 +67,8 @@ run_user_manual = safe_import("user_manual", "run_user_manual")
 st.sidebar.title("🗽 DAIVID Analytics Navigator")
 st.sidebar.caption("Select a module to explore")
 
+show_flat = st.sidebar.checkbox("🔀 Show All Modules (Flat List)", value=False)
+
 analysis_levels = {
     "🟢 Core (Data Prep)": [
         "Notebook Scout", "Auto EDA", "Auto Feature Engineering", "Distribution Auditor",
@@ -92,8 +94,12 @@ analysis_levels = {
     "📦 Deployment & Docs": ["Saved Models", "PDF Report", "DAIVID Analytics Scorecard", "User Manual"]
 }
 
-level = st.sidebar.selectbox("📚 Select Level", list(analysis_levels.keys()), index=0)
-module = st.sidebar.radio("🧪 Module", analysis_levels[level])
+if show_flat:
+    all_modules = [m for modules in analysis_levels.values() for m in modules]
+    module = st.sidebar.selectbox("📚 Module (All)", all_modules)
+else:
+    level = st.sidebar.selectbox("📚 Select Level", list(analysis_levels.keys()), index=0)
+    module = st.sidebar.radio("🧪 Module", analysis_levels[level])
 
 # === ROUTING ===
 if module == "Notebook Scout":
