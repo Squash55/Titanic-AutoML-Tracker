@@ -1,4 +1,3 @@
-# automl_comparison.py
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -7,9 +6,9 @@ import seaborn as sns
 from tpot_connector import _tpot_cache
 
 
-def run_automl_comparison():
+def run():
     st.title("📊 AutoML Comparison Dashboard")
-    st.markdown("""
+    st.markdown(""" 
     This panel compares the performance of all AutoML models you've run.
     Metrics include accuracy, F1, AUC, feature count, and training time.
     Use this to identify the best-performing model or spot overfitting.
