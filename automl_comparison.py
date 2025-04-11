@@ -7,7 +7,7 @@ from tpot_connector import _tpot_cache
 
 
 def run():
-    st.title("📊 AutoML Comparison Dashboard")
+    st.title("📊 AutoML Comparison")
     st.markdown(""" 
     This panel compares the performance of all AutoML models you've run.
     Metrics include accuracy, F1, AUC, feature count, and training time.
