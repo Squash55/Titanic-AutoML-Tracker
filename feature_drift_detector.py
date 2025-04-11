@@ -1,5 +1,3 @@
-# feature_drift_detector.py
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -8,9 +6,15 @@ import seaborn as sns
 from scipy.stats import ks_2samp, chi2_contingency
 from tpot_connector import _tpot_cache
 
-
 def run_feature_drift_detector():
     st.title("🔍 Feature Drift Detector")
+
+    # Stated Purpose Below the Title
+    st.markdown("""
+    This module detects **feature drift** in your dataset by comparing training and new data. 
+    Drift occurs when the distribution of features changes over time, which can cause your model's performance to degrade. 
+    This tool allows you to monitor feature distributions and take action when significant drift is detected.
+    """)
 
     X_train = _tpot_cache.get("latest_X_train")
     X_new = st.session_state.get("X")
@@ -89,7 +93,8 @@ def run_feature_drift_detector():
     st.markdown("---")
     st.markdown("""
     ### 🧠 Interpretation
-    - Drift may indicate that **your model's assumptions no longer hold**.
-    - For severe drift, consider retraining or monitoring predictions on these features.
-    - Use drifted features to trigger alerts or run fairness audits.
+    - **Drift may indicate that your model's assumptions no longer hold**. Feature drift can cause a model to become less accurate over time as the underlying data changes.
+    - **For severe drift**, consider retraining or monitoring predictions on these features. Use drifted features to trigger alerts or run fairness audits.
+    - **AI-driven Drift Detection**: AI can help by automatically identifying features that may have a significant impact on model performance when drift occurs. This provides an automated way to ensure your models remain valid and accurate even as data evolves over time.
+    - **Real-Time Drift Feedback**: AI-powered tools can dynamically analyze new data as it flows in and suggest adjustments to the model or its features to prevent drift-related performance degradation.
     """)
