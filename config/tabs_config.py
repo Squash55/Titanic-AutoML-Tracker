@@ -34,7 +34,7 @@ DAIVID_TABS = {
     "Auto EDA": "auto_eda",
     "auto_fe_logreg_lab": "auto_fe_logreg_lab.py",
     "auto_feature_engineering": "autofe.py",
-    "auto_threshold_optimizer": "auto_threshold_optimizer.py",
+    "Threshold Optimizer": "auto_threshold_optimizer",
     "auto_ml_comparison": "automl_comparison.py",
     "auto_ml_launcher": "automl_launcher.py",
     "catreg_switcher": "catreg_switcher.py",
