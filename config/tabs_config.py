@@ -6,7 +6,7 @@ TITANIC_MODULE_GROUPS = {
         "Outlier Suppressor", "Cat_Reg Switcher", "LogReg Nonlinear Tricks", "LogReg + Interaction Explorer"
     ],
     "🟡 Mid (Modeling)": [
-        "Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"
+        "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"
     ],
     "🟣 Advanced: Interpretability": [
         "SHAP Panel", "Golden Q&A (SHAP)", "SHAP Comparison", "SHAP Waterfall",
@@ -30,7 +30,6 @@ TITANIC_MODULE_GROUPS = {
 DAIVID_TABS = {
     "AutoML & AI Validation": "automl_with_validation.py",
     "AI-Generated Validation Scenarios": "ai_validation_scenarios.py",
-    "Algorithm Selector": "algorithm_selector.py",
     "Auto EDA": "auto_eda.py",
     "auto_fe_logreg_lab": "auto_fe_logreg_lab.py",
     "auto_feature_engineering": "autofe.py",
