@@ -54,7 +54,14 @@ st.session_state.app_state["active_tab"] = selected_tab
 # -- Dynamic Import + Run --
 try:
     modname = DAIVID_TABS[selected_tab]
+
+    # Manually import the 'catreg_switcher' to test if it exists
+    if modname == "catreg_switcher":
+        import catreg_switcher  # This is the manual import check
+        st.success("✅ Successfully imported catreg_switcher manually!")
+    
     module = importlib.import_module(modname)
+
     if hasattr(module, "run"):
         module.run()
     else:
@@ -65,23 +72,3 @@ except Exception as e:
 
 st.markdown("---")
 st.markdown("🧠 Powered by DAIVID – Dynamic AI for Insight, Validation, Interpretation & Discovery")
-
-# -- Dynamic Import + Run --
-try:
-    modname = DAIVID_TABS[selected_tab]
-    
-    # Manually import the 'catreg_switcher' to test if it exists
-    if modname == "catreg_switcher":
-        import catreg_switcher  # This is the manual import check
-        st.success("✅ Successfully imported catreg_switcher manually!")
-    
-    module = importlib.import_module(modname)
-    
-    if hasattr(module, "run"):
-        module.run()
-    else:
-        st.warning(f"⚠️ `{modname}` found but missing a `run()` function.")
-except Exception as e:
-    st.error(f"❌ Failed to load `{selected_tab}` → `{DAIVID_TABS.get(selected_tab)}`")
-    st.exception(e)
-
