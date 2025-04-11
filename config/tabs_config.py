@@ -52,7 +52,7 @@ DAIVID_TABS = {
     "Feature Drift Detector": "feature_drift_detector.py", 
     "Feature Engineering": "feature_engineering.py",
     "Feature Impact Tester": "feature_impact_tester.py",
-    "Feature Importance Compare": "feature_importance_compare.py",
+    "Feature Impact & Comparison Analyzer": “feature_importance_panel.py”,
     "Generate Missing Tabs": "generate_missing_tabs.py",
     "Golden Q&A (SHAP)": "golden_qna_shap.py",
     "LogReg Nonlinear Lab": "logreg_nonlinear_lab.py",
