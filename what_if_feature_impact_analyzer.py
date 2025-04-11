@@ -1,12 +1,16 @@
-# feature_impact_tester.py
-
 import streamlit as st
 import pandas as pd
 import numpy as np
 from tpot_connector import _tpot_cache
 
-def run_feature_impact_tester():
-    st.title("🧬 Feature Impact Tester")
+def run_what_if_feature_impact_analyzer():
+    st.title("🔍 What-If Feature Impact Analyzer")
+
+    # Stated Purpose
+    st.markdown("""
+    This tool analyzes the impact of modifying or removing individual features on model predictions.
+    It helps you understand how each feature contributes to the model's decisions and identifies which features are fragile, dominant, or negligible.
+    """)
 
     model = _tpot_cache.get("latest_tpot_model")
     X_train = _tpot_cache.get("latest_X_train")
@@ -15,11 +19,7 @@ def run_feature_impact_tester():
         st.warning("⚠️ TPOT model or training data missing. Please run AutoML first.")
         return
 
-    st.markdown("""
-    This panel shows how each feature affects model predictions when removed or nulled.
-    Use it to identify fragile, dominant, or ignorable features.
-    """)
-
+    # Instance selection for analysis
     instance_idx = st.slider("🔢 Choose a training row to analyze", 0, len(X_train) - 1, 0)
     instance = X_train.iloc[[instance_idx]]
     st.dataframe(instance)
@@ -68,10 +68,14 @@ def run_feature_impact_tester():
     st.markdown("### 📊 Feature Impact Summary")
     st.dataframe(df, use_container_width=True)
 
+    # Download CSV with impact results
+    csv = df.to_csv(index=False).encode("utf-8")
+    st.download_button("📥 Download Impact Report", data=csv, file_name="feature_impact_report.csv", mime="text/csv")
+
     st.markdown("---")
     st.markdown("""
     ### 🧠 Interpretation
-    - Features with high impact scores drastically affect model predictions.
-    - Zero or None impact suggests robustness or irrelevance.
-    - Use this to guide feature pruning, explainability, or adversarial robustness testing.
+    - **High impact scores**: These features drastically affect model predictions. Consider focusing on these for optimization, validation, or explainability.
+    - **Low or zero impact**: These features may be robust or irrelevant, and could potentially be pruned from the model.
+    - **Use in What-If analysis**: This tool is ideal for feature pruning, explainability, or testing adversarial robustness by modifying specific features and observing changes in the model's behavior.
     """)
