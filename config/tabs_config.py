@@ -6,22 +6,22 @@ TITANIC_MODULE_GROUPS = {
         "Outlier Suppressor", "Cat↔Reg Switcher", "LogReg Nonlinear Tricks", "LogReg + Interaction Explorer"
     ],
     "🟡 Mid (Modeling)": [
-        "AutoML Comparison", "Ensemble Builder"
+        "AutoML Comparison", "Correlation Matrix Lab", "SHAP Panel", "Golden Q&A (SHAP)", "SHAP Comparison", "SHAP Waterfall",
+        "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap"
     ],
-    "🟣 Advanced: Interpretability": [
-        "SHAP Panel", "Golden Q&A (SHAP)", "SHAP Comparison", "SHAP Waterfall",
-        "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Correlation Matrix Lab"
+   
+    "🟣 Advanced: Optimization": [
+        "Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer", "DOE Panel", "Ensemble Builder"
     ],
+    
     "🟣 Advanced: Validation & Drift": [
-        "Threshold Optimizer", "Residual Plot", "Model Diagnostics Lab",
-        "Feature Drift Detector", "Target Drift Diagnostic", "AI-Generated Validation Scenarios", "AutoML & AI Validation"
+        "Residual Plot", "Model Diagnostics Lab", "Threshold Optimizer",
+     "AI-Generated Validation Scenarios", "AutoML & AI Validation", "Feature Drift Detector", "Target Drift Diagnostic", 
     ],
     "🟣 Advanced: Stress Testing": [
-        "Sensitivity Explorer", "Synthetic Perturbation Tester", "DOE Panel"
+        "Sensitivity Explorer", "Synthetic Perturbation Tester"
     ],
-    "🟣 Advanced: Optimization": [
-        "Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer"
-    ],
+    
     "📦 Deployment & Docs": [
         "Saved Models", "PDF Report", "DAIVID Analytics Scorecard", "User Manual"
     ],
