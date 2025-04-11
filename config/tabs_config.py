@@ -11,7 +11,7 @@ TITANIC_MODULE_GROUPS = {
     ],
    
     "🟣 Advanced: Optimization": [
-        "Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer", "DOE Panel", "Ensemble Builder", "Experiment Tracker & CSV Export"
+        "Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer", "DOE Panel", "SHAP Screening Design of Experiments (DOE)", "Ensemble Builder", "Experiment Tracker & CSV Export"
     ],
     
     "🟣 Advanced: Validation & Drift": [
@@ -64,6 +64,7 @@ DAIVID_TABS = {
     "Residual Plot Panel": "residual_plot_panel.py",
     "Sensitivity Explorer": "sensitivity_explorer.py",
     "SHAP Comparison": "shap_comparison.py",
+    "SHAP Screening Design of Experiments (DOE)": "shap_screening_doe.py",
     "SHAP Interpretability": "shap_interpretability.py",
     "SHAP Permutation Delta": "shap_permutation_delta.py",
     "SHAP Waterfall": "shap_waterfall.py",
