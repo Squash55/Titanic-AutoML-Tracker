@@ -3,7 +3,7 @@
 TITANIC_MODULE_GROUPS = {
     "🟢 Core (Data Prep)": [
         "Notebook Scout", "Auto EDA", "Auto Feature Engineering", "Distribution Auditor",
-        "Outlier Suppressor", "Cat_Reg Switcher", "LogReg Nonlinear Tricks", "LogReg + Interaction Explorer"
+        "Outlier Suppressor", "Cat↔Reg Switcher", "LogReg Nonlinear Tricks", "LogReg + Interaction Explorer"
     ],
     "🟡 Mid (Modeling)": [
         "AutoML Comparison", "Ensemble Builder"
@@ -23,7 +23,10 @@ TITANIC_MODULE_GROUPS = {
         "Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer"
     ],
     "📦 Deployment & Docs": [
-        "DAIVID Roadmap", "Saved Models", "PDF Report", "DAIVID Analytics Scorecard", "User Manual"
+        "Saved Models", "PDF Report", "DAIVID Analytics Scorecard", "User Manual"
+    ],
+    "📑 Roadmap": [  # Ensure this section exists
+        "DAIVID Roadmap"
     ]
 }
 
