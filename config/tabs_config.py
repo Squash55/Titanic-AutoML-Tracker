@@ -11,7 +11,7 @@ TITANIC_MODULE_GROUPS = {
     ],
    
     "🟣 Advanced: Optimization": [
-        "Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer", "DOE Panel", "Ensemble Builder"
+        "Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer", "DOE Panel", "Ensemble Builder", "Experiment Tracker & CSV Export"
     ],
     
     "🟣 Advanced: Validation & Drift": [
@@ -46,7 +46,7 @@ DAIVID_TABS = {
     "Distribution Auditor": "distribution_auditor.py",
     "DOE Panel": "doe_panel.py",
     "Ensemble Builder": "ensemble_builder.py",
-    "Experiment Tracker": "experiment_tracker.py",
+    "Experiment Tracker & CSV Export": "experiment_tracker.py",
     "Feature Drift Detector": "feature_drift_detector.py",
     "Feature Engineering": "feature_engineering.py",
     "Feature Impact Tester": "feature_impact_tester.py",
