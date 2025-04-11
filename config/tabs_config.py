@@ -42,7 +42,7 @@ DAIVID_TABS = {
     "DAIVID HPO Engine": "daivid_hpo_engine.py",
     "DAIVID HPO Trainer": "daivid_hpo_trainer.py",
     "DAIVID Roadmap": "daivid_roadmap.py",
-    "DAIVID Scorecard": "daivid_scorecard.py",
+    "DAIVID Analytics Scorecard": "daivid_scorecard.py",
     "Distribution Auditor": "distribution_auditor.py",
     "DOE Panel": "doe_panel.py",
     "Ensemble Builder": "ensemble_builder.py",
