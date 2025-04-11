@@ -23,7 +23,7 @@ TITANIC_MODULE_GROUPS = {
         "Smart HPO Recommender", "DAIVID HPO Engine", "DAIVID HPO Trainer", "Zoomed HPO Explorer"
     ],
     "📦 Deployment & Docs": [
-        "Saved Models", "PDF Report", "DAIVID Analytics Scorecard", "User Manual"
+        "DAIVID Roadmap", "Saved Models", "PDF Report", "DAIVID Analytics Scorecard", "User Manual"
     ]
 }
 
