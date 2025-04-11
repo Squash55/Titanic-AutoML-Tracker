@@ -37,7 +37,7 @@ DAIVID_TABS = {
     "Threshold Optimizer": "auto_threshold_optimizer.py",
     "AutoML Comparison": "automl_comparison.py",
     "auto_ml_launcher": "automl_launcher.py",
-    "Cat ↔ Reg Switcher": "catreg_switcher",
+    "Cat ↔ Reg Switcher": "catreg_switcher.py",
     "daivid_hpo_engine": "daivid_hpo_engine.py",
     "daivid_hpo_trainer": "daivid_hpo_trainer.py",
     "daivid_roadmap": "daivid_roadmap.py",
