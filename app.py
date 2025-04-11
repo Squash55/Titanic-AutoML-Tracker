@@ -13,7 +13,7 @@ TAB_ICONS = {
     "AutoML Launcher": "🚀", "Golden Q&A (SHAP)": "❓", "SHAP Panel": "🧠", "Notebook Scout": "📓",
     "Auto Feature Engineering": "🧬", "Auto EDA": "📊", "Distribution Auditor": "🧮", "Outlier Suppressor": "🧹",
     "Cat_Reg Switcher": "🔄", "LogReg Nonlinear Tricks": "🎛️", "LogReg + Interaction Explorer": "🧠",
-    "Algorithm Selector": "🎯", "AutoML Comparison": "📈", "Ensemble Builder": "🧩",
+    "AutoML Comparison": "📈", "Ensemble Builder": "🧩",
     "SHAP Comparison": "🔍", "SHAP Waterfall": "🌊", "Feature Importance Lab": "🎚️", "SHAP Summary Lab": "📉",
     "Explainability Heatmap": "🔥", "Correlation Matrix Lab": "🧩", "Threshold Optimizer": "⚖️", "Residual Plot": "📉",
     "Model Diagnostics Lab": "🩺", "Feature Drift Detector": "🌪️", "Target Drift Diagnostic": "📤",
