@@ -28,16 +28,16 @@ TITANIC_MODULE_GROUPS = {
 }
 
 DAIVID_TABS = {
-    "AutoML & AI Validation": "automl_with_validation",
-    "AI-Generated Validation Scenarios": "ai_validation_scenarios",
-    "Algorithm Selector": "algorithm_selector",
-    "Auto EDA": "auto_eda",
+    "AutoML & AI Validation": "automl_with_validation.py",
+    "AI-Generated Validation Scenarios": "ai_validation_scenarios.py",
+    "Algorithm Selector": "algorithm_selector.py",
+    "Auto EDA": "auto_eda.py",
     "auto_fe_logreg_lab": "auto_fe_logreg_lab.py",
     "auto_feature_engineering": "autofe.py",
-    "Threshold Optimizer": "auto_threshold_optimizer",
-    "AutoML Comparison": "automl_comparison",
+    "Threshold Optimizer": "auto_threshold_optimizer.py",
+    "AutoML Comparison": "automl_comparison.py",
     "auto_ml_launcher": "automl_launcher.py",
-    "Cat ↔ Reg Switcher": "catreg_switcher"
+    "Cat ↔ Reg Switcher": "catreg_switcher.py"
     "daivid_hpo_engine": "daivid_hpo_engine.py",
     "daivid_hpo_trainer": "daivid_hpo_trainer.py",
     "daivid_roadmap": "daivid_roadmap.py",
