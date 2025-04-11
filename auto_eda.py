@@ -1,9 +1,10 @@
-import streamlit as st
+import streamlit as st 
 import pandas as pd
 import numpy as np
 from tpot_connector import __dict__ as _tpot_cache
+import shap
 
-def run_auto_eda():
+def run():
     st.title("📊 Auto EDA Dashboard (Safe Mode)")
 
     # 1. Grab cached values
@@ -33,6 +34,24 @@ def run_auto_eda():
     df["target"] = y
 
     st.success("✅ Auto EDA inputs are valid. Charts will be enabled after safe-mode passes.")
+
+    # AI Insights: Show basic statistical insights about the data
+    st.subheader("📊 Basic Statistical Insights")
+    st.write(df.describe())
+
+    # Feature importance (if a model exists)
+    if model:
+        if isinstance(model, (RandomForestClassifier, RandomForestRegressor)):
+            importances = model.feature_importances_
+            feature_names = df.columns
+            st.subheader("🔍 Feature Importance")
+            st.bar_chart(dict(zip(feature_names, importances)))
+
+        elif isinstance(model, TPOTClassifier):  # If TPOT model is available
+            st.subheader("🔍 SHAP Feature Importance")
+            explainer = shap.TreeExplainer(model.fitted_pipeline_)
+            shap_values = explainer.shap_values(df)
+            shap.summary_plot(shap_values, df)
 
     # Placeholder for switching tabs
     eda_tab = st.selectbox("📌 Choose a Chart to Render", [
