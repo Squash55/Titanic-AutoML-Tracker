@@ -55,7 +55,7 @@ def load_titanic_data():
 
 # Main run function
 def run():
-    st.title("🚀 AutoML Pipeline with Model Selection and Validation Scenarios")
+    st.title("🚀 AutoML & AI Validation")
 # Purpose statement
     st.markdown("""
     This tool allows you to select an algorithm, fine-tune hyperparameters, and run AutoML using TPOT. 
