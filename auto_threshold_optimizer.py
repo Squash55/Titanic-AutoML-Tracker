@@ -1,5 +1,3 @@
-# auto_threshold_optimizer.py
-
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -7,7 +5,7 @@ from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_sc
 from tpot_connector import __dict__ as _tpot_cache
 import matplotlib.pyplot as plt
 
-def run_threshold_optimizer():
+def run():
     st.subheader("🎯 Auto Threshold Optimization")
 
     model = _tpot_cache.get("latest_tpot_model") or _tpot_cache.get("latest_rf_model")
