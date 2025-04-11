@@ -1,12 +1,12 @@
-# explainable_boosting_visualizer.py
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-from interpret.glassbox import ExplainableBoostingClassifier
-from interpret import show
+import seaborn as sns
+import shap
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
-import os
+from interpret.glassbox import ExplainableBoostingClassifier
+from interpret import show
 
 
 def run_explainable_boosting_visualizer():
@@ -32,10 +32,21 @@ def run_explainable_boosting_visualizer():
     ebm_global = ebm.explain_global()
     show(ebm_global)
 
-    st.subheader("Classification Report")
+    # Generate model evaluation metrics
     y_pred = ebm.predict(X_test)
     report = classification_report(y_test, y_pred, output_dict=True)
     st.dataframe(pd.DataFrame(report).transpose())
+
+    # Display AI insights based on model performance
+    accuracy = report["accuracy"]
+    st.markdown("### 🤖 AI Insights")
+
+    if accuracy < 0.8:
+        st.warning(f"⚠️ The model accuracy is **{accuracy*100:.2f}%**, which is below the ideal threshold of 80%. Consider adding more features, fine-tuning hyperparameters, or trying a different model.")
+    elif accuracy < 0.9:
+        st.info(f"📊 The model accuracy is **{accuracy*100:.2f}%**. It's performing decently, but you may want to consider additional optimization steps or model ensembling.")
+    else:
+        st.success(f"🎉 Excellent model accuracy: **{accuracy*100:.2f}%**! You can proceed with model interpretation and deployment.")
 
     # Optional PDF inclusion toggle
     st.session_state.include_ebm_pdf = st.checkbox("🧾 Include this chart in the PDF report")
@@ -56,3 +67,12 @@ def run_explainable_boosting_visualizer():
         st.info("📸 Top features saved as image for PDF export.")
     except Exception as e:
         st.warning(f"⚠️ Could not save EBM plot: {e}")
+
+    # Real-time Model Tuning Feedback
+    st.markdown("### 💡 Model Tuning Insights")
+    if "model_tuning" in st.session_state:
+        tuning_feedback = st.session_state.model_tuning
+        st.info(f"🔧 **Model Tuning Suggestions**: {tuning_feedback}")
+    else:
+        st.info("🔧 **Model Tuning Suggestions**: Consider using hyperparameter optimization to further improve model accuracy.")
+
