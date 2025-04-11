@@ -8,7 +8,6 @@ from sklearn.metrics import classification_report
 from interpret.glassbox import ExplainableBoostingClassifier
 from interpret import show
 
-
 def run_explainable_boosting_visualizer():
     st.header("📈 Explainable Boosting Visualizer")
 
@@ -48,25 +47,39 @@ def run_explainable_boosting_visualizer():
     else:
         st.success(f"🎉 Excellent model accuracy: **{accuracy*100:.2f}%**! You can proceed with model interpretation and deployment.")
 
+    # Dynamic Insights Based on SHAP Values
+    st.subheader("🔍 SHAP Value Insights")
+    explainer = shap.Explainer(ebm, X_train)
+    shap_values = explainer(X_test)
+    
+    # Display SHAP values for a specific feature
+    feature_importances = pd.Series(ebm.feature_importances_, index=X.columns)
+    feature_importances = feature_importances.sort_values(ascending=True)
+    
+    st.markdown("### 📊 Top Feature Importances")
+    fig, ax = plt.subplots(figsize=(8, 6))
+    feature_importances.plot(kind="barh", ax=ax)
+    ax.set_title("EBM Feature Importances")
+    ax.set_xlabel("Importance")
+    fig.tight_layout()
+    st.pyplot(fig)
+    
+    # AI Insight Based on Feature Importance
+    st.markdown("### 🧠 AI Insights: Feature Importance")
+    if feature_importances.max() > 0.2:
+        st.warning("⚠️ One feature is dominating the model's prediction. Consider investigating the impact of this feature and whether it could lead to overfitting.")
+    else:
+        st.success("✅ The model is utilizing a balanced set of features. Great diversity in feature importance.")
+
+    # Show SHAP dependence plots
+    st.subheader("SHAP Dependence Plots for Top Features")
+    for feature in feature_importances.index[:3]:
+        st.markdown(f"#### {feature} SHAP Dependence Plot")
+        shap.dependence_plot(feature, shap_values.values, X_test)
+        st.pyplot()
+
     # Optional PDF inclusion toggle
     st.session_state.include_ebm_pdf = st.checkbox("🧾 Include this chart in the PDF report")
-
-    # Save a static version of top feature plot
-    try:
-        feature_importances = pd.Series(ebm.feature_importances_, index=X.columns)
-        feature_importances = feature_importances.sort_values(ascending=True)
-
-        fig, ax = plt.subplots(figsize=(8, 6))
-        feature_importances.plot(kind="barh", ax=ax)
-        ax.set_title("EBM Feature Importances")
-        ax.set_xlabel("Importance")
-
-        fig.tight_layout()
-        fig.savefig("ebm_feature_plot.png")
-        st.pyplot(fig)
-        st.info("📸 Top features saved as image for PDF export.")
-    except Exception as e:
-        st.warning(f"⚠️ Could not save EBM plot: {e}")
 
     # Real-time Model Tuning Feedback
     st.markdown("### 💡 Model Tuning Insights")
@@ -76,3 +89,24 @@ def run_explainable_boosting_visualizer():
     else:
         st.info("🔧 **Model Tuning Suggestions**: Consider using hyperparameter optimization to further improve model accuracy.")
 
+    # AI Insights Based on Performance
+    if accuracy < 0.75:
+        st.info("🔧 Consider adding more diverse features or experimenting with different transformations (e.g., normalization, log-transforms) for better results.")
+    
+    # Advanced AI Insights
+    st.markdown("### 🧠 Advanced AI Insights")
+    st.write("""
+    **AI insights** are crucial in optimizing the EBM model:
+    - **Feature Selection**: Use AI to prioritize features and identify any redundant or irrelevant features. Removing unnecessary features can help reduce model complexity and improve performance.
+    - **Hyperparameter Tuning**: AI can recommend hyperparameter values that maximize model performance, saving time compared to manual tuning.
+    - **Model Evaluation**: Use AI-driven performance evaluation techniques like cross-validation and ensemble learning to identify potential weaknesses or overfitting in the model.
+    - **Model Drift Detection**: After deployment, AI can monitor model drift and suggest re-training or feature updates to maintain optimal performance.
+    """)
+
+    st.markdown("### 🧠 AI Insights: How to Leverage These Suggestions")
+    st.info("""
+    AI insights, when incorporated into the model building process, guide users towards more informed decisions, faster model optimization, and robust deployment strategies.
+    
+    - **Improvement Suggestions**: After completing certain tasks, AI could suggest enhancements or highlight areas that need further attention (e.g., "You're making progress in algorithm selection but could improve the 'Explainability' step").
+    - **Real-Time Feedback**: As you progress through tasks in the DSE process, AI can provide feedback such as "Consider adding more training data for better feature selection" or "You may want to focus on hyperparameter tuning next based on your current progress."
+    """)
