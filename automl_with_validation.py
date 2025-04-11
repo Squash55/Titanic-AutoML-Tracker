@@ -56,7 +56,11 @@ def load_titanic_data():
 # Main run function
 def run():
     st.title("🚀 AutoML Pipeline with Model Selection and Validation Scenarios")
-
+# Purpose statement
+    st.markdown("""
+    This tool allows you to select an algorithm, fine-tune hyperparameters, and run AutoML using TPOT. 
+    It also generates synthetic validation scenarios for robustness testing, helping to evaluate model performance on edge cases.
+    """)
     # Step 1: Algorithm Selector
     task_type = st.radio("Select Task Type", ["Classification", "Regression"])
     
