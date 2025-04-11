@@ -3,7 +3,7 @@
 TITANIC_MODULE_GROUPS = {
     "🟢 Core (Data Prep)": [
         "Notebook Scout", "Auto EDA", "Auto Feature Engineering", "Distribution Auditor",
-        "Outlier Suppressor", "Cat ↔ Reg Switcher", "LogReg Nonlinear Tricks", "LogReg + Interaction Explorer"
+        "Outlier Suppressor", "Cat↔Reg Switcher", "LogReg Nonlinear Tricks", "LogReg + Interaction Explorer"
     ],
     "🟡 Mid (Modeling)": [
         "Algorithm Selector", "AutoML Launcher", "AutoML Comparison", "Ensemble Builder"
@@ -37,7 +37,7 @@ DAIVID_TABS = {
     "Threshold Optimizer": "auto_threshold_optimizer.py",
     "AutoML Comparison": "automl_comparison.py",
     "auto_ml_launcher": "automl_launcher.py",
-    "Cat ↔ Reg Switcher": "catreg_switcher.py",
+    "Cat↔Reg Switcher": "catreg_switcher.py",
     "daivid_hpo_engine": "daivid_hpo_engine.py",
     "daivid_hpo_trainer": "daivid_hpo_trainer.py",
     "daivid_roadmap": "daivid_roadmap.py",
