@@ -1,9 +1,14 @@
-
 import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import shap
+from sklearn.preprocessing import LabelEncoder
 
-def show_dse_maturity_panel():
+def run_dse_maturity_panel(df=None, model=None):
     st.title("🎯 Full DSE Maturity Tracker")
 
+    # Define DSE Grid
     dse_grid = [
         ("1. Create a Project Charter and Collect the right Data", [
             "Create a data dictionary, problem statement and scope of project",
@@ -47,7 +52,7 @@ def show_dse_maturity_panel():
         ])
     ]
 
-    # Setup
+    # Setup DSE matrix status tracking in session state
     if "dse_matrix_status" not in st.session_state:
         st.session_state.dse_matrix_status = {
             cat: {desc: "❌" for desc in tasks} for cat, tasks in dse_grid
@@ -55,7 +60,9 @@ def show_dse_maturity_panel():
 
     color_map = {"❌": "gray", "🟡": "orange", "✅": "green"}
     cycle = ["❌", "🟡", "✅"]
+    completed = []
 
+    # Iterate through the DSE grid to display the tasks and buttons
     for cat, tasks in dse_grid:
         st.markdown(f"### {cat}")
         for desc in tasks:
@@ -66,4 +73,40 @@ def show_dse_maturity_panel():
                 i = cycle.index(current)
                 st.session_state.dse_matrix_status[cat][desc] = cycle[(i + 1) % len(cycle)]
             col[1].markdown(f"<div style='padding:4px 0;'>{desc}</div>", unsafe_allow_html=True)
+            if current == "✅":
+                completed.append(desc)
         st.markdown("---")
+
+    total = sum(len(items) for _, items in dse_grid)
+    pct = int(len(completed) / total * 100)
+    st.markdown(f"## 🎯 DSE Maturity Completion: `{pct}%`")
+    st.progress(pct / 100)
+
+    # === AI Assistant Suggestions ===
+    st.markdown(""" ### 🤖 Smart AI Suggestions """)
+    if pct < 40:
+        st.info("📌 Focus on completing core features and setting up reliable CI workflows first.")
+    elif pct < 70:
+        st.info("📌 You’re halfway there — now polish documentation, licensing, and tab structure.")
+    else:
+        st.success("🎉 You’re close to acquisition-ready. Consider branding, pitch decks, and strategic outreach.")
+
+    # === How AI Insights Benefit DSE ===
+    st.markdown(""" ### 🧠 AI Insights in DSE """)
+    st.write("""
+    **AI insights** play a crucial role in optimizing the DSE process:
+    
+    - **Feature Selection**: Use AI to automatically rank features based on importance and predictive power. AI can help streamline the feature engineering process by identifying the most relevant features.
+    - **Hyperparameter Tuning (HPO)**: AI-driven HPO can fine-tune models to achieve optimal performance by searching through large parameter spaces more efficiently than manual methods.
+    - **Data Quality**: AI can suggest preprocessing steps such as normalizing or transforming data, detecting outliers, and identifying features that may require special handling.
+    - **Model Evaluation**: AI can analyze the performance of models across different subsets of data and recommend which models are best suited for particular types of problems.
+    - **Validation & Drift Detection**: AI can be used to monitor model performance and automatically detect any drift in the data distribution or model predictions over time, ensuring the model remains robust after deployment.
+    """)
+
+    st.markdown("### 🧠 AI Insights: How to Leverage These Suggestions")
+    st.info("""
+    AI insights, when incorporated into the DSE process, guide users toward more informed decisions, faster model optimization, and robust model deployment strategies.
+    
+    - **Improvement Suggestions**: After completing certain tasks, AI could suggest enhancements or highlight areas that need further attention (e.g., "You're making progress in algorithm selection but could improve the 'Explainability' step").
+    - **Real-Time Feedback**: As you progress through tasks in the DSE process, AI can provide feedback such as "Consider adding more training data for better feature selection" or "You may want to focus on hyperparameter tuning next based on your current progress."
+    """)
