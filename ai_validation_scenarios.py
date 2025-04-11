@@ -34,6 +34,12 @@ def generate_insights(y_true, y_pred):
 def run():
     st.title("🧪 AI-Generated Validation Scenarios")
 
+    # Purpose statement below title
+    st.markdown("""
+    **Purpose:**  
+    The **AI-Generated Validation Scenarios** module helps test the robustness of your model by generating synthetic edge cases and validating model predictions on these extreme scenarios. This tool is designed for adversarial testing, robustness checks, and hypothesis generation, enabling you to explore how your model performs under uncommon or out-of-distribution data conditions. By comparing synthetic predictions with expected outcomes, it highlights areas where the model may struggle and provides insights into potential weaknesses or biases.
+    """)
+
     # Load the latest model and data from the cache
     model = _tpot_cache.get("latest_tpot_model")
     X_train = _tpot_cache.get("latest_X_train")
