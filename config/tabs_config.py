@@ -7,7 +7,7 @@ TITANIC_MODULE_GROUPS = {
     ],
     "🟡 Mid (Modeling)": [
         "AutoML Comparison", "Correlation Matrix Lab", "SHAP Panel", "Golden Q&A (SHAP)", "SHAP Comparison", "SHAP Waterfall",
-        "Feature Importance Lab", "What-If Feature Impact Analyzer", "SHAP Summary Lab", "Explainability Heatmap", "Explainable Boosting Visualizer"
+        "Feature Impact & Comparison Analyzer", "What-If Feature Impact Analyzer", "SHAP Summary Lab", "Explainability Heatmap", "Explainable Boosting Visualizer"
     ],
    
     "🟣 Advanced: Optimization": [
@@ -52,7 +52,7 @@ DAIVID_TABS = {
     "Feature Drift Detector": "feature_drift_detector.py", 
     "Feature Engineering": "feature_engineering.py",
     "Feature Impact Tester": "feature_impact_tester.py",
-    "Feature Impact & Comparison Analyzer": “feature_importance_panel.py”,
+    "Feature Impact & Comparison Analyzer": "feature_importance_panel.py",
     "Generate Missing Tabs": "generate_missing_tabs.py",
     "Golden Q&A (SHAP)": "golden_qna_shap.py",
     "LogReg Nonlinear Lab": "logreg_nonlinear_lab.py",
