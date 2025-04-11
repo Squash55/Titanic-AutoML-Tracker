@@ -31,7 +31,7 @@ DAIVID_TABS = {
     "AutoML & AI Validation": "automl_with_validation",
     "AI-Generated Validation Scenarios": "ai_validation_scenarios",
     "Algorithm Selector": "algorithm_selector",
-    "auto_eda": "auto_eda.py",
+    "Auto EDA": "auto_eda",
     "auto_fe_logreg_lab": "auto_fe_logreg_lab.py",
     "auto_feature_engineering": "autofe.py",
     "auto_threshold_optimizer": "auto_threshold_optimizer.py",
