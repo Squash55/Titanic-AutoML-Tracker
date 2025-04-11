@@ -7,6 +7,13 @@ import matplotlib.pyplot as plt
 
 def run():
     st.subheader("🎯 Auto Threshold Optimization")
+    
+    # Add Purpose Statement
+    st.markdown("""
+    This tool helps optimize classification model performance by fine-tuning the decision threshold. 
+    It allows you to select the best threshold for maximizing metrics like precision, recall, F1 score, or accuracy, 
+    while also visualizing the impact of threshold adjustments.
+    """)
 
     model = _tpot_cache.get("latest_tpot_model") or _tpot_cache.get("latest_rf_model")
     X_test = _tpot_cache.get("latest_X_test")
