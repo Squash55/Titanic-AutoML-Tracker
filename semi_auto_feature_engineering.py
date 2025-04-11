@@ -1,8 +1,7 @@
-
 import streamlit as st
 import pandas as pd
-import numpy as np
 
+# Feature engineering functions
 def add_title(df):
     df['Title'] = df['Name'].str.extract(' ([A-Za-z]+)\.', expand=False)
     return df
@@ -27,8 +26,17 @@ def add_cabin_known(df):
     df['CabinKnown'] = df['Cabin'].notnull().astype(int)
     return df
 
-def show_feature_engineering_playground():
-    st.header("🧪 Auto Feature Engineering Playground")
+# Semi-Automated Feature Engineering tool
+def show_semi_automated_feature_engineering():
+    st.header("🧪 Semi-Automated Feature Engineering")
+
+    # Purpose statement
+    st.markdown("""
+    **Purpose**: This tool allows you to **selectively add custom features** to your dataset using **semi-automated** methods. 
+    It is a flexible tool that offers suggested transformations like extracting titles from names, creating family size variables, 
+    binning fare values, and more, giving you control over the feature engineering process.
+    """)
+
     uploaded = st.file_uploader("Upload Titanic training CSV", type=["csv"], key="feat")
 
     if uploaded:
@@ -59,5 +67,20 @@ def show_feature_engineering_playground():
             st.subheader("🧬 Transformed Dataset Preview:")
             st.dataframe(df_transformed.head())
 
+            # Allow user to download the transformed dataset
             csv = df_transformed.to_csv(index=False).encode("utf-8")
             st.download_button("📥 Download Transformed CSV", data=csv, file_name="transformed_titanic.csv", mime="text/csv")
+
+            # AI Insights Section
+            st.markdown("### 🧠 AI Insights")
+            st.write("""
+            **AI Insights** for Feature Engineering:
+            - **Feature Selection**: Use AI models to automatically rank features based on predictive power. This can help guide which features are more valuable for training and prediction.
+            - **Hyperparameter Tuning**: AI can optimize the parameters for feature transformations, such as the optimal number of bins for the Fare column or the best threshold for age categorization.
+            - **Automated Feature Creation**: AI-driven insights can suggest new combinations of features that might help improve the model's performance (e.g., combinations of age, fare, or family size).
+            - **Model-Ready Data**: By applying AI to the transformed data, you ensure that the dataset is ready for any predictive modeling task.
+            """)
+
+    else:
+        st.info("📂 Please upload a Titanic training CSV to begin feature engineering.")
+
