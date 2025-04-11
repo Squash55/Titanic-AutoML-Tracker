@@ -1,4 +1,3 @@
-# daivid_hpo_trainer.py
 import streamlit as st
 import optuna
 import pandas as pd
@@ -15,6 +14,10 @@ def run_daivid_hpo_trainer():
         st.title("🧪 DAIVID HPO Trainer")
         st.markdown("""
         This module performs hyperparameter optimization using the selected configuration from the Smart HPO panel.
+
+        Hyperparameter optimization (HPO) tunes the model by selecting the best hyperparameters to maximize performance. Optuna is used to evaluate various configurations and select the best-performing one.
+
+        The purpose of this tool is to improve the accuracy and robustness of the model by optimizing parameters.
         """)
 
         config = _tpot_cache.get("last_hpo_config")
@@ -25,25 +28,23 @@ def run_daivid_hpo_trainer():
             st.warning("⚠️ Training data not found. Please run AutoML first.")
             return
 
-        import optuna
-        from sklearn.model_selection import cross_val_score
+        st.markdown("### 🔍 Configuration Summary")
+        st.json(config)
 
         model_choice = config["model"]
 
         def objective(trial):
+            # Based on the chosen model, hyperparameters are tuned.
             if model_choice == "Random Forest":
-                from sklearn.ensemble import RandomForestClassifier
                 n_estimators = trial.suggest_int("n_estimators", 50, 300)
                 max_depth = trial.suggest_int("max_depth", 3, 20)
                 clf = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth)
             elif model_choice == "XGBoost":
-                from xgboost import XGBClassifier
                 n_estimators = trial.suggest_int("n_estimators", 50, 300)
                 learning_rate = trial.suggest_float("learning_rate", 0.01, 0.3)
                 max_depth = trial.suggest_int("max_depth", 3, 10)
                 clf = XGBClassifier(n_estimators=n_estimators, learning_rate=learning_rate, max_depth=max_depth)
             elif model_choice == "Logistic Regression":
-                from sklearn.linear_model import LogisticRegression
                 C = trial.suggest_float("C", 0.01, 10.0, log=True)
                 clf = LogisticRegression(C=C, max_iter=1000)
             else:
