@@ -35,7 +35,7 @@ DAIVID_TABS = {
     "auto_fe_logreg_lab": "auto_fe_logreg_lab.py",
     "auto_feature_engineering": "autofe.py",
     "Threshold Optimizer": "auto_threshold_optimizer",
-    "auto_ml_comparison": "automl_comparison.py",
+    "AutoML Comparison": "automl_comparison",
     "auto_ml_launcher": "automl_launcher.py",
     "catreg_switcher": "catreg_switcher.py",
     "daivid_hpo_engine": "daivid_hpo_engine.py",
