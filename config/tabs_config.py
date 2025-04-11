@@ -7,7 +7,7 @@ TITANIC_MODULE_GROUPS = {
     ],
     "🟡 Mid (Modeling)": [
         "AutoML Comparison", "Correlation Matrix Lab", "SHAP Panel", "Golden Q&A (SHAP)", "SHAP Comparison", "SHAP Waterfall",
-        "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap"
+        "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Explainable Boosting Visualizer"
     ],
    
     "🟣 Advanced: Optimization": [
@@ -47,7 +47,8 @@ DAIVID_TABS = {
     "DOE Panel": "doe_panel.py",
     "Ensemble Builder": "ensemble_builder.py",
     "Experiment Tracker & CSV Export": "experiment_tracker.py",
-    "Feature Drift Detector": "feature_drift_detector.py",
+    "Explainable Boosting Visualizer": "explainable_boosting_visualizer"
+    "Feature Drift Detector": "feature_drift_detector.py", 
     "Feature Engineering": "feature_engineering.py",
     "Feature Impact Tester": "feature_impact_tester.py",
     "Feature Importance Compare": "feature_importance_compare.py",
