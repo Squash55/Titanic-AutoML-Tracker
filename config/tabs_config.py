@@ -35,7 +35,7 @@ DAIVID_TABS = {
     "Auto FE LogReg Lab": "auto_fe_logreg_lab.py",
     "Threshold Optimizer": "auto_threshold_optimizer.py",
     "AutoML Comparison": "automl_comparison.py",
-    "Cat ↔ Reg Switcher": "catreg_switcher.py",  # Fixed name
+    "Cat_Reg Switcher": "catreg_switcher.py",  # Fixed name
     "DAIVID HPO Engine": "daivid_hpo_engine.py",
     "DAIVID HPO Trainer": "daivid_hpo_trainer.py",
     "DAIVID Roadmap": "daivid_roadmap.py",
