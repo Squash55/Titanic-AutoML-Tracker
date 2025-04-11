@@ -47,6 +47,7 @@ DAIVID_TABS = {
     "DOE Panel": "doe_panel.py",
     "Ensemble Builder": "ensemble_builder.py",
     "Experiment Tracker & CSV Export": "experiment_tracker.py",
+    "Explainability Heatmap": "explainability_heatmap.py",
     "Explainable Boosting Visualizer": "explainable_boosting_visualizer.py",
     "Feature Drift Detector": "feature_drift_detector.py", 
     "Feature Engineering": "feature_engineering.py",
