@@ -1,5 +1,3 @@
-# ensemble_builder.py
-
 import streamlit as st
 from sklearn.ensemble import VotingClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
@@ -90,6 +88,22 @@ def run_ensemble_builder():
                 "Recall": rec
             }]
             st.success("✅ Added to internal leaderboard cache.")
+
+        # === AI Insights ===
+        st.markdown("### 🧠 AI Insights")
+        st.write("""
+        **Ensemble Models** like the VotingClassifier can significantly improve prediction accuracy by combining the strengths of multiple models. In this case, the **TPOT** and **Random Forest** models bring complementary strengths:
+        
+        - **TPOT**: Automatically searches for the best pipeline and feature selection strategies.
+        - **Random Forest**: Handles overfitting by averaging the results of many decision trees.
+
+        When combined in an ensemble model, we leverage the **diversity** of the two models to boost overall predictive performance.
+
+        **AI Insights for Improvement**:
+        - **Hyperparameter Tuning**: Experiment with hyperparameter tuning on each model individually before building the ensemble. This can increase accuracy.
+        - **Model Selection**: Adding more models to the ensemble (e.g., XGBoost, SVM) can further improve results, particularly for complex datasets.
+        - **Class Imbalance**: For imbalanced datasets, consider adjusting the class weights for the Random Forest model.
+        """)
 
     except Exception as e:
         st.error(f"❌ Ensemble prediction failed: {type(e).__name__}: {e}")
