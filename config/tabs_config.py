@@ -7,7 +7,7 @@ TITANIC_MODULE_GROUPS = {
     ],
     "🟡 Mid (Modeling)": [
         "AutoML Comparison", "Correlation Matrix Lab", "SHAP Panel", "Golden Q&A (SHAP)", "SHAP Comparison", "SHAP Waterfall",
-        "Feature Importance Lab", "SHAP Summary Lab", "Explainability Heatmap", "Explainable Boosting Visualizer"
+        "Feature Importance Lab", "What-If Feature Impact Analyzer", "SHAP Summary Lab", "Explainability Heatmap", "Explainable Boosting Visualizer"
     ],
    
     "🟣 Advanced: Optimization": [
@@ -83,6 +83,7 @@ DAIVID_TABS = {
     "TPOT Saver": "tpot_saver.py",
     "User Manual": "user_manual.py",
     "User Manual Generator": "user_manual_generator.py",
+    "What-If Feature Impact Analyzer": "what_if_feature_impact_analyzer.py",
     "Zoom HPO Explorer": "zoom_hpo_explorer.py",
 }
 
