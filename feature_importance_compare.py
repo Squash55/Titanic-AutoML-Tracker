@@ -11,8 +11,18 @@ except ImportError:
     latest_tpot_model = None
     latest_X_train = None
 
+
+# --- Refactored Purpose and Run Function ---
+def run():
+    show_feature_importance_panel()
+
 def show_feature_importance_panel():
-    st.title("📊 Compare Feature Importance (Baseline vs New)")
+    st.title("📊 Feature Impact & Comparison Analyzer")
+
+    st.markdown("""
+    ### 📊 Purpose of the App
+    This panel allows you to analyze and compare feature importance between baseline and new datasets. It helps identify which features affect your model's predictions, enabling better decision-making in feature engineering and model optimization.
+    """)
 
     col1, col2 = st.columns(2)
     with col1:
@@ -78,14 +88,22 @@ def show_feature_importance_panel():
         axes[1].set_title("New Importances")
         st.pyplot(fig)
 
-        st.subheader("💡 Smart Suggestions")
+        # --- Enhanced AI Insights ---
+        st.subheader("💡 Smart AI Suggestions")
         gainers = merged[merged["Change"] > 0].head(3)["Feature"].tolist()
         droppers = merged[merged["Change"] < 0].tail(3)["Feature"].tolist()
 
         if gainers:
-            st.markdown(f"✅ These features gained importance: **{', '.join(gainers)}**")
+            st.markdown(f"✅ These features gained importance: **{', '.join(gainers)}**. Consider optimizing or further exploring these features.")
         if droppers:
-            st.markdown(f"⚠️ These features dropped in importance: **{', '.join(droppers)}**")
+            st.markdown(f"⚠️ These features dropped in importance: **{', '.join(droppers)}**. Consider removing, re-engineering, or monitoring these features.")
+
+        st.markdown("""
+        ### 🧠 How AI Insights Benefit Feature Importance Comparison
+        - **Gainers**: Features that gained importance should be explored further and may offer valuable insights or improvements to the model.
+        - **Droppers**: Features that lost importance could be irrelevant, redundant, or noisy. Consider removing them for optimization.
+        - **Dynamic Feedback**: AI can help prioritize which features should be further investigated or removed, saving time and resources.
+        """)
 
     elif not base_file and not new_file:
         st.markdown("---")
