@@ -2,7 +2,7 @@
 
 TITANIC_MODULE_GROUPS = {
     "🟢 Core (Data Prep)": [
-        "Notebook Scout", "Auto EDA", "Auto Feature Engineering", "Distribution Auditor",
+        "Notebook Scout", "Auto EDA", "Auto Feature Engineering", "Semi-Automated Feature Engineering", "Distribution Auditor",
         "Outlier Suppressor", "Cat↔Reg Switcher", "LogReg Nonlinear Tricks", "LogReg + Interaction Explorer"
     ],
     "🟡 Mid (Modeling)": [
@@ -64,6 +64,7 @@ DAIVID_TABS = {
     "Outlier Suppressor": "outlier_suppressor.py",
     "PDF Report": "pdf_report.py",
     "Residual Plot Panel": "residual_plot_panel.py",
+    "Semi-Automated Feature Engineering": "semi_auto_feature_engineering.py",
     "Sensitivity Explorer": "sensitivity_explorer.py",
     "SHAP Comparison": "shap_comparison.py",
     "SHAP Screening Design of Experiments (DOE)": "shap_screening_doe.py",
